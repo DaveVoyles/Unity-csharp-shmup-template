@@ -3,30 +3,29 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
-    public int     HitPoints;						// assigned when the enemy spawns
-    public Vector3 Motion;							// assigned when the enemy spawns
-    Transform      _myTransform;
-    GameObject     _gameManager;
+    public int             HitPoints;						// assigned when the enemy spawns
+    public Vector3         Motion;							// assigned when the enemy spawns
+    private Transform      _myTransform;
+    private GameObject     _gameManager;
 
-    static float   enemyBulletSpeed = 5;
+    static float           enemyBulletSpeed = 6;
 
     void Start()
     {
-        _myTransform = transform;				      // cached for performance
-        _gameManager = GameObject.Find("GameManager"); // store the game manager for accessing its functions
+        _myTransform = transform;				            // cached for performance
+        _gameManager = GameObject.Find("GameManager");      // store the game manager for accessing its functions
     }
 
     void Update()
     {
-        // move
-        _myTransform.position += (Motion * Time.deltaTime);
+        _myTransform.position += (Motion * Time.deltaTime); // move
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PlayerBullet"))			// hit by a bullet
+        if (other.CompareTag("PlayerBullet"))			    // hit by a bullet
         {
-            TakeDamage(1);								// take away 1 hit point
+            TakeDamage(1);								    // take away 1 hit point
 
             // disable the bullet and put it back on its stack
             other.gameObject.active = false;
@@ -45,7 +44,7 @@ public class Enemy : MonoBehaviour
     public void Explode() // destroy this enemy
     {
         // draw particle explosion effect
-        // play sound
+        // TODO:play sound
         Destroy(this.gameObject);
 
         // increment the score
@@ -62,7 +61,7 @@ public class Enemy : MonoBehaviour
 
         // position and enable it
         newBullet.gameObject.transform.position = _myTransform.position;
-        newBullet.gameObject.active = true;
+        newBullet.gameObject.SetActive(true);
 
         // calculate the direction to the player
         var shootVector = _gameManager.GetComponent<GameManager>().player.transform.position - _myTransform.position;
@@ -71,7 +70,7 @@ public class Enemy : MonoBehaviour
         shootVector.Normalize();
 
         // scale it up to the correct speed
-        shootVector *= enemyBulletSpeed;
+        shootVector      *= enemyBulletSpeed;
         newBullet.motion = shootVector;
     }
 }

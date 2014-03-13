@@ -4,7 +4,7 @@ public class ScrollingUVs : MonoBehaviour
 {
 
     private Vector2 uvOffset = Vector2.zero; // used for UV scrolling 
-    Vector2         uvAnimationRate;         // define the rate in the editor (0, -0.1f) looks good
+    public  Vector2 uvAnimationRate;         // define the rate in the editor (0, -0.1f) looks good
 
     void LateUpdate()
     {

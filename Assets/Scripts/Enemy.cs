@@ -7,12 +7,12 @@ public class Enemy : MonoBehaviour
     public Vector3         Motion;							// assigned when the enemy spawns
     private Transform      _myTransform;
     private GameObject     _gameManager;
-
-    static float           enemyBulletSpeed = 6;
+    private float          _enemyBulletSpeed;
 
     void Start()
     {
         _myTransform = transform;				            // cached for performance
+        _enemyBulletSpeed = 6;                              // How fast enemy bullets fly
         _gameManager = GameObject.Find("GameManager");      // store the game manager for accessing its functions
     }
 
@@ -28,7 +28,7 @@ public class Enemy : MonoBehaviour
             TakeDamage(1);								    // take away 1 hit point
 
             // disable the bullet and put it back on its stack
-            other.gameObject.active = false;
+            other.gameObject.SetActive(false); 
             GameManager.playerBulletStack.Push(other.GetComponent<Bullet>());
         }
     }
@@ -48,7 +48,7 @@ public class Enemy : MonoBehaviour
         Destroy(this.gameObject);
 
         // increment the score
-        _gameManager.GetComponent<GameManager>().score++;
+        GameManager.score++;
     }
 
 
@@ -70,7 +70,7 @@ public class Enemy : MonoBehaviour
         shootVector.Normalize();
 
         // scale it up to the correct speed
-        shootVector      *= enemyBulletSpeed;
+        shootVector      *= _enemyBulletSpeed;
         newBullet.motion = shootVector;
     }
 }

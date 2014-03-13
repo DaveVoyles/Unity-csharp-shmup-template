@@ -1,5 +1,6 @@
-﻿// The Game Manager is an invisible Game Object which manages generic stuff like 
-// keeping track of bullets, spawning enemies, scoring, the GUI etc...
+﻿/* The Game Manager is an invisible Game Object which manages generic stuff like 
+ * keeping track of bullets, spawning enemies, scoring, the GUI etc...
+ */
 
 using System.Collections;
 using System.Collections.Generic;
@@ -8,17 +9,16 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-    public Bullet                playerBullet;		 // link to the bullet prefab
-    public Bullet                enemyBullet;		 // prefab link
-    public Enemy                 enemy;			     // enemy prefab
-    public Player                player;			 // link to the player
+    public Bullet                playerBullet;		 // PREFAB: Bullet
+    public Bullet                enemyBullet;		 // PREFAB: Enemy Bullet
+    public Enemy                 enemy;			     // PREFAB: Enemy
+    public Player                player;			 // SCRIPT: Player
     public static Stack<Bullet>  playerBulletStack;
     public static Stack<Bullet>  enemyBulletStack; 
     private bool _isSpawning;                        // Continue to spawn until told otherwise
 
-    public int score = 0;				             // counts how many enemies have been killed
-    public int lives = 5;					         // how many lives the player has left
-
+    public static int score = 0;	                 // counts how many enemies have been killed
+    public static int lives = 5;		             // how many lives the player has left
 
 
     void  Start ()
@@ -34,12 +34,12 @@ public class GameManager : MonoBehaviour {
     void  CreatePlayerBulletStack ()
     {
         // create bullets for the player and store them in a stack
-        // this is faster than instantiating them when the player shoots
+        // this is faster than instantiating them when the player shoots 
         for (var i= 0; i < 50; i++)
         {
-            var newBullet = (Bullet) Instantiate(playerBullet, Vector3.zero, Quaternion.identity);      // create a bullet
-            newBullet.gameObject.SetActive(false);                                                      // disable it until it's needed
-            playerBulletStack.Push(newBullet);	                                                        // put it on the stack
+            var newBullet = (Bullet) Instantiate(playerBullet, Vector3.zero, Quaternion.identity);          // create a bullet
+            newBullet.gameObject.SetActive(false);                                                          // disable it until it's needed
+            playerBulletStack.Push(newBullet);	                                                            // put it on the stack
         }    
 }
 
@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour {
         {
             // spawn an enemy off screen at a random X position and set hit points
             var randomX        = Random.Range(-4.0f, 4.0f);
-            var newEnemy       = (Enemy) Instantiate(enemy, new Vector3(randomX, 0, 10), Quaternion.identity);
+            var newEnemy       = (Enemy)Instantiate(enemy, new Vector3(randomX, 0, 10), Quaternion.identity);
             newEnemy.HitPoints = 4;
 
             // move it and tell it to shoot at a random time

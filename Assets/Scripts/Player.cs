@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public Transform   MyTransform;	             // for caching
+    private Transform  _playerTransform;         // for caching
     public float       PlayerSpeed;
     public float       FireRate;                 // time between shots
     public float       PlayerBulletSpeed;
@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        MyTransform              = transform;    // caching the transform is faster than accessing 'transform' directly
+        _playerTransform         = transform;    // caching the transform is faster than accessing 'transform' directly
         FireRate                 = (float) 0.025;
         _horizontalMovementLimit = 8;
         _verticalMovementLimit   = 6;
@@ -27,11 +27,11 @@ public class Player : MonoBehaviour
         // read movement inputs
         var horizontalMove = (PlayerSpeed * Input.GetAxis("Horizontal"))    * Time.deltaTime;
         var verticalMove   = (PlayerSpeed * Input.GetAxis("Vertical"))      * Time.deltaTime;
-        var moveVector = new Vector3(horizontalMove, 0, verticalMove);
-            moveVector = Vector3.ClampMagnitude(moveVector, PlayerSpeed     * Time.deltaTime); // prevents the player moving above its max speed on diagonals
+        var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
+            moveVector     = Vector3.ClampMagnitude(moveVector, PlayerSpeed * Time.deltaTime); // prevents the player moving above its max speed on diagonals
 
         // move the player
-        MyTransform.Translate(moveVector);
+        _playerTransform.Translate(moveVector);
 
         KeepPlayerInBounds();
         CheckIfShooting();
@@ -40,8 +40,8 @@ public class Player : MonoBehaviour
     private void KeepPlayerInBounds()
     {
         // restrict the position to inside the player's movement limits
-        MyTransform.position = new Vector3(Mathf.Clamp(MyTransform.position.x, -_horizontalMovementLimit, _horizontalMovementLimit), 0,
-                                           Mathf.Clamp(MyTransform.position.z, -_verticalMovementLimit,   _verticalMovementLimit));
+        _playerTransform.position = new Vector3(Mathf.Clamp(_playerTransform.position.x, -_horizontalMovementLimit, _horizontalMovementLimit), 0,
+                                                Mathf.Clamp(_playerTransform.position.z, -_verticalMovementLimit,   _verticalMovementLimit));
     }
 
     private void CheckIfShooting()
@@ -53,26 +53,25 @@ public class Player : MonoBehaviour
             _nextFire = Time.time + FireRate;
             
             // get a bullet from the stack
-            Bullet newBullet = GameManager.playerBulletStack.Pop();
+            Bullet newBullet = GameManager.PlayerBulletStack.Pop();
 
             // position and enable it
-            newBullet.gameObject.transform.position = MyTransform.position;
+            newBullet.gameObject.transform.position = _playerTransform.position;
             newBullet.gameObject.SetActive(true); 
 
             // set its speed (it moves in its own onUpdate function)
-            newBullet.motion = new Vector3(0, 0, PlayerBulletSpeed);
+            newBullet.Velocity = new Vector3(0, 0, PlayerBulletSpeed);
         }
 
     }
-
     void OnTriggerEnter(Collider other) // must have hit an enemy or enemy bullet
     {
-        GameManager.lives--;                                         // lose a life            
+        GameManager.Lives--;                                         // lose a life            
 
         // check if it was a bullet we hit, if so put it back on its stack
         if (other.CompareTag("EnemyBullet"))
         {
-            GameManager.enemyBulletStack.Push(other.GetComponent<Bullet>());
+            GameManager.EnemyBulletStack.Push(other.GetComponent<Bullet>());
             other.gameObject.SetActive(false);                       // deactivate the bullet
         }
         else if (other.CompareTag("Enemy"))                          // if it was an enemy, just destroy it

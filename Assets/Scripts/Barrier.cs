@@ -5,20 +5,18 @@ using UnityEngine;
 
 public class Barrier : MonoBehaviour
 {
-    GameManager gameManager;                                                  // link to the game manager
-
     // a bullet has entered this barrier - check what type it is and put it back on the correct stack
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("PlayerBullet"))                                 // was this a player bullet?
         {
             // put the bullet back on the stack for later re-use
-            GameManager.playerBulletStack.Push(other.GetComponent<Bullet>()); // push the Bullet component, not the collider
+            GameManager.PlayerBulletStack.Push(other.GetComponent<Bullet>()); // push the Bullet component, not the collider
             other.gameObject.SetActive(false);                                // deactivate the bullet
         }
         else if (other.CompareTag("EnemyBullet"))                             // was this an enemy bullet?
         {
-            GameManager.enemyBulletStack.Push(other.GetComponent<Bullet>());
+            GameManager.EnemyBulletStack.Push(other.GetComponent<Bullet>());
             other.gameObject.SetActive(false);                                // deactivate the bullet
         }
     }

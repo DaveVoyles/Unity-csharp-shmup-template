@@ -9,23 +9,23 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-    public Bullet                playerBullet;		 // PREFAB: Bullet
-    public Bullet                enemyBullet;		 // PREFAB: Enemy Bullet
+    public Bullet                PlayerBullet;		 // PREFAB: Bullet
+    public Bullet                EnemyBullet;		 // PREFAB: Enemy Bullet
     public Enemy                 enemy;			     // PREFAB: Enemy
     public Player                player;			 // SCRIPT: Player
-    public static Stack<Bullet>  playerBulletStack;
-    public static Stack<Bullet>  enemyBulletStack; 
+    public static Stack<Bullet>  PlayerBulletStack;
+    public static Stack<Bullet>  EnemyBulletStack; 
     private bool _isSpawning;                        // Continue to spawn until told otherwise
 
-    public static int score = 0;	                 // counts how many enemies have been killed
-    public static int lives = 5;		             // how many lives the player has left
+    public static int Score = 0;	                 // counts how many enemies have been killed
+    public static int Lives = 5;		             // how many lives the player has left
 
 
     void  Start ()
     {
         _isSpawning       = true;
-        playerBulletStack = new Stack<Bullet>();
-        enemyBulletStack  = new Stack<Bullet>();
+        PlayerBulletStack = new Stack<Bullet>();
+        EnemyBulletStack  = new Stack<Bullet>();
         CreatePlayerBulletStack();
         CreateEnemyBulletStack();
         StartCoroutine(SpawnEnemy());
@@ -37,9 +37,9 @@ public class GameManager : MonoBehaviour {
         // this is faster than instantiating them when the player shoots 
         for (var i= 0; i < 50; i++)
         {
-            var newBullet = (Bullet) Instantiate(playerBullet, Vector3.zero, Quaternion.identity);          // create a bullet
+            var newBullet = (Bullet) Instantiate(PlayerBullet, Vector3.zero, Quaternion.identity);          // create a bullet
             newBullet.gameObject.SetActive(false);                                                          // disable it until it's needed
-            playerBulletStack.Push(newBullet);	                                                            // put it on the stack
+            PlayerBulletStack.Push(newBullet);	                                                            // put it on the stack
         }    
 }
 
@@ -49,16 +49,16 @@ public class GameManager : MonoBehaviour {
         // creating way more than needed, because in a game like this it's good to have lots of enemy bullets
         for (var j= 0; j < 40; j++)
         {
-		    var newEnemyBullet = (Bullet) Instantiate (enemyBullet, Vector3.zero, Quaternion.identity);     // create a bullet
+		    var newEnemyBullet = (Bullet) Instantiate (EnemyBullet, Vector3.zero, Quaternion.identity);     // create a bullet
 		    newEnemyBullet.gameObject.SetActive(false);                                                     // disable it until it's needed
-		    enemyBulletStack.Push(newEnemyBullet);                                                          // put it on the stack
+		    EnemyBulletStack.Push(newEnemyBullet);                                                          // put it on the stack
         }
     }
 
     void  OnGUI ()
     {
-        GUI.Box( new Rect(10, 10, 80, 20), "Score: " + score);
-        GUI.Box( new Rect(10, 40, 80, 20), "Lives: " + lives);
+        GUI.Box( new Rect(10, 10, 80, 20), "Score: " + Score);
+        GUI.Box( new Rect(10, 40, 80, 20), "Lives: " + Lives);
     }
 
     IEnumerator SpawnEnemy()  // the IEnumerator here allows this function to call itself
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour {
             newEnemy.HitPoints = 4;
 
             // move it and tell it to shoot at a random time
-            newEnemy.Motion = new Vector3(0, 0, -3);
+            newEnemy.motion = new Vector3(0, 0, -3);
             var shootDelay  = Random.Range(0.5f, 2.0f);
             StartCoroutine(newEnemy.Shoot(shootDelay)); // waits a few seconds then shoots
 

@@ -5,15 +5,17 @@ public class Enemy : MonoBehaviour
 {
     public int             HitPoints;						// assigned when the enemy spawns
     public Vector3         motion;							// assigned when the enemy spawns
-    private Transform      _enemyTransform;                    // current transform of enemy, cached for perf during init
+    private Transform      _enemyTransform;                 // current transform of enemy, cached for perf during init
     private GameObject     _gameManager;                    // Need instance (NOT static) of GM to grab bullet from pool
     private float          _enemyBulletSpeed;
+    private SoundManager   _soundManager;
+
 
     void Start()
     {
         _enemyTransform   = transform;				        // cached for performance
         _enemyBulletSpeed = 6;                              // How fast enemy bullets fly
-        _gameManager      = GameObject.Find("GameManager"); // store the game manager for accessing its functions
+        _gameManager      = GameObject.Find("GameManager"); // store the game manager for accessing its functions   
     }
 
     void Update()
@@ -43,9 +45,12 @@ public class Enemy : MonoBehaviour
 
     public void Explode() // destroy this enemy
     {
-        // TODO: play sound & particle effect
-        // TODO: Add pooling for enemies as well
-        Destroy(gameObject);
+        if (gameObject != null)
+        {
+            // TODO: play sound & particle effect
+            // TODO: Add pooling for enemies as well
+            Destroy(gameObject);
+        }
 
         // increment the score
         GameManager.Score++;
@@ -55,25 +60,24 @@ public class Enemy : MonoBehaviour
     public IEnumerator Shoot(float delay) // waits for 'delay' seconds, then shoots directly at the player
     {
         yield return new WaitForSeconds(delay);
-
+  
         // get a bullet from the stack
         Bullet newBullet = GameManager.EnemyBulletStack.Pop();
 
         // position and enable it
-        if (newBullet != null)
-        {
-            newBullet.gameObject.transform.position = _enemyTransform.position;
-            newBullet.gameObject.SetActive(true);
+        if (newBullet == null) yield break;
 
-            // calculate the direction to the player
-            var shootVector = _gameManager.GetComponent<GameManager>().player.transform.position - _enemyTransform.position;
+        newBullet.gameObject.transform.position = _enemyTransform.position;
+        newBullet.gameObject.SetActive(true);
 
-            // normalize this vector (make its length 1)
-            shootVector.Normalize();
+        // calculate the direction to the player
+        var shootVector = _gameManager.GetComponent<GameManager>().player.transform.position - _enemyTransform.position;
 
-            // scale it up to the correct speed
-            shootVector       *= _enemyBulletSpeed;
-            newBullet.Velocity = shootVector;
-        }
+        // normalize this vector (make its length 1)
+        shootVector.Normalize();
+
+        // scale it up to the correct speed
+        shootVector       *= _enemyBulletSpeed;
+        newBullet.Velocity = shootVector;
     }
 }

@@ -15,13 +15,15 @@ public class GameManager : MonoBehaviour {
     public Player                player;			 // SCRIPT: Player
     public static Stack<Bullet>  PlayerBulletStack;
     public static Stack<Bullet>  EnemyBulletStack; 
-    private bool _isSpawning;                        // Continue to spawn until told otherwise
+    private bool                 _isSpawning;        // Continue to spawn until told otherwise
 
     public static int Score = 0;	                 // counts how many enemies have been killed
     public static int Lives = 5;		             // how many lives the player has left
 
+    private SoundManager _soundManager;
+    public AudioClip     BackgroundMusic;
 
-    void  Start ()
+   void  Start ()
     {
         _isSpawning       = true;
         PlayerBulletStack = new Stack<Bullet>();
@@ -29,13 +31,16 @@ public class GameManager : MonoBehaviour {
         CreatePlayerBulletStack();
         CreateEnemyBulletStack();
         StartCoroutine(SpawnEnemy());
+
+        _soundManager = SoundManager.GetSingleton();        // Grab SoundManange
+        _soundManager.PlayClip(BackgroundMusic, false);    // Play track
     }
 
     void  CreatePlayerBulletStack ()
     {
         // create bullets for the player and store them in a stack
         // this is faster than instantiating them when the player shoots 
-        for (var i= 0; i < 50; i++)
+        for (var i= 0; i < 70; i++)
         {
             var newBullet = (Bullet) Instantiate(PlayerBullet, Vector3.zero, Quaternion.identity);          // create a bullet
             newBullet.gameObject.SetActive(false);                                                          // disable it until it's needed
@@ -82,6 +87,5 @@ public class GameManager : MonoBehaviour {
             yield return new WaitForSeconds(3);
         }
     }
-    
 }
 

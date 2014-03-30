@@ -3,13 +3,17 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private Transform  _playerTransform;         // for caching
-    public float       PlayerSpeed;
-    public float       FireRate;                 // time between shots
-    public float       PlayerBulletSpeed;
-    private float      _nextFire;                // used to time the next shot
-    private float      _horizontalMovementLimit; // stops the player leaving the view
-    private float      _verticalMovementLimit;
+    private Transform    _playerTransform;         // for caching
+    public float         PlayerSpeed;
+    public float         FireRate;                 // time between shots
+    public float         PlayerBulletSpeed;
+    private float        _nextFire;                // used to time the next shot
+    private float        _horizontalMovementLimit; // stops the player leaving the view
+    private float        _verticalMovementLimit;
+    public AudioClip     SFX_shoot;
+    private SoundManager _soundManager;               
+
+
 
     void Start()
     {
@@ -20,6 +24,7 @@ public class Player : MonoBehaviour
         _nextFire                = 0;
         PlayerBulletSpeed        = 25;
         PlayerSpeed              = 18;
+        _soundManager = SoundManager.GetSingleton();
     }
 
     void Update()
@@ -41,7 +46,7 @@ public class Player : MonoBehaviour
     {
         // restrict the position to inside the player's movement limits
         _playerTransform.position = new Vector3(Mathf.Clamp(_playerTransform.position.x, -_horizontalMovementLimit, _horizontalMovementLimit), 0,
-                                                Mathf.Clamp(_playerTransform.position.z, -_verticalMovementLimit,   _verticalMovementLimit));
+                                                Mathf.Clamp(_playerTransform.position.z, -_verticalMovementLimit,   _verticalMovementLimit  ));
     }
 
     private void CheckIfShooting()
@@ -57,26 +62,29 @@ public class Player : MonoBehaviour
 
             // position and enable it
             newBullet.gameObject.transform.position = _playerTransform.position;
-            newBullet.gameObject.SetActive(true); 
+            newBullet.gameObject.SetActive(true);
 
             // set its speed (it moves in its own onUpdate function)
             newBullet.Velocity = new Vector3(0, 0, PlayerBulletSpeed);
+
+            _soundManager.PlayClip(SFX_shoot, false);    // play shooting SFX
         }
 
     }
+
     void OnTriggerEnter(Collider other) // must have hit an enemy or enemy bullet
     {
-        GameManager.Lives--;                                         // lose a life            
-
         // check if it was a bullet we hit, if so put it back on its stack
         if (other.CompareTag("EnemyBullet"))
         {
             GameManager.EnemyBulletStack.Push(other.GetComponent<Bullet>());
             other.gameObject.SetActive(false);                       // deactivate the bullet
+            GameManager.Lives--;                                     // lose a life      
         }
         else if (other.CompareTag("Enemy"))                          // if it was an enemy, just destroy it
         {
             other.GetComponent<Enemy>().Explode();
+            GameManager.Lives--;                                     // lose a life   
         }
     }
 }

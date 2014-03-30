@@ -65,7 +65,7 @@ public class Player : MonoBehaviour
             newBullet.gameObject.SetActive(true);
 
             // set its speed (it moves in its own onUpdate function)
-            newBullet.Velocity = new Vector3(0, 0, PlayerBulletSpeed);
+            newBullet.Velocity = new Vector3(PlayerBulletSpeed, 0, 0);
 
             _soundManager.PlayClip(SFX_shoot, false);    // play shooting SFX
         }

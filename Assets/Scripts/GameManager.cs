@@ -71,18 +71,18 @@ public class GameManager : MonoBehaviour {
         while (_isSpawning)
         {
             // spawn an enemy off screen at a random X position and set hit points
-            var randomX        = Random.Range(-4.0f, 4.0f);
-            var newEnemy       = (Enemy)Instantiate(enemy, new Vector3(randomX, 0, 10), Quaternion.identity);
+            var randomY  = Random.Range(-4.0f, 4.0f)
+            var newEnemy = (Enemy)Instantiate(enemy, new Vector3(10, 0, randomY), Quaternion.identity);
             newEnemy.HitPoints = 4;
 
             // move it and tell it to shoot at a random time
-            newEnemy.motion = new Vector3(0, 0, -3);
+            newEnemy.motion = new Vector3(-3, 0, 0);
             var shootDelay  = Random.Range(0.5f, 2.0f);
             StartCoroutine(newEnemy.Shoot(shootDelay)); // waits a few seconds then shoots
 
             // destroy it in 7 seconds (it will be off-screen by then if the player hasn't killed it)
             Destroy(newEnemy.gameObject, 7);
-
+        
             // Wait 3 seconds, then call this function again 
             yield return new WaitForSeconds(3);
         }

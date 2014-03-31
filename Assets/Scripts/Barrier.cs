@@ -6,20 +6,14 @@ using UnityEngine;
 
 public class Barrier : MonoBehaviour
 {
-    private Transform _playerBulletInstance;
-
-    // a bullet has entered this barrier - check what type it is and put it back on the correct stack
+    // a bullet has entered this barrier -- put it back on the correct stack
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PlayerBullet"))                                 // was this a player bullet?
+        // was this a bullet?
+        if (other.CompareTag("PlayerBullet") || other.CompareTag("EnemyBullet"))                                 
         {
             // put the bullet back on the stack for later re-use
              PoolManager.Pools["BulletPool"].Despawn(other.transform);
-        }
-        else if (other.CompareTag("EnemyBullet"))                             // was this an enemy bullet?
-        {
-
-                // CODE FOR ENEMY BULLET
         }
     }
 }

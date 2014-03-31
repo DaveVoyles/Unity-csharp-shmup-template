@@ -1,0 +1,75 @@
+-debug
+-target:library
+-nowarn:0169
+-out:Temp/Assembly-CSharp.dll
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll"
+-r:Library/ScriptAssemblies/Assembly-CSharp-firstpass.dll
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll"
+-define:UNITY_STANDALONE_WIN
+-define:ENABLE_MICROPHONE
+-define:ENABLE_TEXTUREID_MAP
+-define:ENABLE_AUDIO_FMOD
+-define:UNITY_STANDALONE
+-define:ENABLE_MONO
+-define:ENABLE_SPRITES
+-define:ENABLE_TERRAIN
+-define:ENABLE_GENERICS
+-define:ENABLE_SUBSTANCE
+-define:INCLUDE_WP8SUPPORT
+-define:ENABLE_MOVIES
+-define:ENABLE_WWW
+-define:ENABLE_IMAGEEFFECTS
+-define:ENABLE_WEBCAM
+-define:INCLUDE_METROSUPPORT
+-define:RENDER_SOFTWARE_CURSOR
+-define:ENABLE_NETWORK
+-define:ENABLE_PHYSICS
+-define:ENABLE_CACHING
+-define:ENABLE_CLOTH
+-define:ENABLE_2D_PHYSICS
+-define:ENABLE_SHADOWS
+-define:ENABLE_AUDIO
+-define:ENABLE_NAVMESH_CARVING
+-define:ENABLE_DUCK_TYPING
+-define:ENABLE_SINGLE_INSTANCE_BUILD_SETTING
+-define:UNITY_4_3_4
+-define:UNITY_4_3
+-define:ENABLE_PROFILER
+-define:UNITY_EDITOR
+-define:UNITY_EDITOR_WIN
+Assets/PoolManagerExampleFiles/Scripts/CreationExample.cs
+Assets/PoolManagerExampleFiles/Scripts/OnCreatedDelegateExample.cs
+Assets/PoolManagerExampleFiles/Scripts/OnSpawnedExample.cs
+Assets/PoolManagerExampleFiles/Scripts/ParticleWaitTest.cs
+Assets/PoolManagerExampleFiles/Scripts/ReallySimpleAudioSpawner.cs
+Assets/PoolManagerExampleFiles/Scripts/ReallySimpleParticleSpawner.cs
+Assets/PoolManagerExampleFiles/Scripts/SimpleSpawner.cs
+Assets/Scripts/Barrier.cs
+Assets/Scripts/Bullet.cs
+Assets/Scripts/Enemy.cs
+Assets/Scripts/GameManager.cs
+Assets/Scripts/Player.cs
+Assets/Scripts/ScrollingUVs.cs
+Assets/Scripts/SoundManager.cs
+Assets/Scripts/mySpawner.cs
+Assets/TargetProExampleFiles/Scripts/DemoEnemy.cs
+Assets/TargetProExampleFiles/Scripts/DemoEnemyWithLOS.cs
+Assets/TargetProExampleFiles/Scripts/DemoSeeker.cs
+Assets/TargetProExampleFiles/Scripts/DemoTurret.cs
+Assets/TargetProExampleFiles/Scripts/GrowWithDetonator.cs
+Assets/UnityConstraintsExampleFiles/Scripts/MoveTargetDemo.cs
+Assets/UnityConstraintsExampleFiles/Scripts/ScriptedExample.cs
+Assets/UnityConstraintsExampleFiles/Scripts/Transform_Demo.cs
+Assets/iTween/Plugins/iTween.cs
+Assets/iTween/Plugins/iTweenEditor/Examples/StartAndStopTween.cs
+"Assets/iTween/Plugins/iTweenEditor/Helper Classes/EventParamMappings.cs"
+"Assets/iTween/Plugins/iTweenEditor/Helper Classes/Vector3OrTransform.cs"
+"Assets/iTween/Plugins/iTweenEditor/Helper Classes/Vector3OrTransformArray.cs"
+Assets/iTween/Plugins/iTweenEditor/iTweenEvent.cs
+Assets/iTween/Plugins/iTweenEditor/iTweenPath.cs
+Assets/iTween/Plugins/iTweenMultiPath/iTweenMultiPath.cs
+Assets/iTween/Sample/MoveSample.cs
+Assets/iTween/Sample/RotateSample.cs
+Assets/iTween/Sample/SampleInfo.cs
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Mono\lib/mono/unity\System.Runtime.Serialization.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Mono\lib/mono/unity\System.Xml.Linq.dll"

@@ -1,0 +1,75 @@
+-debug
+-target:library
+-nowarn:0169
+-out:Temp/Assembly-CSharp-Editor.dll
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll"
+-r:Library/ScriptAssemblies/Assembly-CSharp-firstpass.dll
+-r:Library/ScriptAssemblies/Assembly-CSharp.dll
+-r:Assets/UnityVS/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll
+-r:Assets/UnityVS/Editor/SyntaxTree.VisualStudio.Unity.Messaging.dll
+-r:Assets/UnityVS/Editor/UnityVS.VersionSpecific.dll
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.Graphs.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/PlaybackEngines/iPhonePlayer/EditorExtensions/UnityEditor.iOS.Extensions.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/PlaybackEngines/WP8Support/EditorExtensions/UnityEditor.WP8.Extensions.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/PlaybackEngines/MetroSupport/EditorExtensions/UnityEditor.Metro.Extensions.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/PlaybackEngines/BB10Player/EditorExtensions/UnityEditor.BB10.Extensions.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/PlaybackEngines/AndroidPlayer/EditorExtensions/UnityEditor.Android.Extensions.dll"
+-r:"C:\Program Files (x86)\Unity\Editor\Data\PackageManager\Unity\PackageManager\4.3.4\Unity.PackageManager.dll"
+-define:UNITY_STANDALONE_WIN
+-define:ENABLE_MICROPHONE
+-define:ENABLE_TEXTUREID_MAP
+-define:ENABLE_AUDIO_FMOD
+-define:UNITY_STANDALONE
+-define:ENABLE_MONO
+-define:ENABLE_SPRITES
+-define:ENABLE_TERRAIN
+-define:ENABLE_GENERICS
+-define:ENABLE_SUBSTANCE
+-define:INCLUDE_WP8SUPPORT
+-define:ENABLE_MOVIES
+-define:ENABLE_WWW
+-define:ENABLE_IMAGEEFFECTS
+-define:ENABLE_WEBCAM
+-define:INCLUDE_METROSUPPORT
+-define:RENDER_SOFTWARE_CURSOR
+-define:ENABLE_NETWORK
+-define:ENABLE_PHYSICS
+-define:ENABLE_CACHING
+-define:ENABLE_CLOTH
+-define:ENABLE_2D_PHYSICS
+-define:ENABLE_SHADOWS
+-define:ENABLE_AUDIO
+-define:ENABLE_NAVMESH_CARVING
+-define:ENABLE_DUCK_TYPING
+-define:ENABLE_SINGLE_INSTANCE_BUILD_SETTING
+-define:UNITY_4_3_4
+-define:UNITY_4_3
+-define:ENABLE_PROFILER
+-define:UNITY_EDITOR
+-define:UNITY_EDITOR_WIN
+Assets/Editor/PathologicalGames/Common/PGEditorUtils.cs
+Assets/Editor/PathologicalGames/PoolManager/PreRuntimePoolItemInspector.cs
+Assets/Editor/PathologicalGames/PoolManager/SpawnPoolInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/CollisionTargetTrackerInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/DetonatorInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/FireControllerInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/LineOfSightModifierInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/ProjectileInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/TargetProMessengerInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/TargetTrackerInspector.cs
+Assets/Editor/PathologicalGames/TargetPro/TargetableInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/BillboardConstraintInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/ConstraintBaseInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/ConstraintFrameworkBaseInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/LookAtBaseClassInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/LookAtConstraintInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/SmoothLookAtConstraintInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/SmoothTransformConstraintInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/TransformConstraintInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/TurntableConstraintInspector.cs
+Assets/Editor/PathologicalGames/UnityConstraints/WorldTo2DCameraConstraintInspector.cs
+Assets/iTween/Plugins/iTweenEditor/Editor/iTweenEventDataEditor.cs
+Assets/iTween/Plugins/iTweenEditor/Editor/iTweenPathEditor.cs
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Mono\lib/mono/2.0\System.Runtime.Serialization.dll"
+-r:"C:/Program Files (x86)/Unity/Editor/Data/Mono\lib/mono/2.0\System.Xml.Linq.dll"

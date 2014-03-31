@@ -1,21 +1,24 @@
-﻿using UnityEngine;
+﻿using PathologicalGames;
+using UnityEngine;
 using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
-    public int             HitPoints;						// assigned when the enemy spawns
+    public int             hitPoints;						// assigned when the enemy spawns
     public Vector3         motion;							// assigned when the enemy spawns
     private Transform      _enemyTransform;                 // current transform of enemy, cached for perf during init
     private GameObject     _gameManager;                    // Need instance (NOT static) of GM to grab bullet from pool
     private float          _enemyBulletSpeed;
     private SoundManager   _soundManager;
 
+    private Transform      _enemyBulletPrefab;
 
     void Start()
     {
         _enemyTransform   = transform;				        // cached for performance
         _enemyBulletSpeed = 6;                              // How fast enemy bullets fly
-        _gameManager      = GameObject.Find("GameManager"); // store the game manager for accessing its functions   
+        _gameManager      = GameObject.Find("GameManager"); // store the game manager for accessing its functions
+        _enemyBulletPrefab = PoolManager.Pools["BulletPool"].prefabs["EnemyBulletPrefab"];
     }
 
     void Update()
@@ -29,17 +32,16 @@ public class Enemy : MonoBehaviour
         {
             TakeDamage(1);								    // take away 1 hit point
 
-            // disable the bullet and put it back on its stack
-            other.gameObject.SetActive(false); 
-    //        GameManager.PlayerBulletStack.Push(other.GetComponent<Bullet>());
+            // put the bullet back on the stack for later re-use
+            PoolManager.Pools["BulletPool"].Despawn(other.transform);
         }
     }
 
     void TakeDamage(int damage)
     {
         // subtract damage and check if it's dead
-        HitPoints -= damage;
-        if (HitPoints <= 0)
+        hitPoints -= damage;
+        if (hitPoints <= 0)
             Explode();
     }
 
@@ -53,31 +55,28 @@ public class Enemy : MonoBehaviour
         }
 
         // increment the score
-        GameManager.Score++;
+        GameManager.score++;
     }
 
 
-//    public IEnumerator Shoot(float delay) // waits for 'delay' seconds, then shoots directly at the player
-//    {
-//        yield return new WaitForSeconds(delay);
-  
-//        // get a bullet from the stack
-//        Bullet newBullet = GameManager.EnemyBulletStack.Pop();
+    public IEnumerator Shoot(float delay) // waits for 'delay' seconds, then shoots directly at the player
+    {
+        yield return new WaitForSeconds(delay);
 
-//        // position and enable it
-//        if (newBullet == null) yield break;
+        // Grabs current instance of bullet
+        Transform _enemyBulletInstance = PoolManager.Pools["BulletPool"].Spawn(_enemyBulletPrefab);
 
-//        newBullet.gameObject.transform.position = _enemyTransform.position;
-//        newBullet.gameObject.SetActive(true);
+        _enemyBulletInstance.gameObject.transform.position = _enemyTransform.position;
+        _enemyBulletInstance.gameObject.SetActive(true);
 
-//        // calculate the direction to the player
-//        var shootVector = _gameManager.GetComponent<GameManager>().player.transform.position - _enemyTransform.position;
+        // calculate the direction to the player
+        var shootVector = _gameManager.GetComponent<GameManager>().player.transform.position - _enemyTransform.position;
 
-//        // normalize this vector (make its length 1)
-//        shootVector.Normalize();
+        // normalize this vector (make its length 1)
+        shootVector.Normalize();
 
-//        // scale it up to the correct speed
-//        shootVector       *= _enemyBulletSpeed;
-//        newBullet.Velocity = shootVector;
-//    }
+        // scale it up to the correct speed
+        shootVector *= _enemyBulletSpeed;
+        _enemyBulletInstance.gameObject.GetComponent<Bullet>().velocity = shootVector;
+    }
 }

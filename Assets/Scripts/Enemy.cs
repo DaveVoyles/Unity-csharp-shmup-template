@@ -31,7 +31,7 @@ public class Enemy : MonoBehaviour
 
             // disable the bullet and put it back on its stack
             other.gameObject.SetActive(false); 
-            GameManager.PlayerBulletStack.Push(other.GetComponent<Bullet>());
+    //        GameManager.PlayerBulletStack.Push(other.GetComponent<Bullet>());
         }
     }
 
@@ -57,27 +57,27 @@ public class Enemy : MonoBehaviour
     }
 
 
-    public IEnumerator Shoot(float delay) // waits for 'delay' seconds, then shoots directly at the player
-    {
-        yield return new WaitForSeconds(delay);
+//    public IEnumerator Shoot(float delay) // waits for 'delay' seconds, then shoots directly at the player
+//    {
+//        yield return new WaitForSeconds(delay);
   
-        // get a bullet from the stack
-        Bullet newBullet = GameManager.EnemyBulletStack.Pop();
+//        // get a bullet from the stack
+//        Bullet newBullet = GameManager.EnemyBulletStack.Pop();
 
-        // position and enable it
-        if (newBullet == null) yield break;
+//        // position and enable it
+//        if (newBullet == null) yield break;
 
-        newBullet.gameObject.transform.position = _enemyTransform.position;
-        newBullet.gameObject.SetActive(true);
+//        newBullet.gameObject.transform.position = _enemyTransform.position;
+//        newBullet.gameObject.SetActive(true);
 
-        // calculate the direction to the player
-        var shootVector = _gameManager.GetComponent<GameManager>().player.transform.position - _enemyTransform.position;
+//        // calculate the direction to the player
+//        var shootVector = _gameManager.GetComponent<GameManager>().player.transform.position - _enemyTransform.position;
 
-        // normalize this vector (make its length 1)
-        shootVector.Normalize();
+//        // normalize this vector (make its length 1)
+//        shootVector.Normalize();
 
-        // scale it up to the correct speed
-        shootVector       *= _enemyBulletSpeed;
-        newBullet.Velocity = shootVector;
-    }
+//        // scale it up to the correct speed
+//        shootVector       *= _enemyBulletSpeed;
+//        newBullet.Velocity = shootVector;
+//    }
 }

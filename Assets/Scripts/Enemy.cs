@@ -6,18 +6,18 @@ public class Enemy : MonoBehaviour
 {
     public int             hitPoints;						// assigned when the enemy spawns
     public Vector3         motion;							// assigned when the enemy spawns
+
     private Transform      _enemyTransform;                 // current transform of enemy, cached for perf during init
     private GameObject     _gameManager;                    // Need instance (NOT static) of GM to grab bullet from pool
     private float          _enemyBulletSpeed;
     private SoundManager   _soundManager;
-
     private Transform      _enemyBulletPrefab;
 
     void Start()
     {
-        _enemyTransform   = transform;				        // cached for performance
-        _enemyBulletSpeed = 6;                              // How fast enemy bullets fly
-        _gameManager      = GameObject.Find("GameManager"); // store the game manager for accessing its functions
+        _enemyTransform    = transform;				         // cached for performance
+        _enemyBulletSpeed  = 6;                              // How fast enemy bullets fly
+        _gameManager       = GameObject.Find("GameManager"); // store the game manager for accessing its functions
         _enemyBulletPrefab = PoolManager.Pools["BulletPool"].prefabs["EnemyBulletPrefab"];
     }
 
@@ -59,7 +59,7 @@ public class Enemy : MonoBehaviour
     }
 
 
-    public IEnumerator Shoot(float delay) // waits for 'delay' seconds, then shoots directly at the player
+    public IEnumerator ShootTowardPlayer(float delay) // waits for 'delay' seconds, then shoots directly at the player
     {
         yield return new WaitForSeconds(delay);
 

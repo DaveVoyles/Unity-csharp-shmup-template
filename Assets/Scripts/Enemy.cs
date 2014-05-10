@@ -58,6 +58,12 @@ public class Enemy : MonoBehaviour
         GameManager.score++;
     }
 
+    public void MoveTowardPlayerSlowly()
+    {
+    
+
+    }
+
 
     public IEnumerator ShootTowardPlayer(float delay) // waits for 'delay' seconds, then shoots directly at the player
     {

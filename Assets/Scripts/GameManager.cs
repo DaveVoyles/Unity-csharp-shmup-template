@@ -8,27 +8,30 @@ using UnityEngine;
 using PathologicalGames;
 using Random = UnityEngine.Random;
 
-
 public class GameManager : MonoBehaviour
 {
+    public Enemy         enemy;              // PREFAB: Enemy
+    public Player        player;             // SCRIPT: Player
+    public static int    score = 0;          // counts how many enemies have been killed
+    public static int    lives = 5;          // how many lives the player has left
+    public AudioClip     backgroundMusic;
+    public Transform     enemyTransform;
+    public Transform     pathEnemyTransform;
 
-    public Enemy enemy; // PREFAB: Enemy
-    public Player player; // SCRIPT: Player
-    public static int score = 0; // counts how many enemies have been killed
-    public static int lives = 5; // how many lives the player has left
-    public AudioClip backgroundMusic;
-    public Transform enemyTransform;
-
-    private bool _isSpawning = true; // Continue to spawn until told otherwise
+    private bool         _isSpawning  = true; // Continue to spawn until told otherwise
+    private string       _nameOfPool  = "BulletPool";
+    private int          _respawnTime = 3;
     private SoundManager _soundManager;
-    private string _nameOfPool = "BulletPool";
-    private int _respawnTime = 3;
+
+    
 
     private void Start()
     {
-     //   StartCoroutine(SpawnMovingEnemy());
-        StartCoroutine(SpawnStationaryEnemy());
-        _soundManager = SoundManager.GetSingleton(); // Grab SoundManange
+        StartCoroutine(SpawnEnemyOnPathOne());
+        InvokeRepeating("SpawnEnemyOnPathThree", 0, 3);
+
+       // InvokeRepeating("SpawnEnemyOnRandomPath", 0, 3);
+        _soundManager = SoundManager.GetSingleton();    // Grab SoundManange
         _soundManager.PlayClip(backgroundMusic, false); // Play track
     }
 
@@ -37,7 +40,7 @@ public class GameManager : MonoBehaviour
         GUI.Box(new Rect(10, 10, 80, 20), "Score: " + score);
         GUI.Box(new Rect(10, 40, 80, 20), "Lives: " + lives);
     }
-
+    
 
     /// <summary>
     /// Spawns an enemy which scrolls from right to left on the screen
@@ -48,13 +51,13 @@ public class GameManager : MonoBehaviour
         while (_isSpawning)
         {
             // spawn an enemy off screen at a random X position and set hit points
-            var randomY = Random.Range(-4.0f, 4.0f);
+            var randomY = Random.Range(-10.0f, 10.0f);
 
             // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
             Transform _enemyInstance = PoolManager.Pools[_nameOfPool].Spawn(enemyTransform);
 
             // position, enable, then set velocity
-            _enemyInstance.gameObject.transform.position = new Vector3(10, 0, randomY);
+            _enemyInstance.gameObject.transform.position = new Vector3(0, randomY, 0);
             _enemyInstance.gameObject.SetActive(true);
 
             // Grab the "enemy" script, so that we can access the variables exposed
@@ -83,11 +86,11 @@ public class GameManager : MonoBehaviour
             // spawn an enemy off screen at a random X position and set hit points
             var randomY = Random.Range(-4.0f, 4.0f);
 
-            // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+            // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
             Transform _enemyInstance = PoolManager.Pools[_nameOfPool].Spawn(enemyTransform);
 
             // position, enable, then set velocity
-            _enemyInstance.gameObject.transform.position = new Vector3(10, 0, randomY);
+            _enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
             _enemyInstance.gameObject.SetActive(true);
 
             // Grab the "enemy" script, so that we can access the variables exposed
@@ -102,5 +105,46 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(_respawnTime);
         }
     }
-};
+     
 
+    /// <summary>
+    /// Spawns enemies on a random path at random intervals
+    /// </summary>
+    private void SpawnEnemyOnRandomPath()
+    {
+        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
+        var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+
+        _iTweenMoveToPath.FollowRandomPath();
+    }   
+
+    private IEnumerator SpawnEnemyOnPathOne()
+    {
+        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
+        var _iTweenMoveToPath = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+
+        yield return StartCoroutine(_iTweenMoveToPath.FollowPathOne(_iTweenMoveToPath.frequency, _iTweenMoveToPath.numberOfEnemiesToSpawn));
+        print("Spawning Enemy On Path One");
+    }
+
+    private IEnumerator SpawnEnemyOnPathTwo()
+    {
+          var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform).gameObject;
+
+          iTween.MoveTo(_pathEnemyInstance, iTween.Hash("path", iTweenPath.GetPath("path2"), "time", 5));
+          print("Spawning Enemy On Path Two");
+
+          yield return new WaitForSeconds(2);
+    }
+
+    private void SpawnEnemyOnPathThree()
+    {
+        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
+        var _iTweenMoveToPath = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+
+        _iTweenMoveToPath.FollowPathThree();
+        print("Spawning Enemy On Path Three");
+    }
+
+    
+}; 

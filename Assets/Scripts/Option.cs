@@ -14,79 +14,68 @@ public class Option : MonoBehaviour
     private Transform _currentTransform;
     private float     _nextFire                = 0;
     private float     _fireRate                = 2;
-    private enum CurrentState
+    private enum      CurrentState
     {
-        AttachedToFront,
-        AttachedToBack,
-        Idle,
-        FiringForward,
-        FiringBackward,
-        ReturningFromForward,
-        ReturningFromBackward,
-    }
+        Attached,
+        NotAttached
+    };
     private CurrentState _currentState;
+    private bool         _isAttachedToFront   = true;
      
 
 	void Start ()
 	{
-        // Reference to player's position
+        // Reference to player's transform
 	    _playerTransform = GameObject.Find("Player").transform;
-        AttachedToFront();
+        // Set the option's Z pos to that of the player's ship
+        this.transform.position = _playerTransform.position;
 	}
 	
 	void Update ()
 	{
         // Constantly rotate
         this.transform.Rotate(new Vector3(0, 50, 0) * Time.deltaTime);
-        KeepWithinScreenBounds();
 
-	    if (Input.GetButton("FireOption_Main") && Time.time > _nextFire)
+	    KeepWithinScreenBounds();
+	    HandleInput();
+
+	    if (_isAttachedToFront)
 	    {
-	        // delay the next button press by the firing rate
-	        _nextFire = Time.time + _fireRate;
+            AttachToFront();
+        }
+        else if (_isAttachedToFront == false)
+        {
+            // Set the option's Z pos to that of the player's ship
+            this.transform.position = new Vector3(0, 0, _playerTransform.position.z);
+        }
 
-	        if (_currentState == CurrentState.AttachedToFront     )
-	        {
-                ShootOption();
-	        }
-	        if (_currentState == CurrentState.FiringForward       )
-	        {
-                ReturnFromForwrad();
-	        }
-	        if (_currentState == CurrentState.ReturningFromForward)
-	        {
-                AttachedToFront();
-	        }
-	        if (_currentState == CurrentState.Idle                )
-	        {
-                ReturnFromForwrad();
-	        }
-	    }
+        // Set the option's Z pos to that of the player's ship
+        this.transform.position = _playerTransform.position;
 
-	    // What is the option currently doing?
-        //switch (_currentState)
-        //{
-        //    case CurrentState.AttachedToFront:
-        //        AttachedToFront();
-        //        break;
-        //    case CurrentState.AttachedToBack:
-        //        break;
-        //    case CurrentState.FiringBackward:
-        //        break;
-        //    case CurrentState.FiringForward:
-        //        ShootOption();
-        //        break;
-        //    case CurrentState.ReturningFromBackward:
-        //        break;
-        //    case CurrentState.ReturningFromForward:
-        //        ReturnFromForwrad();
-        //        break;
-        //    default:
-        //        _currentState = CurrentState.AttachedToFront;
-        //        AttachedToFront();
-        //        break;
-        //}
+
 	}
+
+    /// <summary>
+    /// Changes current state of option, when user hits "FireOption_Main"
+    /// </summary>
+    private void HandleInput()
+    {
+        if (Input.GetButton("FireOption_Main") && Time.time > _nextFire)
+        {
+            // delay the next button press by the firing rate
+            _nextFire = Time.time + _fireRate;
+
+            if (_currentState == CurrentState.Attached)
+            {
+                StartCoroutine(ShootOption());
+            }
+            if (_currentState == CurrentState.NotAttached)
+            {
+                StartCoroutine(AttachToFront());
+
+            }
+        }
+    }
 
     /// <summary>
     /// Used for physics operations
@@ -98,11 +87,15 @@ public class Option : MonoBehaviour
     /// <summary>
     /// Shoots the option in front of the player
     /// </summary>
-    void ShootOption()
+    IEnumerator  ShootOption()
     {
-        const float pushForce = 250f;
+        _isAttachedToFront    = false;
+        const float pushForce = 700f;
         rigidbody.AddForce(Vector3.right * pushForce);
         Debug.Log("Shoot Option");
+
+        yield return new WaitForSeconds(1f);
+        _currentState = CurrentState.NotAttached;
     }
 
     /// <summary>
@@ -115,12 +108,14 @@ public class Option : MonoBehaviour
         // Return to the player over a 3 second period
         iTween.MoveTo(this.gameObject, _playerTransform.position, 3);
 
-        // If option is behind player, actually set it to pos in front of player
-        Vector3 _inFrontOfPlayerPos     = _playerTransform.TransformPoint(Vector3.right * _distanceFromPlayer);
+        // Find the position just in front of the player
+        Vector3 _inFrontOfPlayerPos = _playerTransform.TransformPoint(Vector3.right*_distanceFromPlayer);
+
+        // If option is behind player, set it to pos in front of player
         if (this.transform.position.x < _inFrontOfPlayerPos.x)
         {
             this.transform.position = _inFrontOfPlayerPos;
-            _currentState = CurrentState.AttachedToFront;
+            this._currentState      = CurrentState.Attached;
         }
         Debug.Log("Returning Option");
     }
@@ -128,15 +123,26 @@ public class Option : MonoBehaviour
     /// <summary>
     /// Keeps the option locked to the player's position
     /// </summary>
-    void AttachedToFront()
+    IEnumerator AttachToFront()
     {
-        Vector3 _inFrontOfPlayerPos = _playerTransform.TransformPoint(Vector3.right * _distanceFromPlayer);
-        this.transform.position     = _inFrontOfPlayerPos;
+        // Keep a slight distance in front of player on X-Axis, but same on Y-Axis
+        _isAttachedToFront = true;
+        //const float pushForce = 100f;
+        //rigidbody.AddForce(Vector3.left * pushForce);
+        const float speed = 200;
+        float step = speed * Time.deltaTime;
+        transform.position = Vector3.MoveTowards(transform.position, _playerTransform.position, step);
+     //   Vector3 _inFrontOfPlayerPos = _playerTransform.TransformPoint(Vector3.right * _distanceFromPlayer);
+     //   this.transform.position     = _inFrontOfPlayerPos;
+
+        yield return new WaitForSeconds(1f);
+        _currentState = CurrentState.Attached;
         Debug.Log("Attached to front of player");
     }
 
     /// <summary>
     /// Keeps option within the bounds of the screen
+    /// TODO: Change this so it uses the barrier or camera collision, and not this hacked solution
     /// </summary>
     void KeepWithinScreenBounds()
     {
@@ -153,7 +159,6 @@ public class Option : MonoBehaviour
         if (other.CompareTag("BulletCollectors"))
         {
             rigidbody.velocity = Vector3.zero;
-            _currentState = CurrentState.Idle;
             Debug.Log("I hit something -- Stopping movement");
         }
 
@@ -161,7 +166,6 @@ public class Option : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
         }
-
     }
 
 }

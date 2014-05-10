@@ -7,8 +7,6 @@ public class Player : MonoBehaviour
     private SoundManager _soundManager;
     private string _nameOfPool              = "BulletPool";   // References SpawnPool game object
     private float _nextFire                 = 0;              // used to time the next shot
-    private float _horizontalMovementLimit  = 17.3f;
-    private float _verticalMovementLimit    = 9.5f;
     private Transform _playerTransform;                      // for caching
     private float _playerSpeed              = 18;
     private float _fireRate                 = (float)0.035;  // time between shots
@@ -30,22 +28,15 @@ public class Player : MonoBehaviour
         // read movement inputs
         var horizontalMove = (_playerSpeed * Input.GetAxis("Horizontal"))    * Time.deltaTime;
         var verticalMove   = (_playerSpeed * Input.GetAxis("Vertical"))      * Time.deltaTime;
-        var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
-            // prevents the player moving above its max speed on diagonals
-            moveVector     = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); 
+        var moveVector = new Vector3(horizontalMove, 0, verticalMove);
+        // prevents the player moving above its max speed on diagonals
+        moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); 
 
         // move the player
         _playerTransform.Translate(moveVector);
 
         // KeepPlayerInBounds();
         CheckIfShooting();
-    }
-
-    private void KeepPlayerInBounds()
-    {
-        // restrict the position to inside the player's movement limits
-        _playerTransform.position = new Vector3(Mathf.Clamp(_playerTransform.position.x, -_horizontalMovementLimit, _horizontalMovementLimit), 0,
-                                                Mathf.Clamp(_playerTransform.position.z, -_verticalMovementLimit,   _verticalMovementLimit  ));
     }
 
     private void CheckIfShooting()
@@ -109,11 +100,10 @@ public class Player : MonoBehaviour
             other.gameObject.SetActive(false);
         }
         // if it was an enemy, just destroy it
-        else if (other.CompareTag("Enemy")) 
+        if (other.CompareTag("Enemy")) 
         {
             other.GetComponent<Enemy>().Explode();  // Blow up enemy
             GameManager.lives--;                    // lose a life   
         }
-
     }
 }

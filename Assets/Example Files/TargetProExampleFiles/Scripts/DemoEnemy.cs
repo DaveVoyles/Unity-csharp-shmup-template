@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using PathologicalGames;
 
@@ -23,6 +24,8 @@ public class DemoEnemy : MonoBehaviour
 
         targetable.AddOnHitColliderDelegate(this.OnHit);
     }
+
+
 
     private void OnHit(HitEffectList effects, Target target, Collider other)
     {
@@ -76,4 +79,6 @@ public class DemoEnemy : MonoBehaviour
         if (this.isDead) return;
         this.transform.localScale = Vector3.one;
     }
+
 }
+

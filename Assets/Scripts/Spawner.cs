@@ -10,19 +10,21 @@ public class Spawner : MonoBehaviour {
     
     public Transform pathEnemyTransform;
     public Transform enemyTransform;            
-    public int pathOneSpawnAmount             = 0;  
+    public int pathOneSpawnAmount             = 0;
+    public int pathTwoSpawnAmount             = 0;
+    public int pathThreeSpawnAmount           = 0;  
     public float pathOneSpawnInterval         = 0f;
     public float pathTwoSpawnInterval         = 0f;
     public float pathThreeSpawnInterval       = 0f;
     public float spawnStationaryEnemyInterval = 0f;
     public float timeToRunPathOne             = 0;
-    public float timeToRunpathTwo             = 0;
+    public float timeToRunPathTwo             = 0;
     public float timeToRunPathThree           = 0;
     public iTween.EaseType pathOneEaseType;
     public iTween.EaseType pathTwoEaseType;
     public iTween.EaseType pathThreeEaseType;
 
-    private string _nameOfPool = "BulletPool";
+    private string _nameOfPool = "BulletPool";  
     private SpawnPool _pool    = null;
     private bool _isSpawning   = true; // Continue to spawn until told otherwise
  
@@ -38,16 +40,19 @@ public class Spawner : MonoBehaviour {
         this._pool.group.localPosition = new Vector3(1.5f, 0, 0);
         this._pool.group.localRotation = Quaternion.identity;
 
-        this.StartCoroutine(SpawnRoutine());
+        this.StartCoroutine(SpawnPathOne());
+        this.StartCoroutine(SpawnPathTwo());
+        this.StartCoroutine(SpawnPathThree());
         this.StartCoroutine(SpawnStationaryEnemy());
         this.SpawnEnemyOnRandomPath();
 	}
 	
     /// <summary>
-    /// Spawn an instance every this.spawnInterval
+    /// Spawn an (this.pathOneSpawnAmount) instances of  every this.pathOneSpawnInterval
     /// </summary>
-    private IEnumerator SpawnRoutine()
+    private IEnumerator SpawnPathOne()
     {
+        // How many enemies should we spawn?
         int count = this.pathOneSpawnAmount;
         while (count >= 0)
         {
@@ -56,11 +61,55 @@ public class Spawner : MonoBehaviour {
             var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
             // Enemy follows this path
-            _iTweenMoveToPath.FollowPathThree(this.timeToRunPathThree, this.pathOneEaseType);
+            _iTweenMoveToPath.FollowPathOne(this.timeToRunPathOne, this.pathOneEaseType);
             count--;
             
             // call this function, every (x) seconds
             yield return new WaitForSeconds(this.pathOneSpawnInterval);
+        }
+    }
+
+    /// <summary>
+    /// Spawn an (this.pathOneSpawnAmount) instances of  every this.pathTwoSpawnInterval
+    /// </summary>
+    private IEnumerator SpawnPathTwo()
+    {
+        // How many enemies should we spawn?
+        int count = this.pathTwoSpawnAmount;
+        while (count >= 0)
+        {
+            // Grab an instance of the enemy transform
+            var _pathEnemyInstance = this._pool.Spawn(pathEnemyTransform);
+            var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+
+            // Enemy follows this path
+            _iTweenMoveToPath.FollowPathTwo(this.timeToRunPathTwo, this.pathTwoEaseType);
+            count--;
+
+            // call this function, every (x) seconds
+            yield return new WaitForSeconds(this.pathTwoSpawnInterval);
+        }
+    }
+
+    /// <summary>
+    /// Spawn an (this.pathOneSpawnAmount) instances of  every this.pathThreeSpawnInterval
+    /// </summary>
+    private IEnumerator SpawnPathThree()
+    {
+        // How many enemies should we spawn?
+        int count = this.pathThreeSpawnAmount;
+        while (count >= 0)
+        {
+            // Grab an instance of the enemy transform
+            var _pathEnemyInstance = this._pool.Spawn(pathEnemyTransform);
+            var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+
+            // Enemy follows this path
+            _iTweenMoveToPath.FollowPathThree(this.timeToRunPathThree, this.pathThreeEaseType);
+            count--;
+
+            // call this function, every (x) seconds
+            yield return new WaitForSeconds(this.pathThreeSpawnInterval);
         }
     }
 
@@ -105,8 +154,5 @@ public class Spawner : MonoBehaviour {
         _iTweenMoveToPath.FollowRandomPath();
     }   
   
-
-
-
-
+    
 }

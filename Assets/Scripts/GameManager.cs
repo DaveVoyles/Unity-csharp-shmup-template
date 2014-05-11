@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {   
-        _soundManager = SoundManager.GetSingleton();    // Grab SoundManange
+        _soundManager = SoundManager.GetSingleton();    // Grab SoundMananger
         _soundManager.PlayClip(backgroundMusic, false); // Play track
     }
 

@@ -1,20 +1,17 @@
-﻿using PathologicalGames;
+﻿/// <summary>
+/// Builds a random path for the game object to traverse, over a random period of time
+/// </summary>
+using PathologicalGames;
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Author: Dave Voyles
-/// Date: May 2014
-/// Builds a random path for the game object to traverse, over a random period of time
-/// </summary>
-
 public class iTweenMoveToPath : MonoBehaviour
 {
+    public int numberOfEnemiesToSpawn     = 3;      // How many enemies should run along the path?
+    public float frequency                = 2;      // How often should this path be used?
 
     private string _iTweenPathName        = null;   // What is the name of the path?
     private int    _timeToRunPath         = 0;      // How long should it take to go over the path?
-    public int     numberOfEnemiesToSpawn = 3;      // How many enemies should run along the path?
-    public float   frequency              = 2;      // How often should this path be used?
 
 
     /// <summary>
@@ -24,7 +21,40 @@ public class iTweenMoveToPath : MonoBehaviour
     {
         GeneratePathName();
         GenerateTimeToRunPath();
-        PathConstructor(_iTweenPathName, _timeToRunPath);
+        RandomPathConstructor(_iTweenPathName, _timeToRunPath);
+    }
+
+    /// <summary>
+    /// Follows a preset path
+    /// </summary>
+    /// <param name="timeToRunPath"></param>
+    /// <param name="easeType"></param>
+    public void FollowPathOne(float timeToRunPath, iTween.EaseType easeType)
+    {
+        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path1"), "time", timeToRunPath,
+            "easetype", easeType, "movetopath", false, "oncomplete", "deactivate"));
+    }
+
+    /// <summary>
+    /// Follows a preset path
+    /// </summary>
+    /// <param name="timeToRunPath"></param>
+    /// <param name="easeType"></param>
+    public void FollowPathTwo(float timeToRunPath, iTween.EaseType easeType)
+    {
+        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path2"), "time", timeToRunPath,
+            "easetype", easeType, "movetopath", false, "oncomplete", "deactivate"));
+    }
+
+    /// <summary>
+    /// Follows a preset path
+    /// </summary>
+    /// <param name="timeToRunPath"></param>
+    /// <param name="easeType"></param>
+    public void FollowPathThree(float timeToRunPath, iTween.EaseType easeType)
+    {
+        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path3"), "time", timeToRunPath,
+            "easetype", easeType, "movetopath", false, "oncomplete", "deactivate"));
     }
 
     /// <summary>
@@ -32,13 +62,10 @@ public class iTweenMoveToPath : MonoBehaviour
     /// </summary>
     /// <param name="_iTweenPathName"></param>
     /// <param name="_timeToRunPath"></param>
-    private void PathConstructor( string _iTweenPathName, int _timeToRunPath)
+    private void RandomPathConstructor(string _iTweenPathName, int _timeToRunPath)
     {
-        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath(_iTweenPathName), "time", _timeToRunPath, "oncomplete", "deactivate" ));
-    }
-    public void FollowPathThree()
-    {
-        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path3"), "time", 5, "movetopath", false, "oncomplete", "deactivate"));
+        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath(_iTweenPathName),
+            "time", _timeToRunPath, "oncomplete", "deactivate"));
     }
 
     /// <summary>

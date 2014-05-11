@@ -10,15 +10,11 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public Enemy         enemy;              // PREFAB: Enemy
-    public Player        player;             // SCRIPT: Player
+    public Player        player;
     public static int    score = 0;          // counts how many enemies have been killed
     public static int    lives = 5;          // how many lives the player has left
     public AudioClip     backgroundMusic;
-    public Transform     enemyTransform;
-    public Transform     pathEnemyTransform;
 
-    private bool         _isSpawning  = true; // Continue to spawn until told otherwise
     private string       _nameOfPool  = "BulletPool";
     private int          _respawnTime = 3;
     private SoundManager _soundManager;
@@ -35,78 +31,4 @@ public class GameManager : MonoBehaviour
         GUI.Box(new Rect(10, 40, 80, 20), "Lives: " + lives);
     }
 
-    /// <summary>
-    /// Spawns an enemy which scrolls from right to left on the screen
-    /// </summary>
-    private IEnumerator SpawnMovingEnemy() // the IEnumerator here allows this function to call itself
-    {
-        while (_isSpawning)
-        {
-            // spawn an enemy off screen at a random X position and set hit points
-            var randomY = Random.Range(-10.0f, 10.0f);
-
-            // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-            Transform _enemyInstance = PoolManager.Pools[_nameOfPool].Spawn(enemyTransform);
-
-            // position, enable, then set velocity
-            _enemyInstance.gameObject.transform.position = new Vector3(0, randomY, 0);
-            _enemyInstance.gameObject.SetActive(true);
-
-            // Grab the "enemy" script, so that we can access the variables exposed
-            var scriptRef = _enemyInstance.GetComponent<Enemy>();
-            scriptRef.hitPoints = 4;
-
-            // move it and tell it to shoot at a random time
-            scriptRef.motion = new Vector3(-3, 0, 0);
-            var shootDelay   = Random.Range(0.5f, 2.0f);
-
-            // waits a few seconds then shoots
-            StartCoroutine(scriptRef.ShootTowardPlayer(shootDelay)); 
-
-            // Wait 3 seconds, then call this function again 
-            yield return new WaitForSeconds(_respawnTime);    }
-    }
-
-    /// <summary>
-    /// Spawns a stationary enemy
-    /// </summary>
-    private IEnumerator SpawnStationaryEnemy() // the IEnumerator here allows this function to call itself
-    {
-        while (_isSpawning)
-        {
-            // spawn an enemy off screen at a random X position and set hit points
-            var randomY = Random.Range(-4.0f, 4.0f);
-
-            // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
-            Transform _enemyInstance = PoolManager.Pools[_nameOfPool].Spawn(enemyTransform);
-
-            // position, enable, then set velocity
-            _enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
-            _enemyInstance.gameObject.SetActive(true);
-
-            // Grab the "enemy" script, so that we can access the variables exposed
-            var scriptRef = _enemyInstance.GetComponent<Enemy>();
-            scriptRef.hitPoints = 4;
-
-            // waits a few seconds then shoots
-            var shootDelay = Random.Range(0.5f, 2.0f);
-            StartCoroutine(scriptRef.ShootTowardPlayer(shootDelay)); 
-
-            // Wait 3 seconds, then call this function again 
-            yield return new WaitForSeconds(_respawnTime);
-        }
-    }
-     
-
-    /// <summary>
-    /// Spawns enemies on a random path at random intervals
-    /// </summary>
-    private void SpawnEnemyOnRandomPath()
-    {
-        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
-        var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-
-        _iTweenMoveToPath.FollowRandomPath();
-    }   
-  
 }; 

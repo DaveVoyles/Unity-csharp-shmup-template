@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(Transform))]
 public class Enemy : MonoBehaviour
 {
     public int             hitPoints;						// assigned when the enemy spawns
@@ -63,7 +64,6 @@ public class Enemy : MonoBehaviour
     
 
     }
-
 
     public IEnumerator ShootTowardPlayer(float delay) // waits for 'delay' seconds, then shoots directly at the player
     {

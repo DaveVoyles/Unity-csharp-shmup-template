@@ -23,14 +23,8 @@ public class GameManager : MonoBehaviour
     private int          _respawnTime = 3;
     private SoundManager _soundManager;
 
-    
-
     private void Start()
-    {
-        StartCoroutine(SpawnEnemyOnPathOne());
-        InvokeRepeating("SpawnEnemyOnPathThree", 0, 3);
-
-       // InvokeRepeating("SpawnEnemyOnRandomPath", 0, 3);
+    {   
         _soundManager = SoundManager.GetSingleton();    // Grab SoundManange
         _soundManager.PlayClip(backgroundMusic, false); // Play track
     }
@@ -40,12 +34,10 @@ public class GameManager : MonoBehaviour
         GUI.Box(new Rect(10, 10, 80, 20), "Score: " + score);
         GUI.Box(new Rect(10, 40, 80, 20), "Lives: " + lives);
     }
-    
 
     /// <summary>
     /// Spawns an enemy which scrolls from right to left on the screen
     /// </summary>
-    /// <returns></returns>
     private IEnumerator SpawnMovingEnemy() // the IEnumerator here allows this function to call itself
     {
         while (_isSpawning)
@@ -78,7 +70,6 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Spawns a stationary enemy
     /// </summary>
-    /// <returns></returns>
     private IEnumerator SpawnStationaryEnemy() // the IEnumerator here allows this function to call itself
     {
         while (_isSpawning)
@@ -117,34 +108,5 @@ public class GameManager : MonoBehaviour
 
         _iTweenMoveToPath.FollowRandomPath();
     }   
-
-    private IEnumerator SpawnEnemyOnPathOne()
-    {
-        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
-        var _iTweenMoveToPath = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-
-        yield return StartCoroutine(_iTweenMoveToPath.FollowPathOne(_iTweenMoveToPath.frequency, _iTweenMoveToPath.numberOfEnemiesToSpawn));
-        print("Spawning Enemy On Path One");
-    }
-
-    private IEnumerator SpawnEnemyOnPathTwo()
-    {
-          var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform).gameObject;
-
-          iTween.MoveTo(_pathEnemyInstance, iTween.Hash("path", iTweenPath.GetPath("path2"), "time", 5));
-          print("Spawning Enemy On Path Two");
-
-          yield return new WaitForSeconds(2);
-    }
-
-    private void SpawnEnemyOnPathThree()
-    {
-        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
-        var _iTweenMoveToPath = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-
-        _iTweenMoveToPath.FollowPathThree();
-        print("Spawning Enemy On Path Three");
-    }
-
-    
+  
 }; 

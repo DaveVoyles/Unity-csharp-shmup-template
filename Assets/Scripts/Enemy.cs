@@ -72,6 +72,7 @@ public class Enemy : MonoBehaviour
         // Grabs current instance of bullet
         Transform _enemyBulletInstance = PoolManager.Pools["BulletPool"].Spawn(_enemyBulletPrefab);
 
+        //TODO: Do I even need this here? At least, the SetActive part?
         _enemyBulletInstance.gameObject.transform.position = _enemyTransform.position;
         _enemyBulletInstance.gameObject.SetActive(true);
 

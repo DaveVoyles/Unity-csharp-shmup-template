@@ -62,13 +62,13 @@ public class EnemyMovementBehavior : MonoBehaviour {
 
         }
         if(_currentState == CurrentState.MoveToPlayerSlowly)
-        {
+        {   //TODO: ADD Tweening here
             const float speed = 4f;
             float step = speed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, _playerTransform.position, step);
         }
         if (_currentState == CurrentState.MoveToPlayerQuickly)
-        {
+        {   //TODO: ADD Tweening here
             const float speed = 8f;
             float step = speed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, _playerTransform.position, step);

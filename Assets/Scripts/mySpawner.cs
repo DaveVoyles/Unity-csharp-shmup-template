@@ -47,7 +47,7 @@ public class mySpawner : MonoBehaviour
 
         this.pool.CreatePrefabPool(prefabPool);
 
-        this.StartCoroutine(Spawner());
+
 
 
         // NEW EXAMPLE... Preabs[] dict

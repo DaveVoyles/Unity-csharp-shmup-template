@@ -11,12 +11,15 @@ using System.Collections;
 public class iTweenMoveToPath : MonoBehaviour
 {
 
-    private string _iTweenPathName        = null;      // What is the name of the path?
-    private int    _timeToRunPath         = 0;          // How long should it take to go over the path?
-    public int     numberOfEnemiesToSpawn = 3;  // How many enemies should run along the path?
-    public float   frequency              = 2;               // How often should this path be used?
+    private string _iTweenPathName        = null;   // What is the name of the path?
+    private int    _timeToRunPath         = 0;      // How long should it take to go over the path?
+    public int     numberOfEnemiesToSpawn = 3;      // How many enemies should run along the path?
+    public float   frequency              = 2;      // How often should this path be used?
 
 
+    /// <summary>
+    /// Uses a random time and random path name, then builds a path and has the enemy run along it
+    /// </summary>
     public void FollowRandomPath()
     {
         GeneratePathName();
@@ -35,7 +38,7 @@ public class iTweenMoveToPath : MonoBehaviour
     }
     public void FollowPathThree()
     {
-        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path3"), "time", 5, "oncomplete", "deactivate"));
+        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path3"), "time", 5, "movetopath", false, "oncomplete", "deactivate"));
     }
 
     /// <summary>
@@ -44,9 +47,7 @@ public class iTweenMoveToPath : MonoBehaviour
     /// </summary>
     private void deactivate()
     {
-        gameObject.SetActive(false);
-        // TODO: put the bullet back on the stack for later re-use
-       // PoolManager.Pools["BulletPool"].Despawn(gameObject.transform);
+        PoolManager.Pools["BulletPool"].Despawn(gameObject.transform);
     }
 
     /// <summary>
@@ -69,26 +70,6 @@ public class iTweenMoveToPath : MonoBehaviour
         _timeToRunPath = Random.Range(5, 10);   
 
         return _timeToRunPath;
-    }
-
-
-    /// <summary>
-    /// Spawns enemies on path one
-    /// </summary>
-    /// <param name="_frequency">How often the enemy should spawn</param>
-    /// <param name="numberOfEnemiesToSpawn">The number of enemies to spawn</param>
-    /// <returns></returns>
-    public IEnumerator FollowPathOne(float frequency, int numberOfEnemiesToSpawn)
-    {
-        var numberOfEnemiesSpawned = 0;
-        if (numberOfEnemiesSpawned < numberOfEnemiesToSpawn)
-        {
-
-            iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path1"), "time", 5, "oncomplete", "deactivate"));
-            numberOfEnemiesSpawned++;
-            Debug.Log("We can spawn!");
-            yield return new WaitForSeconds(frequency);
-        }
     }
 
 

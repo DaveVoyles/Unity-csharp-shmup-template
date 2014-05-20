@@ -16,7 +16,7 @@ public class Spawner : MonoBehaviour {
     public float pathOneSpawnInterval         = 0f;
     public float pathTwoSpawnInterval         = 0f;
     public float pathThreeSpawnInterval       = 0f;
-    public float spawnStationaryEnemyInterval = 0f;
+    public float stationaryEnemyInterval      = 0f;
     public float timeToRunPathOne             = 0;
     public float timeToRunPathTwo             = 0;
     public float timeToRunPathThree           = 0;
@@ -139,7 +139,7 @@ public class Spawner : MonoBehaviour {
             StartCoroutine(scriptRef.ShootTowardPlayer(shootDelay));
 
             // Wait 3 seconds, then call this function again 
-            yield return new WaitForSeconds(spawnStationaryEnemyInterval);
+            yield return new WaitForSeconds(stationaryEnemyInterval);
         }
     }
 
@@ -149,7 +149,7 @@ public class Spawner : MonoBehaviour {
     private void SpawnEnemyOnRandomPath()
     {
         var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
-        var _iTweenMoveToPath = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+        var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
         _iTweenMoveToPath.FollowRandomPath();
     }   

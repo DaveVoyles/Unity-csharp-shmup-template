@@ -25,10 +25,10 @@ public class iTweenMoveToPath : MonoBehaviour
     }
 
     /// <summary>
-    /// Follows a preset path
+    /// Follows the first path from iTween paths
     /// </summary>
-    /// <param name="timeToRunPath"></param>
-    /// <param name="easeType"></param>
+    /// <param name="timeToRunPath">How long will it take to finish?</param>
+    /// <param name="easeType"> Which type of standard easing will we use?</param>
     public void FollowPathOne(float timeToRunPath, iTween.EaseType easeType)
     {
         iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath("path1"), "time", timeToRunPath,

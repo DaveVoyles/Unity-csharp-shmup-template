@@ -10,6 +10,7 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
+    // Keep globals here, so that other classes (enemy, etc.) can have one point of reference
     public Player        player;
     public static int    score = 0;          // counts how many enemies have been killed
     public static int    lives = 5;          // how many lives the player has left
@@ -19,8 +20,9 @@ public class GameManager : MonoBehaviour
     private int          _respawnTime = 3;
     private SoundManager _soundManager;
 
+
     private void Start()
-    {   
+    {  
         _soundManager = SoundManager.GetSingleton();    // Grab SoundMananger
         _soundManager.PlayClip(backgroundMusic, false); // Play track
     }

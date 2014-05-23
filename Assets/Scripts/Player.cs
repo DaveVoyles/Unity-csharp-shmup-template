@@ -8,20 +8,23 @@ using Random = UnityEngine.Random;
 
 public class Player : MonoBehaviour
 {
-    private SoundManager _soundManager;                       // reference to global sound manager  
-    private float _nextFire                 = 0;              // used to time the next shot
-    private Transform _playerTransform;                       // for caching
-    private float _playerSpeed              = 18;
-    private float _fireRate                 = (float)0.035;   // time between shots
-    private float _playerBulletSpeed        = 25;
-    private String _particlePool            = "ParticlePool";
-    private String _bulletPool              = "BulletPool";
-    private float _shipInvisibleTime        = 1.5f;
-    private float _blinkRate                = .4f;
-    private int _numberOfTimesToBlink       = 10;
-    private int _blinkCount                 = 0;
-    private enum state{ Playing, Explosion, Invincible }
-    private state _state                    = state.Playing;
+    private SoundManager _soundManager;                           // reference to global sound manager  
+    private float        _nextFire                = 0;            // used to time the next shot
+    private Transform    _playerTransform;                        // for caching
+    private float        _playerSpeed             = 18;
+    private float        _fireRate                = (float)0.035; // time between shots
+    private float        _playerBulletSpeed       = 25;
+    private String       _particlePool            = "ParticlePool";
+    private String       _bulletPool              = "BulletPool";
+    private float        _shipInvisibleTime       = 1.5f;
+    private float        _blinkRate               = .4f;
+    private int          _numberOfTimesToBlink    = 10;
+    private int          _blinkCount              = 0;
+    private enum state  { Playing, Explosion, Invincible }
+    private state        _state                   = state.Playing;
+    private float        _bulletLeft = -10;
+    private float        _bulletCenter = 0;
+    private float        _bulletRight = 10;
 
     private Transform _playerSpawnPoint;
 
@@ -33,10 +36,9 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        _playerTransform         = transform;       // caching the transform is faster than accessing 'transform' directly
+        _playerTransform         = transform;                                     // caching the transform is faster than accessing 'transform' directly
         _soundManager            = SoundManager.GetSingleton();
-        // set reference to Spawn Point (which is a child of Main Camera)
-        _playerSpawnPoint = GameObject.Find("PlayerSpawnPoint").transform;
+        _playerSpawnPoint        = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point (which is a child of Main Camera)
     }
 
     void Update()
@@ -48,8 +50,7 @@ public class Player : MonoBehaviour
             var horizontalMove = (_playerSpeed*Input.GetAxis("Horizontal"))*Time.deltaTime;
             var verticalMove   = (_playerSpeed*Input.GetAxis("Vertical"  ))*Time.deltaTime;
             var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
-            // prevents the player moving above its max speed on diagonals
-            moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed*Time.deltaTime);
+            moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); // prevents the player moving above its max speed on diagonals
 
             // move the player
             _playerTransform.Translate(moveVector);
@@ -63,7 +64,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void CheckIfShooting()
     {
-        if (Input.GetButton("Fire1") && Time.time > _nextFire)
+        if (Input.GetButton("Fire1") && Time.time > _nextFire && _state == state.Playing)
         {
             // delay the next shot by the firing rate
             _nextFire = Time.time + _fireRate;
@@ -85,6 +86,20 @@ public class Player : MonoBehaviour
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
 
+    private void ShootSpreadWeapon()
+    {
+        // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+        Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab);
+
+        // position, enable, then set velocity
+        _playerBulletInstance.gameObject.transform.position = _playerTransform.position;
+        _playerBulletInstance.gameObject.SetActive(true);
+        _playerBulletInstance.gameObject.GetComponent<Bullet>().velocity = new Vector3(_playerBulletSpeed, 0, 0);
+
+        // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
+    }
+
+
     private void ShootMissiles()
     {
         // Grabs current instance of bullet, by retrieving missile prefab from spawn pool
@@ -101,7 +116,8 @@ public class Player : MonoBehaviour
     /// </summary>
     void OnTriggerEnter(Collider other)
     {
-        if (_state != state.Playing) return;
+        // Is the player doing anything but playing? Get out of here.
+        if (_state != state.Playing) return;    
 
         // check if it was a bullet we hit, if so put it back on its stack
         if (other.CompareTag("EnemyBullet"))
@@ -160,40 +176,37 @@ public class Player : MonoBehaviour
     {
         _state = state.Explosion;
         this.Explode();
-        this.gameObject.renderer.enabled = false;
-        // Spawn player at spawn point
+        this.gameObject.renderer.enabled = false; // make player invisible
         this.transform.position = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y,
-                                               this.transform.position.z);
-        yield return new WaitForSeconds(_shipInvisibleTime);
-
+            this.transform.position.z); // move player to PlayerSpawnPoint
+        yield return new WaitForSeconds(_shipInvisibleTime); // Wait a few seconds...
         if (GameManager.lives > 0)
         {
-            print("Lives are > 0");
             // Create particle effect at spawn point
-           var _particleInstance = PoolManager.Pools[_particlePool].Spawn(this.spawnParticlePrefab, this.transform.position, this.transform.rotation);
+            var _particleInstance = PoolManager.Pools[_particlePool].Spawn(this.spawnParticlePrefab,
+                this.transform.position, this.transform.rotation);
             // Start off with the player being displayed & make it invincible
             this.gameObject.renderer.enabled = true;
             this._state = state.Invincible;
 
+            // Blink 10 times
             while (_blinkCount < _numberOfTimesToBlink)
             {
                 // Flip back and forth between visible / invisible
-                gameObject.renderer.enabled = !this.gameObject.renderer.enabled;
+                this.gameObject.renderer.enabled = !this.gameObject.renderer.enabled;
 
-                if (this.gameObject.renderer.enabled == false)
-                {
+                if (this.gameObject.renderer.enabled == true){
                     _blinkCount++;
-                    print("Blink count is:" + "" + _blinkCount);
-                    yield return new WaitForSeconds(_blinkRate);
+                    print(_blinkCount);
                 }
-
+                yield return new WaitForSeconds(_blinkRate);
             }
-            //this._blinkCount = 0;
-            //this._state      = state.Playing;
             // Place particle back in pool after 2 seconds
             PoolManager.Pools[_particlePool].Despawn(_particleInstance, 2);
         }
-
+        // Reset blink count
+       // this._blinkCount = 0;    // If this is uncommented, when the player respawns, it will keep respawning, quickly, and create particles. WHY??
+        this._state = state.Playing;
     }
 
 

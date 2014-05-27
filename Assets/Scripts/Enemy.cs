@@ -18,7 +18,7 @@ public class Enemy : MonoBehaviour
     private Transform      _enemyBulletPrefab;
     private String         _particlePool = "ParticlePool";
     private String         _bulletPool   = "BulletPool";
-    private SpawnPool _spawnPool;
+    private SpawnPool     _spawnPool;
 
     void Start()
     {

@@ -25,8 +25,9 @@ public class Player : MonoBehaviour
     private float        _bulletLeft = -10;
     private float        _bulletCenter = 0;
     private float        _bulletRight = 10;
+    private float        _bulletSpeed = 2500;
+    private Transform    _playerSpawnPoint;                     // Finds spawn point in editor
 
-    private Transform _playerSpawnPoint;
 
     public Transform playerBulletPrefab;
     public Transform playerMissilePrefab;
@@ -42,22 +43,23 @@ public class Player : MonoBehaviour
     }
 
     void Update()
-    {
+    {   
         // Is the player alive?
-        if (_state != state.Explosion)
-        {
-            // read movement inputs
-            var horizontalMove = (_playerSpeed*Input.GetAxis("Horizontal"))*Time.deltaTime;
-            var verticalMove   = (_playerSpeed*Input.GetAxis("Vertical"  ))*Time.deltaTime;
-            var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
-            moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); // prevents the player moving above its max speed on diagonals
+        if (_state == state.Explosion) return;
 
-            // move the player
-            _playerTransform.Translate(moveVector);
+        var horizontalMove = (_playerSpeed * Input.GetAxis("Horizontal")) * Time.deltaTime;
+        var verticalMove = (_playerSpeed * Input.GetAxis("Vertical")) * Time.deltaTime;
+        var moveVector = new Vector3(horizontalMove, 0, verticalMove);
+        // prevents the player moving above its max speed on diagonals
+        moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime);
+        moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); // prevents the player moving above its max speed on diagonals
 
-            CheckIfShooting();
-        }
+        // move the player
+        _playerTransform.Translate(moveVector);
+
+        CheckIfShooting();
     }
+
 
     /// <summary>
     /// Is the player shooting? Left-click for bullets, right-click for missiles
@@ -69,32 +71,57 @@ public class Player : MonoBehaviour
             // delay the next shot by the firing rate
             _nextFire = Time.time + _fireRate;
 
-            ShootBullets();
+          //  ShootBullets();
+            ShootSpreadWeapon();
         }
     }
+
+    //private void ShootBullets()
+    //{
+    //    // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+    //    Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab);
+
+    //    // position, then set velocity
+    //    _playerBulletInstance.gameObject.transform.position = _playerTransform.position;
+    //    _playerBulletInstance.gameObject.GetComponent<Bullet>().velocity = new Vector3(_playerBulletSpeed, 0, 0);
+
+    //    // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
+    //}
 
     private void ShootBullets()
     {
         // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab);
+        Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
 
-        // position, enable, then set velocity
-        _playerBulletInstance.gameObject.transform.position = _playerTransform.position;
-        _playerBulletInstance.gameObject.SetActive(true);
-        _playerBulletInstance.gameObject.GetComponent<Bullet>().velocity = new Vector3(_playerBulletSpeed, 0, 0);
+        // set rotation, then apply force
+        _playerBulletInstance.transform.Rotate(_bulletLeft, 0, 0);
+        _playerBulletInstance.rigidbody.AddForce(_playerBulletInstance.transform.right * 1000);    
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
 
+    /// <summary>
+    /// Shoots three bullets at once, like the spread weapon in Contra.
+    /// </summary>
     private void ShootSpreadWeapon()
     {
         // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab);
+        Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        // set rotation, then apply force
+        _playerBulletInstance.transform.Rotate(0, 0, _bulletLeft);
+        _playerBulletInstance.rigidbody.AddForce(_playerBulletInstance.transform.right * this._bulletSpeed);
 
-        // position, enable, then set velocity
-        _playerBulletInstance.gameObject.transform.position = _playerTransform.position;
-        _playerBulletInstance.gameObject.SetActive(true);
-        _playerBulletInstance.gameObject.GetComponent<Bullet>().velocity = new Vector3(_playerBulletSpeed, 0, 0);
+        // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+        Transform _playerBulletInstance2 = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        // set rotation, then apply force
+        _playerBulletInstance2.transform.Rotate(0, 0, _bulletCenter);
+        _playerBulletInstance2.rigidbody.AddForce(_playerBulletInstance2.transform.right * this._bulletSpeed);
+
+        // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+        Transform _playerBulletInstance3 = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        // set rotation, then apply force
+        _playerBulletInstance3.transform.Rotate(0, 0,_bulletRight );
+        _playerBulletInstance3.rigidbody.AddForce(_playerBulletInstance3.transform.right * this._bulletSpeed);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -127,12 +154,12 @@ public class Player : MonoBehaviour
             this.KillPlayer(other);
         }
         // If it is a pickup, then spawn the correct option
-        if (other.CompareTag("Pickup"))
-        {
-            other.gameObject.GetComponent<Pickup>().SpawnMainOption();
-            // TODO: Add this back to the spawning pool, not deactivate it
-            other.gameObject.SetActive(false);
-        }
+        //if (other.CompareTag("Pickup"))
+        //{
+        //    other.gameObject.GetComponent<Pickup>().SpawnMainOption();
+        //    // TODO: Add this back to the spawning pool, not deactivate it
+        //    other.gameObject.SetActive(false);
+        //}
         // if it was an enemy, just destroy it and kill the player
         if (other.CompareTag("Enemy"))
         {
@@ -211,4 +238,8 @@ public class Player : MonoBehaviour
 
 
 }
+
+
+
+
 

@@ -23,6 +23,10 @@ public class Spawner : MonoBehaviour {
     public iTween.EaseType pathOneEaseType;
     public iTween.EaseType pathTwoEaseType;
     public iTween.EaseType pathThreeEaseType;
+    public bool bSpawnPathOne = false;
+    public bool bSpawnPathTwo = false;
+    public bool bSpawnPathThree = false;
+    public bool bSpawnRandomPath = false;
 
     private string _nameOfPool = "BulletPool";  
     private SpawnPool _pool    = null;
@@ -40,11 +44,25 @@ public class Spawner : MonoBehaviour {
         this._pool.group.localPosition = new Vector3(1.5f, 0, 0);
         this._pool.group.localRotation = Quaternion.identity;
 
-        this.StartCoroutine(SpawnPathOne());
-        this.StartCoroutine(SpawnPathTwo());
-        this.StartCoroutine(SpawnPathThree());
+        if (bSpawnPathOne)
+        {
+            this.StartCoroutine(SpawnPathOne());
+        }
+        if (bSpawnPathTwo)
+        {
+            this.StartCoroutine(SpawnPathTwo());
+        }
+        if (bSpawnPathThree)
+        {
+            this.StartCoroutine(SpawnPathThree());
+        }
+        if (bSpawnRandomPath)
+        {
+            this.SpawnEnemyOnRandomPath();
+        }
+
         this.StartCoroutine(SpawnStationaryEnemy());
-        this.SpawnEnemyOnRandomPath();
+
 	}
 	
     /// <summary>

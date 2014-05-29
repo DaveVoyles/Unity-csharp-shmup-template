@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     private float        _nextFire                = 0;            // used to time the next shot
     private Transform    _playerTransform;                        // for caching
     private float        _playerSpeed             = 18;
-    private float        _fireRate                = (float)0.035; // time between shots
+    private float        _fireRate                = 0.035f; // time between shots
     private float        _playerBulletSpeed       = 25;
     private String       _particlePool            = "ParticlePool";
     private String       _bulletPool              = "BulletPool";
@@ -22,11 +22,9 @@ public class Player : MonoBehaviour
     private int          _blinkCount              = 0;
     private enum state  { Playing, Explosion, Invincible }
     private state        _state                   = state.Playing;
-    private float        _bulletLeft = -10;
-    private float        _bulletCenter = 0;
-    private float        _bulletRight = 10;
-    private float        _bulletSpeed = 2500;
-    private Transform    _playerSpawnPoint;                     // Finds spawn point in editor
+    private const float _bulletVelX               = 40f;
+    private const int   _spreadWeaponYoffset      = 10;
+    private Transform   _playerSpawnPoint;                     // Finds spawn point in editor
 
 
     public Transform playerBulletPrefab;
@@ -57,6 +55,12 @@ public class Player : MonoBehaviour
         // move the player
         _playerTransform.Translate(moveVector);
 
+
+    }
+
+    private void FixedUpdate()
+    {
+        if (_state == state.Explosion) return;
         CheckIfShooting();
     }
 
@@ -76,52 +80,32 @@ public class Player : MonoBehaviour
         }
     }
 
-    //private void ShootBullets()
-    //{
-    //    // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-    //    Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab);
-
-    //    // position, then set velocity
-    //    _playerBulletInstance.gameObject.transform.position = _playerTransform.position;
-    //    _playerBulletInstance.gameObject.GetComponent<Bullet>().velocity = new Vector3(_playerBulletSpeed, 0, 0);
-
-    //    // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
-    //}
-
+    /// <summary>
+    /// Shoots one row of bullets in a straight line
+    /// </summary>
     private void ShootBullets()
     {
         // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-
-        // set rotation, then apply force
-        _playerBulletInstance.transform.Rotate(_bulletLeft, 0, 0);
-        _playerBulletInstance.rigidbody.AddForce(_playerBulletInstance.transform.right * 1000);    
+        Transform _playerBulletInstance          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        _playerBulletInstance.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y, this.transform.position.z);   
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
 
     /// <summary>
     /// Shoots three bullets at once, like the spread weapon in Contra.
+    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
     /// </summary>
     private void ShootSpreadWeapon()
     {
-        // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _playerBulletInstance = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        // set rotation, then apply force
-        _playerBulletInstance.transform.Rotate(0, 0, _bulletLeft);
-        _playerBulletInstance.rigidbody.AddForce(_playerBulletInstance.transform.right * this._bulletSpeed);
+        Transform _playerBulletInstance          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        _playerBulletInstance.rigidbody.velocity =  new Vector3(_bulletVelX, this.transform.position.y - _spreadWeaponYoffset, this.transform.position.z);
 
-        // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _playerBulletInstance2 = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        // set rotation, then apply force
-        _playerBulletInstance2.transform.Rotate(0, 0, _bulletCenter);
-        _playerBulletInstance2.rigidbody.AddForce(_playerBulletInstance2.transform.right * this._bulletSpeed);
+        Transform _playerBulletInstance2          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        _playerBulletInstance2.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y, this.transform.position.z);
 
-        // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _playerBulletInstance3 = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        // set rotation, then apply force
-        _playerBulletInstance3.transform.Rotate(0, 0,_bulletRight );
-        _playerBulletInstance3.rigidbody.AddForce(_playerBulletInstance3.transform.right * this._bulletSpeed);
+        Transform _playerBulletInstance3          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        _playerBulletInstance3.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y + _spreadWeaponYoffset, this.transform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -171,7 +155,7 @@ public class Player : MonoBehaviour
     /// Kill player, make invisible & invisible, spawn at spawn point, and create particles
     /// </summary>
     /// <param name="other"> Who are we colliding with?</param>
-    private void KillPlayer(Collider other)
+    public void KillPlayer(Collider other)
     {
         // Call enemy's Explode function for particles / sfx
         if (other.CompareTag("Enemy"))

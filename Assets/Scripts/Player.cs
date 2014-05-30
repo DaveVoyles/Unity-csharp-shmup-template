@@ -16,15 +16,13 @@ public class Player : MonoBehaviour
     private float        _playerBulletSpeed       = 25;
     private String       _particlePool            = "ParticlePool";
     private String       _bulletPool              = "BulletPool";
-    private float        _shipInvisibleTime       = 1.5f;
-    private float        _blinkRate               = .4f;
-    private int          _numberOfTimesToBlink    = 10;
-    private int          _blinkCount              = 0;
     private enum state  { Playing, Explosion, Invincible }
     private state        _state                   = state.Playing;
     private const float _bulletVelX               = 40f;
     private const int   _spreadWeaponYoffset      = 10;
     private Transform   _playerSpawnPoint;                     // Finds spawn point in editor
+    private float       _shipInvisibleTime        = 1f;
+
 
 
     public Transform playerBulletPrefab;
@@ -42,29 +40,28 @@ public class Player : MonoBehaviour
 
     void Update()
     {   
-        // Is the player alive?
+        // Is the player isn't alive, return
         if (_state == state.Explosion) return;
 
+        HandlePlayerMovement();
+        CheckIfShooting();
+    }
+
+    /// <summary>
+    /// Checks for inputs from player handles player movement
+    /// </summary>
+    private void HandlePlayerMovement()
+    {
         var horizontalMove = (_playerSpeed * Input.GetAxis("Horizontal")) * Time.deltaTime;
-        var verticalMove = (_playerSpeed * Input.GetAxis("Vertical")) * Time.deltaTime;
-        var moveVector = new Vector3(horizontalMove, 0, verticalMove);
+        var verticalMove   = (_playerSpeed * Input.GetAxis("Vertical")) * Time.deltaTime;
+        var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
         // prevents the player moving above its max speed on diagonals
         moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime);
         moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); // prevents the player moving above its max speed on diagonals
 
         // move the player
         _playerTransform.Translate(moveVector);
-
-
     }
-
-    private void FixedUpdate()
-    {
-        if (_state == state.Explosion) return;
-        CheckIfShooting();
-    }
-
-
     /// <summary>
     /// Is the player shooting? Left-click for bullets, right-click for missiles
     /// </summary>
@@ -98,8 +95,8 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ShootSpreadWeapon()
     {
-        Transform _playerBulletInstance          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        _playerBulletInstance.rigidbody.velocity =  new Vector3(_bulletVelX, this.transform.position.y - _spreadWeaponYoffset, this.transform.position.z);
+        Transform _playerBulletInstance           = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
+        _playerBulletInstance.rigidbody.velocity  =  new Vector3(_bulletVelX, this.transform.position.y - _spreadWeaponYoffset, this.transform.position.z);
 
         Transform _playerBulletInstance2          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
         _playerBulletInstance2.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y, this.transform.position.z);
@@ -157,13 +154,17 @@ public class Player : MonoBehaviour
     /// <param name="other"> Who are we colliding with?</param>
     public void KillPlayer(Collider other)
     {
-        // Call enemy's Explode function for particles / sfx
-        if (other.CompareTag("Enemy"))
+        // If player isn't alive, then return
+        if (_state == state.Playing)
         {
-            other.GetComponent<Enemy>().Explode();
-        }
-            GameManager.lives--;                   // lose a life   
+            // Call enemy's Explode function for particles / sfx
+            if (other.CompareTag("Enemy"))
+            {
+                other.GetComponent<Enemy>().Explode();
+            }
+            GameManager.lives--;
             StartCoroutine(this.OnBecameInvisible());
+        }
     }
 
     /// <summary>
@@ -187,39 +188,37 @@ public class Player : MonoBehaviour
     {
         _state = state.Explosion;
         this.Explode();
-        this.gameObject.renderer.enabled = false; // make player invisible
+        // Make player ship invisible
+        this.gameObject.renderer.enabled = false;
+        // move player to PlayerSpawnPoint
         this.transform.position = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y,
-            this.transform.position.z); // move player to PlayerSpawnPoint
-        yield return new WaitForSeconds(_shipInvisibleTime); // Wait a few seconds...
+            this.transform.position.z);
+        // Wait a few seconds...
+        yield return new WaitForSeconds(_shipInvisibleTime);
+
         if (GameManager.lives > 0)
         {
+            // Player is invincible while flashing
+            this._state = state.Invincible;
             // Create particle effect at spawn point
             var _particleInstance = PoolManager.Pools[_particlePool].Spawn(this.spawnParticlePrefab,
                 this.transform.position, this.transform.rotation);
-            // Start off with the player being displayed & make it invincible
+            // Make player ship visible again
             this.gameObject.renderer.enabled = true;
-            this._state = state.Invincible;
 
-            // Blink 10 times
-            while (_blinkCount < _numberOfTimesToBlink)
-            {
-                // Flip back and forth between visible / invisible
-                this.gameObject.renderer.enabled = !this.gameObject.renderer.enabled;
-
-                if (this.gameObject.renderer.enabled == true){
-                    _blinkCount++;
-                    print(_blinkCount);
-                }
-                yield return new WaitForSeconds(_blinkRate);
-            }
+            // Make ship flash
+            var flashScript = gameObject.GetComponent<FlashingObject>();
+            StartCoroutine(flashScript.Flash());
             // Place particle back in pool after 2 seconds
             PoolManager.Pools[_particlePool].Despawn(_particleInstance, 2);
+
+            // Wait a few seconds, and make player invincible until done flashing
+            this._state = state.Invincible;
+            yield return new WaitForSeconds(2.2f);
         }
-        // Reset blink count
-       // this._blinkCount = 0;    // If this is uncommented, when the player respawns, it will keep respawning, quickly, and create particles. WHY??
+        // Not flashing anymore? Now you can take hits
         this._state = state.Playing;
     }
-
 
 }
 

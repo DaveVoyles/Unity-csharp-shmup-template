@@ -1,11 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
-/**
- * Restricts the movement of the object to the screen.
+﻿/* Restricts the movement of the object to the screen.
  * @author Jorjon
  * http://answers.unity3d.com/questions/174958/keeping-the-player-inside-the-screen.html
  */
-
+using UnityEngine;
+using System.Collections;
 using UnityEngine;
 
 public class Boundings2D : MonoBehaviour
@@ -13,10 +11,11 @@ public class Boundings2D : MonoBehaviour
 
     void LateUpdate()
     {
-        var left = Camera.main.ViewportToWorldPoint(Vector3.zero).x;
-        var right = Camera.main.ViewportToWorldPoint(Vector3.one).x;
-        var top = Camera.main.ViewportToWorldPoint(Vector3.zero).y;
+        var left   = Camera.main.ViewportToWorldPoint(Vector3.zero).x;
+        var right  = Camera.main.ViewportToWorldPoint(Vector3.one).x;
+        var top    = Camera.main.ViewportToWorldPoint(Vector3.zero).y;
         var bottom = Camera.main.ViewportToWorldPoint(Vector3.one).y;
+
         float x = transform.position.x, y = transform.position.y;
         if (transform.position.x <= left + renderer.bounds.extents.x)
         {

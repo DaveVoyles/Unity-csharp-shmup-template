@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
 {
     private SoundManager _soundManager;                           // reference to global sound manager  
     private float        _nextFire                = 0;            // used to time the next shot
-    private Transform    _playerTransform;                        // for caching
+    private Transform    _xform;                        // for caching
     private float        _playerSpeed             = 18;
     private float        _fireRate                = 0.035f; // time between shots
     private float        _playerBulletSpeed       = 25;
@@ -33,9 +33,10 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        _playerTransform         = transform;                                     // caching the transform is faster than accessing 'transform' directly
-        _soundManager            = SoundManager.GetSingleton();
-        _playerSpawnPoint        = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point (which is a child of Main Camera)
+        _xform                    = transform;                                     // caching the transform is faster than accessing 'transform' directly
+        _soundManager             = SoundManager.GetSingleton();
+        _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point (which is a child of Main Camera)
+        _xform.position           = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
     }
 
     void Update()
@@ -60,7 +61,7 @@ public class Player : MonoBehaviour
         moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); // prevents the player moving above its max speed on diagonals
 
         // move the player
-        _playerTransform.Translate(moveVector);
+        _xform.Translate(moveVector);
     }
     /// <summary>
     /// Is the player shooting? Left-click for bullets, right-click for missiles
@@ -83,8 +84,8 @@ public class Player : MonoBehaviour
     private void ShootBullets()
     {
         // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _playerBulletInstance          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        _playerBulletInstance.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y, this.transform.position.z);   
+        Transform _bulletInst          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
+        _bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y, this.transform.position.z);   
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -95,14 +96,14 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ShootSpreadWeapon()
     {
-        Transform _playerBulletInstance           = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        _playerBulletInstance.rigidbody.velocity  =  new Vector3(_bulletVelX, this.transform.position.y - _spreadWeaponYoffset, this.transform.position.z);
+        Transform _bulletInst           = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
+        _bulletInst.rigidbody.velocity  =  new Vector3(_bulletVelX, this._xform.position.y - _spreadWeaponYoffset, this._xform.position.z);
 
-        Transform _playerBulletInstance2          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        _playerBulletInstance2.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y, this.transform.position.z);
+        Transform _bulletInst2          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
+        _bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, this._xform.position.y, this._xform.position.z);
 
-        Transform _playerBulletInstance3          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._playerTransform.position, Quaternion.identity);
-        _playerBulletInstance3.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y + _spreadWeaponYoffset, this.transform.position.z);
+        Transform _bulletInst3          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
+        _bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, this._xform.position.y + _spreadWeaponYoffset, this._xform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -173,7 +174,7 @@ public class Player : MonoBehaviour
     public void Explode()
     {
         // TODO: play sound
-       var _explosionInstance = PoolManager.Pools[_particlePool].Spawn(this.deathExplosionPrefab, this.transform.position, this.transform.rotation);
+       var _explosionInstance = PoolManager.Pools[_particlePool].Spawn(this.deathExplosionPrefab, this._xform.position, this._xform.rotation);
         // Shake Camera
         Camera.main.GetComponent<CameraShake>().Shake();
         // Despawn particle instance after 2 seconds
@@ -192,7 +193,7 @@ public class Player : MonoBehaviour
         this.gameObject.renderer.enabled = false;
         // move player to PlayerSpawnPoint
         this.transform.position = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y,
-            this.transform.position.z);
+            this._xform.position.z);
         // Wait a few seconds...
         yield return new WaitForSeconds(_shipInvisibleTime);
 
@@ -202,7 +203,7 @@ public class Player : MonoBehaviour
             this._state = state.Invincible;
             // Create particle effect at spawn point
             var _particleInstance = PoolManager.Pools[_particlePool].Spawn(this.spawnParticlePrefab,
-                this.transform.position, this.transform.rotation);
+                this._xform.position, this._xform.rotation);
             // Make player ship visible again
             this.gameObject.renderer.enabled = true;
 

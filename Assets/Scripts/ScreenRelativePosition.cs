@@ -9,13 +9,13 @@ public class ScreenRelativePosition : MonoBehaviour {
 
     public enum ScreenEdge { LEFT, RIGHT, TOP, BOTTOM };
     public ScreenEdge screenEdge;
-    public float yOffset;
-    public float xOffset;
+    public float      yOffset;
+    public float      xOffset;
 
 
 	void Start () {
         Vector3 newPosition = transform.position;
-        Camera camera = Camera.main;
+        Camera camera       = Camera.main;
 
         switch (screenEdge)
         {

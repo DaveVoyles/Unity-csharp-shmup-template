@@ -43,6 +43,7 @@ public class SoundManager : MonoBehaviour
 	public static SoundManager GetSingleton() {
 		if (sGameObj == null) {
 			sGameObj = new GameObject();
+		    sGameObj.name = "SoundManager";
 			return (SoundManager) sGameObj.AddComponent(typeof(SoundManager));
 		}
 		return (SoundManager) sGameObj.GetComponent(typeof(SoundManager));

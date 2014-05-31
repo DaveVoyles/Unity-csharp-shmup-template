@@ -22,6 +22,9 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
+        if (particlePrefab == null){
+            print("One of your prefabs in" + " " + this.name + " " + "are null");
+        }
         _xform         = transform; // cached for performance
         _bulletPrefab  = PoolManager.Pools[_bulletPool].prefabs["EnemyBulletPrefab"];
         _startingColor = renderer.material.color; 

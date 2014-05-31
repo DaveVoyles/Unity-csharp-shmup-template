@@ -10,20 +10,24 @@ public class SpawnPoint : MonoBehaviour
     public AudioClip sfxSpawning;
     public int numberOfEnemiesToSpawn = 10;
     public Transform enemyTypeXform;
-    public float spawnInterval = 1.1f;
+    public float spawnInterval        = 1.1f;
+    public bool isSpawning            = false;
 
-    private Transform _xform;                            // cache spawn point xform
-    private String _particlePool = "ParticlePool";
-    private string _nameOfPool   = "BulletPool";
-    private SpawnPool _pool      = null;
+
+    private String _particlePool   = "ParticlePool";
+    private string _nameOfPool     = "BulletPool";
+    private SpawnPool _pool        = null;
     private int _spawnSphereRadius = 5;
+    private Transform _xform;                            
     private Transform _playerXform;
 
 	private void Start ()
     {
-        CreateSpawnEffects();
-        InstantiateEnemies();
-	}
+	    if (isSpawning){
+	        CreateSpawnEffects();
+	        InstantiateEnemies();
+	    }
+    }
 
     private void Awake()
     {
@@ -38,7 +42,6 @@ public class SpawnPoint : MonoBehaviour
     /// </summary>
     private void CreateSpawnEffects()
     {
-        // Create particle effect at spawn point, then put them back in the stack after (2) seconds
         var _particleInst = PoolManager.Pools[_particlePool].Spawn(particleXform, _xform.position,_xform.rotation);
         PoolManager.Pools[_particlePool].Despawn(_particleInst, 2);
 

@@ -36,7 +36,10 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start()
-    {  
+    {
+        if (player == null) {
+            print("One of your prefabs in" + " " + this.name + " " + "are null");
+        }
         _soundManager = SoundManager.GetSingleton();    // Grab SoundMananger
         _soundManager.PlayClip(backgroundMusic, false); // Play track
     }

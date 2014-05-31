@@ -28,22 +28,23 @@ public class BoidController : MonoBehaviour
 			boid.transform.localPosition = new Vector3(
 							Random.value * collider.bounds.size.x,
 							Random.value * collider.bounds.size.y,
-							Random.value * collider.bounds.size.z) - collider.bounds.extents;
+							 collider.bounds.size.z) - collider.bounds.extents;
 			boid.controller = this;
 			boids.Add(boid);
+
 		}
 	}
 
-	void Update()
-	{
-		Vector3 center = Vector3.zero;
-		Vector3 velocity = Vector3.zero;
-		foreach (BoidFlocking boid in boids)
-		{
-			center += boid.transform.localPosition;
-			velocity += boid.rigidbody.velocity;
-		}
-		flockCenter = center / flockSize;
-		flockVelocity = velocity / flockSize;
-	}
+    void Update()
+    {
+        Vector3 center = Vector3.zero;
+        Vector3 velocity = Vector3.zero;
+        foreach (BoidFlocking boid in boids)
+        {
+            center += boid.transform.localPosition;
+            velocity += boid.rigidbody.velocity;
+        }
+        flockCenter = center / flockSize;
+        flockVelocity = velocity / flockSize;
+    }
 }

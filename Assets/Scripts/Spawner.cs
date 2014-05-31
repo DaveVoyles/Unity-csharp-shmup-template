@@ -44,25 +44,19 @@ public class Spawner : MonoBehaviour {
         this._pool.group.localPosition = new Vector3(1.5f, 0, 0);
         this._pool.group.localRotation = Quaternion.identity;
 
-        if (bSpawnPathOne)
-        {
+        if (bSpawnPathOne){
             this.StartCoroutine(SpawnPathOne());
         }
-        if (bSpawnPathTwo)
-        {
+        if (bSpawnPathTwo){
             this.StartCoroutine(SpawnPathTwo());
         }
-        if (bSpawnPathThree)
-        {
+        if (bSpawnPathThree){
             this.StartCoroutine(SpawnPathThree());
         }
-        if (bSpawnRandomPath)
-        {
+        if (bSpawnRandomPath){
             this.SpawnEnemyOnRandomPath();
         }
-
         this.StartCoroutine(SpawnStationaryEnemy());
-
 	}
 	
     /// <summary>
@@ -150,7 +144,6 @@ public class Spawner : MonoBehaviour {
 
             // Grab the "enemy" script, so that we can access the variables exposed
             var scriptRef = _enemyInstance.GetComponent<Enemy>();
-            scriptRef.hitPoints = 4;
 
             // waits a few seconds then shoots
             var shootDelay = Random.Range(0.5f, 2.0f);

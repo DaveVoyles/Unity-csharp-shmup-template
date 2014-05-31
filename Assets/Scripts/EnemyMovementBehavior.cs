@@ -8,10 +8,11 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(Targetable))]
-[RequireComponent(typeof(iTweenEvent))]
 public class EnemyMovementBehavior : MonoBehaviour {
 
-    private Transform _playerTransform = null;  
+    private Transform _playerXform = null;
+    private float _fastMoveSpeed   = 2.5f;
+    private float _slowMoveSpeed   = 4f;
     private enum CurrentState
     {
         Stopped,
@@ -21,40 +22,35 @@ public class EnemyMovementBehavior : MonoBehaviour {
         Stalk
     };
     private CurrentState _currentState = CurrentState.Stopped;
-    
+
     private void Awake()
     {
-        _playerTransform = GameObject.Find("Player").transform;
-        var targetable   = this.GetComponent<Targetable>();
+        _playerXform     = GameObject.Find("Player").transform;
+        var targetable   = GetComponent<Targetable>();
 
-        // Triggered once when this target is first detected by a TargetTracker .
-        targetable.AddOnDetectedDelegate(this.MoveToPlayerQuickly);
+        // Triggered once when this target is first detected by a TargetTracker 
+        targetable.AddOnDetectedDelegate(MoveToPlayerQuickly);
 
-        // Triggered once when this target is no longer detected by a TargetTracker.
-        targetable.AddOnNotDetectedDelegate(this.WanderAround);
+        // Triggered once when this target is no longer detected by a TargetTracker
+        targetable.AddOnNotDetectedDelegate(WanderAround);
     }
     
 
     /* Functions for event handlers 
      ************************************************/
-    private void StopMovement(TargetTracker source)
-    {
+    private void StopMovement(TargetTracker source){
         _currentState = CurrentState.Stopped;
     }
-    private void WanderAround(TargetTracker source)
-    {
+    private void WanderAround(TargetTracker source){
         _currentState = CurrentState.Wander;
     }
-    private void MoveToPlayerSlowly(TargetTracker source)
-    {
+    private void MoveToPlayerSlowly(TargetTracker source){
         _currentState = CurrentState.MoveToPlayerSlow;
     }
-    private void MoveToPlayerQuickly(TargetTracker source)
-    {
+    private void MoveToPlayerQuickly(TargetTracker source){
         _currentState = CurrentState.MoveToPlayerFast;
     }
-    private void Stalk(TargetTracker source)
-    {
+    private void Stalk(TargetTracker source){
         _currentState = CurrentState.Stalk;
     }
 
@@ -71,32 +67,34 @@ public class EnemyMovementBehavior : MonoBehaviour {
     private void HandleMovementStates()
     {
 
-        if (_currentState == CurrentState.Stopped)
-        {
-            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
+        if (_currentState == CurrentState.Stopped){
+            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         }
-        if (_currentState == CurrentState.Wander)
-        {
+        if (_currentState == CurrentState.Wander){
             //TODO: How do I create wandering logic?
             print("Wandering");
         }
-        if (_currentState == CurrentState.MoveToPlayerSlow)
-        {
-            
-            // Moves after the player quickly, using the "MoveToPlayerSlow" iTween event (attached)
-            iTweenEvent.GetEvent(gameObject, "MoveToPlayerSlow").Play();
-            print("Move To player Slow");
+        if (_currentState == CurrentState.MoveToPlayerSlow){
+            iTween.MoveUpdate(gameObject, _playerXform.position, _slowMoveSpeed);
         }
         if (_currentState == CurrentState.MoveToPlayerFast)
         {
-            // Moves after the player quickly, using the "MoveToPlayer" iTween event (attached)
-            iTweenEvent.GetEvent(gameObject, "MoveToPlayerFast").Play();
-            print("Move To Player Fast");
-        }
-        if (_currentState == CurrentState.Stalk)
-        {
+            //   iTween.PunchScale(gameObject, new Vector3(2,2,2), _slowMoveSpeed);
+            iTween.PunchScale(gameObject, iTween.Hash(
+                "time", _slowMoveSpeed,
+                "amount", new Vector3(2, 2, 2),
+                "oncomplete", "DashToPlayer"
+                ));
 
         }
+        if (_currentState == CurrentState.Stalk){
+            //TODO: Implement functionality 
+        }
+    }
+
+    private void DashToPlayer()
+    {
+        iTween.MoveUpdate(gameObject, _playerXform.position, _fastMoveSpeed);
     }
 }
 

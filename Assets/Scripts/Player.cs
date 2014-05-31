@@ -10,9 +10,9 @@ public class Player : MonoBehaviour
 {
     private SoundManager _soundManager;                           // reference to global sound manager  
     private float        _nextFire                = 0;            // used to time the next shot
-    private Transform    _xform;                        // for caching
+    private Transform    _xform;                                  // for caching
     private float        _playerSpeed             = 18;
-    private float        _fireRate                = 0.035f; // time between shots
+    private float        _fireRate                = 0.035f;       // time between shots
     private float        _playerBulletSpeed       = 25;
     private String       _particlePool            = "ParticlePool";
     private String       _bulletPool              = "BulletPool";
@@ -20,16 +20,14 @@ public class Player : MonoBehaviour
     private state        _state                   = state.Playing;
     private const float _bulletVelX               = 40f;
     private const int   _spreadWeaponYoffset      = 10;
-    private Transform   _playerSpawnPoint;                     // Finds spawn point in editor
+    private Transform   _playerSpawnPoint;                        // Finds spawn point in editor
     private float       _shipInvisibleTime        = 1f;
-
-
-
+    
     public Transform playerBulletPrefab;
     public Transform playerMissilePrefab;
     public AudioClip sfxShoot;
-    public Transform deathExplosionPrefab;                     // particle prefab
-    public Transform spawnParticlePrefab;                      // particle prefab
+    public Transform deathExplosionPrefab;                        // particle prefab
+    public Transform spawnParticlePrefab;                         // particle prefab
 
     void Start()
     {
@@ -58,7 +56,7 @@ public class Player : MonoBehaviour
         var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
         // prevents the player moving above its max speed on diagonals
         moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime);
-        moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); // prevents the player moving above its max speed on diagonals
+        moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); 
 
         // move the player
         _xform.Translate(moveVector);
@@ -84,8 +82,8 @@ public class Player : MonoBehaviour
     private void ShootBullets()
     {
         // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _bulletInst          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
-        _bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, this.transform.position.y, this.transform.position.z);   
+        Transform _bulletInst          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        _bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, transform.position.y, transform.position.z);   
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -96,14 +94,14 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ShootSpreadWeapon()
     {
-        Transform _bulletInst           = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
-        _bulletInst.rigidbody.velocity  =  new Vector3(_bulletVelX, this._xform.position.y - _spreadWeaponYoffset, this._xform.position.z);
+        Transform _bulletInst           = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        _bulletInst.rigidbody.velocity  =  new Vector3(_bulletVelX, _xform.position.y - _spreadWeaponYoffset, _xform.position.z);
 
-        Transform _bulletInst2          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
-        _bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, this._xform.position.y, this._xform.position.z);
+        Transform _bulletInst2          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        _bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y, _xform.position.z);
 
-        Transform _bulletInst3          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, this._xform.position, Quaternion.identity);
-        _bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, this._xform.position.y + _spreadWeaponYoffset, this._xform.position.z);
+        Transform _bulletInst3          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        _bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y + _spreadWeaponYoffset, _xform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -133,7 +131,7 @@ public class Player : MonoBehaviour
         {
             // put the bullet back on the stack for later re-use
             PoolManager.Pools[_bulletPool].Despawn(other.transform);
-            this.KillPlayer(other);
+            KillPlayer(other);
         }
         // If it is a pickup, then spawn the correct option
         //if (other.CompareTag("Pickup"))
@@ -145,7 +143,7 @@ public class Player : MonoBehaviour
         // if it was an enemy, just destroy it and kill the player
         if (other.CompareTag("Enemy"))
         {
-            this.KillPlayer(other);
+            KillPlayer(other);
         }
     }
 
@@ -164,7 +162,7 @@ public class Player : MonoBehaviour
                 other.GetComponent<Enemy>().Explode();
             }
             GameManager.lives--;
-            StartCoroutine(this.OnBecameInvisible());
+            StartCoroutine(OnBecameInvisible());
         }
     }
 
@@ -174,7 +172,7 @@ public class Player : MonoBehaviour
     public void Explode()
     {
         // TODO: play sound
-       var _explosionInstance = PoolManager.Pools[_particlePool].Spawn(this.deathExplosionPrefab, this._xform.position, this._xform.rotation);
+       var _explosionInstance = PoolManager.Pools[_particlePool].Spawn(deathExplosionPrefab, _xform.position, _xform.rotation);
         // Shake Camera
         Camera.main.GetComponent<CameraShake>().Shake();
         // Despawn particle instance after 2 seconds
@@ -188,24 +186,24 @@ public class Player : MonoBehaviour
     private IEnumerator OnBecameInvisible()
     {
         _state = state.Explosion;
-        this.Explode();
+        Explode();
         // Make player ship invisible
-        this.gameObject.renderer.enabled = false;
+        gameObject.renderer.enabled = false;
         // move player to PlayerSpawnPoint
-        this.transform.position = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y,
-            this._xform.position.z);
+        transform.position = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y,
+            _xform.position.z);
         // Wait a few seconds...
         yield return new WaitForSeconds(_shipInvisibleTime);
 
         if (GameManager.lives > 0)
         {
             // Player is invincible while flashing
-            this._state = state.Invincible;
+            _state = state.Invincible;
             // Create particle effect at spawn point
-            var _particleInstance = PoolManager.Pools[_particlePool].Spawn(this.spawnParticlePrefab,
-                this._xform.position, this._xform.rotation);
+            var _particleInstance = PoolManager.Pools[_particlePool].Spawn(spawnParticlePrefab,
+                _xform.position, _xform.rotation);
             // Make player ship visible again
-            this.gameObject.renderer.enabled = true;
+            gameObject.renderer.enabled = true;
 
             // Make ship flash
             var flashScript = gameObject.GetComponent<FlashingObject>();
@@ -214,11 +212,11 @@ public class Player : MonoBehaviour
             PoolManager.Pools[_particlePool].Despawn(_particleInstance, 2);
 
             // Wait a few seconds, and make player invincible until done flashing
-            this._state = state.Invincible;
+            _state = state.Invincible;
             yield return new WaitForSeconds(2.2f);
         }
         // Not flashing anymore? Now you can take hits
-        this._state = state.Playing;
+        _state = state.Playing;
     }
 
 }

@@ -12,8 +12,8 @@ public class FlashingObject : MonoBehaviour
 
     void Start()
     {
-        this._startingColor = this.renderer.material.color;
-        this._mat = GetComponent<MeshRenderer>().material;
+        _startingColor = renderer.material.color; 
+        _mat = GetComponent<MeshRenderer>().material;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class FlashingObject : MonoBehaviour
             yield return new WaitForSeconds(intervalTime);
         }
         // Return to starting color
-        this.renderer.material.color = this._startingColor;
+        renderer.material.color = _startingColor;
     }
 
 }

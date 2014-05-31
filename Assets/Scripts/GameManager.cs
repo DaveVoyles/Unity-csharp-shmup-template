@@ -20,6 +20,20 @@ public class GameManager : MonoBehaviour
     private int          _respawnTime = 3;
     private SoundManager _soundManager;
 
+    static GameObject GMGameObj;
+
+    /// <summary>
+    /// Sets up a static singleton instance of GameManager, which is accessible to everything
+    /// </summary>
+    /// <returns>GameMananger object</returns>
+    public static GameManager GetSingleton()
+    {
+        if (GMGameObj == null){
+            GMGameObj = new GameObject();
+            return (GameManager)GMGameObj.AddComponent(typeof(GameManager));
+        }
+        return (GameManager)GMGameObj.GetComponent(typeof(GameManager));
+    }
 
     private void Start()
     {  

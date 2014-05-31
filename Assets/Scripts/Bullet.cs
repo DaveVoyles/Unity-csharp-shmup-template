@@ -12,25 +12,30 @@ public class Bullet : MonoBehaviour
 
     private int     _dmg       = 1; // How much dmg does it do to objects it hits?
     private String _bulletPool = "BulletPool";
-    private float _lifespan    = 3;
 
     private void Start()
     {
         _xform = transform;
     }
 
-    public void OnSpawned()  // Might be able to make this private and still work?
-    {
-        // Start the timer as soon as this instance is spawned.
-        this.StartCoroutine(this.TimedDespawn());
-    }
+    /// <summary>
+    /// Trying to reset velocity on awake, but not working....
+    /// </summary>
+    //private void Awake()
+    //{
+    //    rigidbody.velocity = Vector3.zero;
+    //    rigidbody.angularVelocity = Vector3.zero;
+    //}
 
-    private IEnumerator TimedDespawn()
-    {
-        // Wait for 'lifespan' (seconds) then despawn this instance.
-        yield return new WaitForSeconds(this._lifespan);
 
-        PoolManager.Pools["BulletPool"].Despawn(this.transform);
+    /// <summary>
+    /// De-spawn bullet if it is out of range of camera
+    /// </summary>
+    private void Update()
+    {
+        if (renderer.isVisible == false){
+            PoolManager.Pools["BulletPool"].Despawn(this.transform);
+        }
     }
 
     private void OnCollisionEnter(Collision other)
@@ -40,13 +45,6 @@ public class Bullet : MonoBehaviour
         {
             var enemy = other.gameObject.GetComponent<Enemy>();
             enemy.TakeDamage(this._dmg);
-            // put the bullet back on the stack for later re-use
-            PoolManager.Pools[_bulletPool].Despawn(this.transform);
-        }
-
-        // Hit a bullet barrier
-        if (other.gameObject.CompareTag("BulletCollectors"))
-        {
             // put the bullet back on the stack for later re-use
             PoolManager.Pools[_bulletPool].Despawn(this.transform);
         }

@@ -59,12 +59,11 @@ public class SwarmBehavior : MonoBehaviour
     }
 
     /// <summary>
-    /// instantiate the drones at a random spawn location
+    /// Generate the same random, spawn location for all enemies and draw particles
+    /// Also, set a brief delay before enemies appear on screen
     /// </summary>
     private IEnumerator InstantiateDrones()
     {
-        // Generate the same random, spawn location for all enemies and draw particles
-        // Also, set a brief delay before enemies appear on screen
         var randomSpawnLocation = GeneratedSpawnPoint();
         gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(randomSpawnLocation);
         yield return new WaitForSeconds(.5f);
@@ -85,9 +84,9 @@ public class SwarmBehavior : MonoBehaviour
             db.drones           = drones;
             db.swarm            = this;
 
-            // spawn at random spawn points throughout the map
-            droneTemp.transform.position = randomSpawnLocation;
+            // spawn at random spawn points throughout the map, then
             // Convert the transform to game object and add it to the list of drones
+            droneTemp.transform.position = randomSpawnLocation;            
             var droneTempToGameObject    = droneTemp.gameObject;
             drones.Add(droneTempToGameObject);
         }

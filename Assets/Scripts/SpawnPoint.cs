@@ -6,19 +6,17 @@ using Random = UnityEngine.Random;
 
 public class SpawnPoint : MonoBehaviour
 {
-    public Transform particleXform;                      // particle prefab
-    public AudioClip sfxSpawning;
-    public int numberOfEnemiesToSpawn = 10;
+    public int numberOfEnemiesToSpawn    = 10;
     public Transform enemyTypeXform;
-    public float IncrementSpawnInterval        = 1.1f;
-    public bool isSpawning            = false;         // TODO: This is here for Debug -- remove for final build
+    public float IncrementSpawnInterval  = 1.1f;
+    public bool isSpawning               = false;         // TODO: This is here for Debug -- remove for final build
 
-    private String _particlePool      = "ParticlePool";
-    private string _nameOfPool        = "BulletPool";
-    private SpawnPool _pool           = null;
-    private int _spawnSphereRadius    = 5;
+    private int _spawnSphereRadius       = 5;
     private Transform _xform;                            
     private Transform _playerXform;
+    private String _particlePool = "ParticlePool";
+    private SpawnPool _pool      = null;
+
 
 	private void Start ()
     {
@@ -30,9 +28,10 @@ public class SpawnPoint : MonoBehaviour
 
     private void Awake()
     {
-        _pool        = PoolManager.Pools[_nameOfPool];
+        _pool        = GameObject.Find("GameManager").transform.gameObject.GetComponent<GameManager>().BulletPool;
         _xform       = GameObject.Find("EnemySpawnPoint").transform;
         _playerXform = GameObject.Find("Player").transform;
+
     }
 
     /// <summary>
@@ -48,7 +47,6 @@ public class SpawnPoint : MonoBehaviour
             SpawnEnemies();
             count--;
 
-            // call this function, every (x) seconds
             yield return new WaitForSeconds(IncrementSpawnInterval);
         }
     }
@@ -58,8 +56,7 @@ public class SpawnPoint : MonoBehaviour
     /// </summary>
     private void SpawnEnemiesImmediately()
     {
-        for (var i = 0; i < numberOfEnemiesToSpawn; i++)
-        {
+        for (var i = 0; i < numberOfEnemiesToSpawn; i++){
             SpawnEnemies();
         }
     }

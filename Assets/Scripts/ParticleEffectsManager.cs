@@ -9,23 +9,17 @@ public class ParticleEffectsManager : MonoBehaviour {
     public Transform playerExplosionXform;
     public AudioClip sfxSpawning;
 
-    private String _particlePool  = "ParticlePool";
-    private SpawnPool _pool       = null;
+    private String _particlePoolString = "ParticlePool";
 
-    private void Start()
-    {
-        _pool = PoolManager.Pools[_particlePool];
-    }
-
-
-    /// <summary>
+    ///<summary>
     /// Creates particles, de-spawns particles, and plays SFX for spawning
     /// </summary>
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreateSpawnEffects(Vector3 spawnLocation)
     {
-        var _particleInst = PoolManager.Pools[_particlePool].Spawn(particleXform, spawnLocation, Quaternion.identity);
-        PoolManager.Pools[_particlePool].Despawn(_particleInst, 2);
+        var pool         = PoolManager.Pools[_particlePoolString];
+        var particleInst = pool.Spawn(particleXform, spawnLocation, Quaternion.identity);
+        pool.Despawn(particleInst, 2);    
 
         //TODO: _soundManager.PlayClip(sfxSpawning, false);                      
     }
@@ -36,8 +30,9 @@ public class ParticleEffectsManager : MonoBehaviour {
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreatePlayerExplosionEffects(Vector3 spawnLocation)
     {
-        var _particleInst = PoolManager.Pools[_particlePool].Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
-        PoolManager.Pools[_particlePool].Despawn(_particleInst, 2);
+        var pool         = PoolManager.Pools[_particlePoolString];
+        var particleInst = pool.Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
+        pool.Despawn(particleInst, 2);
         Camera.main.GetComponent<CameraShake>().Shake();
 
         //TODO: _soundManager.PlayClip(sfxSpawning, false);                      

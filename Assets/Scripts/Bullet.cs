@@ -18,15 +18,6 @@ public class Bullet : MonoBehaviour
         _xform = transform;
     }
 
-    /// <summary>
-    /// Trying to reset velocity on awake, but not working....
-    /// </summary>
-    //private void Awake()
-    //{
-    //    rigidbody.velocity = Vector3.zero;
-    //    rigidbody.angularVelocity = Vector3.zero;
-    //}
-
 
     /// <summary>
     /// De-spawn bullet if it is out of range of camera
@@ -34,7 +25,7 @@ public class Bullet : MonoBehaviour
     private void Update()
     {
         if (renderer.isVisible == false){
-            PoolManager.Pools["BulletPool"].Despawn(this.transform);
+            PoolManager.Pools["BulletPool"].Despawn(_xform);
         }
     }
 
@@ -44,9 +35,9 @@ public class Bullet : MonoBehaviour
         if (other.gameObject.CompareTag("Enemy"))
         {
             var enemy = other.gameObject.GetComponent<Enemy>();
-            enemy.TakeDamage(this._dmg);
+            enemy.TakeDamage(_dmg);
             // put the bullet back on the stack for later re-use
-            PoolManager.Pools[_bulletPool].Despawn(this.transform);
+            PoolManager.Pools[_bulletPool].Despawn(_xform);
         }
     }
 

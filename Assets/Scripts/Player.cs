@@ -14,15 +14,15 @@ public class Player : MonoBehaviour
     private float        _playerSpeed             = 18;
     private float        _fireRate                = 0.035f;       // time between shots
     private float        _playerBulletSpeed       = 25;
-    private String       _bulletPool              = "BulletPool";
     private enum state  { Playing, Explosion, Invincible }
     private state        _state                   = state.Playing;
     private const float _bulletVelX               = 40f;
     private const int   _spreadWeaponYoffset      = 10;
     private Transform   _playerSpawnPoint;                        // Finds spawn point in editor
     private float       _shipInvisibleTime        = 1.3f;
-    
-    public Transform playerBulletPrefab;
+    private SpawnPool _bulletPool                 = null;
+
+    public Transform playerBulletPrefab; 
     public Transform playerMissilePrefab;
     public AudioClip sfxShoot;
     public Transform deathExplosionPrefab;                        // particle prefab
@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
         _soundManager             = SoundManager.GetSingleton();
         _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point (which is a child of Main Camera)
         _xform.position           = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
+        _bulletPool               = GameObject.Find("GameManager").transform.gameObject.GetComponent<GameManager>().BulletPool;
         gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(_xform.position);
     }
 
@@ -50,12 +51,12 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandlePlayerMovement()
     { 
-        var horizontalMove = (_playerSpeed * Input.GetAxis("Horizontal")) * Time.deltaTime;
-        var verticalMove   = (_playerSpeed * Input.GetAxis("Vertical"))   * Time.deltaTime;
+        var horizontalMove = (_playerSpeed * Input.GetAxis("Horizontal"))    * Time.deltaTime;
+        var verticalMove   = (_playerSpeed * Input.GetAxis("Vertical"))      * Time.deltaTime;
         var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
         // prevents the player moving above its max speed on diagonals
-        moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime);
-        moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); 
+        moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime);
+        moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); 
 
         // move the player
         _xform.Translate(moveVector);
@@ -78,11 +79,11 @@ public class Player : MonoBehaviour
 
     /// <summary>
     /// Shoots one row of bullets in a straight line
+    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
     /// </summary>
     private void ShootBullets()
     {
-        // Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-        Transform _bulletInst          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        Transform _bulletInst = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
         _bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, transform.position.y, transform.position.z);   
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
@@ -94,14 +95,14 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ShootSpreadWeapon()
     {
-        Transform _bulletInst           = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        _bulletInst.rigidbody.velocity  =  new Vector3(_bulletVelX, _xform.position.y - _spreadWeaponYoffset, _xform.position.z);
+        var bulletInst                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y - _spreadWeaponYoffset, _xform.position.z);
 
-        Transform _bulletInst2          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        _bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y, _xform.position.z);
+        var bulletInst2                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y, _xform.position.z);
 
-        Transform _bulletInst3          = PoolManager.Pools[_bulletPool].Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        _bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y + _spreadWeaponYoffset, _xform.position.z);
+        var bulletInst3                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y + _spreadWeaponYoffset, _xform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -110,7 +111,7 @@ public class Player : MonoBehaviour
     private void ShootMissiles()
     {
         // Grabs current instance of bullet, by retrieving missile prefab from spawn pool
-        Transform __playerMissileInstance = PoolManager.Pools[_bulletPool].Spawn(playerMissilePrefab);
+//        Transform __playerMissileInstance = PoolManager.Pools[_bulletPool].Spawn(playerMissilePrefab);
 
         // position, enable, then set velocity
    //     __playerMissileInstance.gameObject.transform.position = _playerTransform.position;
@@ -130,7 +131,7 @@ public class Player : MonoBehaviour
         if (other.CompareTag("EnemyBullet"))
         {
             // put the bullet back on the stack for later re-use
-            PoolManager.Pools[_bulletPool].Despawn(other.transform);
+//            PoolManager.Pools[_bulletPool].Despawn(other.transform);
             KillPlayer(other);
         }
         // If it is a pickup, then spawn the correct option

@@ -16,9 +16,15 @@ public class GameManager : MonoBehaviour
     public static int    lives = 5;          // how many lives the player has left
     public AudioClip     backgroundMusic;
 
-    private string       _nameOfPool  = "BulletPool";
-    private int          _respawnTime = 3;
+    private string       _bulletPoolString   = "BulletPool";
+    private string       _ParticlePoolString = "ParticlePool";
+    private int          _respawnTime        = 3;
     private SoundManager _soundManager;
+
+    public SpawnPool BulletPool;
+    public SpawnPool ParticlePool;
+
+
 
     static GameObject GMGameObj;
 
@@ -42,6 +48,9 @@ public class GameManager : MonoBehaviour
         }
         _soundManager = SoundManager.GetSingleton();    // Grab SoundMananger
         _soundManager.PlayClip(backgroundMusic, false); // Play track
+
+        BulletPool    = PoolManager.Pools[_bulletPoolString];
+        ParticlePool  = PoolManager.Pools[_ParticlePoolString]; //TODO: Not working??
     }
 
     private void OnGUI()

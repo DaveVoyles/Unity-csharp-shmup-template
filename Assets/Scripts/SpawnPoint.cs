@@ -14,10 +14,10 @@ public class SpawnPoint : MonoBehaviour
     public bool isSpawning            = false;
 
 
-    private String _particlePool   = "ParticlePool";
-    private string _nameOfPool     = "BulletPool";
-    private SpawnPool _pool        = null;
-    private int _spawnSphereRadius = 5;
+    private String _particlePool      = "ParticlePool";
+    private string _nameOfPool        = "BulletPool";
+    private SpawnPool _pool           = null;
+    private int _spawnSphereRadius    = 5;
     private Transform _xform;                            
     private Transform _playerXform;
 
@@ -31,8 +31,8 @@ public class SpawnPoint : MonoBehaviour
 
     private void Awake()
     {
-        _pool = PoolManager.Pools[_nameOfPool];
-        _xform = GameObject.Find("EnemySpawnPoint").transform;
+        _pool        = PoolManager.Pools[_nameOfPool];
+        _xform       = GameObject.Find("EnemySpawnPoint").transform;
         _playerXform = GameObject.Find("Player").transform;
     }
 

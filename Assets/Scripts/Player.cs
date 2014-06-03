@@ -50,9 +50,9 @@ public class Player : MonoBehaviour
     /// Checks for inputs from player handles player movement
     /// </summary>
     private void HandlePlayerMovement()
-    {
+    { 
         var horizontalMove = (_playerSpeed * Input.GetAxis("Horizontal")) * Time.deltaTime;
-        var verticalMove   = (_playerSpeed * Input.GetAxis("Vertical")) * Time.deltaTime;
+        var verticalMove   = (_playerSpeed * Input.GetAxis("Vertical"))   * Time.deltaTime;
         var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
         // prevents the player moving above its max speed on diagonals
         moveVector = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime);
@@ -61,6 +61,7 @@ public class Player : MonoBehaviour
         // move the player
         _xform.Translate(moveVector);
     }
+
     /// <summary>
     /// Is the player shooting? Left-click for bullets, right-click for missiles
     /// </summary>

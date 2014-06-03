@@ -26,7 +26,8 @@ public class SwarmBehavior : MonoBehaviour
     /// </summary>
     public Transform prefab;
     public List<GameObject> drones;
-    
+
+    private Transform _spawnPointXform;
     private string _nameOfPool = "BulletPool";
     private SpawnPool _pool    = null;
     private Transform _playerXform;
@@ -38,18 +39,35 @@ public class SwarmBehavior : MonoBehaviour
             return;
         }
 
-        _pool        = PoolManager.Pools[_nameOfPool];
-        _playerXform = GameObject.Find("Player").transform;
+        _spawnPointXform = GameObject.Find("EnemySpawnPoint").transform;
+        _pool            = PoolManager.Pools[_nameOfPool];
+        _playerXform     = GameObject.Find("Player").transform;
 
         InstantiateDrones();
-
     }
 
     /// <summary>
-    /// instantiate the drones
+    /// Generates a random spawn point by passing in current location of EnemySpawnPoint
+    /// game object in the scene, and a random number within 20 pixels x & y of the original
+    /// </summary>
+    /// <returns> Vector 3 of a random spawn point, within 20 pixels x & y of the original</returns>
+    private Vector3 GeneratedSpawnPoint()
+    {
+        var position               = _spawnPointXform.position;
+        const int randomRangeValue = 10;
+        var randomSpawnPoint = new Vector3(position.x + Random.Range(-randomRangeValue, randomRangeValue),
+                                           position.y + Random.Range(-randomRangeValue, randomRangeValue), position.y);
+        return randomSpawnPoint;
+    }
+
+    /// <summary>
+    /// instantiate the drones at a random spawn location
     /// </summary>
     private void InstantiateDrones()
     {
+        // Same spawn location for all enemies
+        var randomSpawnLocation = GeneratedSpawnPoint();
+
         for (int i = 0; i < droneCount; i++)
         {
             Transform droneTemp = _pool.Spawn(prefab);
@@ -57,10 +75,8 @@ public class SwarmBehavior : MonoBehaviour
             db.drones           = drones;
             db.swarm            = this;
 
-            // spawn inside circle
-            var spawnPos                  = new Vector2(this.transform.position.x + 20f, this.transform.position.y) + Random.insideUnitCircle * spawnRadius /2;
-            // Start drone locked w/ player's Z-axis
-            droneTemp.transform.position = new Vector3(spawnPos.x, transform.position.y, _playerXform.position.z);
+            // spawn at random spawn points throughout the map
+            droneTemp.transform.position = randomSpawnLocation;
             // Convert the transform to game object and add it to the list of drones
             var droneTempToGameObject    = droneTemp.gameObject;
             drones.Add(droneTempToGameObject);

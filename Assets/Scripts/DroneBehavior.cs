@@ -22,9 +22,9 @@ public class DroneBehavior : MonoBehaviour
     public float desiredSeparation = 1f;
 
     // velocity influences
-    public Vector3 _separation;
-    public Vector3 _alignment;
-    public Vector3 _cohesion;
+    public Vector3 separation;
+    public Vector3 alignment;
+    public Vector3 cohesion;
     public Vector3 _bounds;
 
     // other members of my swarm
@@ -47,13 +47,13 @@ public class DroneBehavior : MonoBehaviour
 
     public virtual void Flock()
     {
-        Vector3 newVelocity = Vector3.zero;
+        var newVelocity = Vector3.zero;
 
         CalculateVelocities();
 
-        newVelocity   += _separation        * separationWeight;
-        newVelocity   += _alignment         * alignmentWeight;
-        newVelocity   += _cohesion          * cohesionWeight;
+        newVelocity   += separation        * separationWeight;
+        newVelocity   += alignment         * alignmentWeight;
+        newVelocity   += cohesion          * cohesionWeight;
         newVelocity   += _bounds            * boundsWeight;
         newVelocity   =  newVelocity        * speed;
         newVelocity   =  rigidbody.velocity + newVelocity;
@@ -70,10 +70,10 @@ public class DroneBehavior : MonoBehaviour
         // the general procedure is that we add up velocities based on the neighbors in our radius for a particular influence (cohesion, separation, etc.) 
         // and divide the sum by the total number of drones in our neighbor radius
         // this produces an evened-out velocity that is aligned with its neighbors to apply to the target drone		
-        Vector3 separationSum = Vector3.zero;
-        Vector3 alignmentSum  = Vector3.zero;
-        Vector3 cohesionSum   = Vector3.zero;
-        Vector3 boundsSum     = Vector3.zero;
+        var separationSum = Vector3.zero;
+        var alignmentSum  = Vector3.zero;
+        var cohesionSum   = Vector3.zero;
+        var boundsSum     = Vector3.zero;
 
         int separationCount = 0;
         int alignmentCount  = 0;
@@ -92,7 +92,7 @@ public class DroneBehavior : MonoBehaviour
             if (distance > 0 && distance < desiredSeparation)
             {
                 // calculate vector headed away from myself
-                Vector3 direction = transform.position - drones[i].transform.position;
+                var direction = transform.position - drones[i].transform.position;
                 direction.Normalize();
                 direction         = direction / distance; // weight by distance
                 separationSum     += direction;
@@ -114,7 +114,7 @@ public class DroneBehavior : MonoBehaviour
             // bounds
             // calculate the bounds influence vector for this drone, based on whether or not neighboring drones are in bounds
             // the desire of the drone to stay within a particular area (added by me in my implementation, since I’m not doing screen wrapping)
-            Bounds bounds = new Bounds(swarm.transform.position, new Vector3(swarm.swarmBounds.x, 10000f, swarm.swarmBounds.y));
+            var bounds = new Bounds(swarm.transform.position, new Vector3(swarm.swarmBounds.x, 10000f, swarm.swarmBounds.y));
             if (distance > 0 && distance < neighborRadius && !bounds.Contains(drones[i].transform.position))
             {
                 Vector3 diff = transform.position - swarm.transform.position;
@@ -127,9 +127,9 @@ public class DroneBehavior : MonoBehaviour
         }
 
         // end
-        _separation = separationCount > 0 ? separationSum      / separationCount           : separationSum;
-        _alignment  = alignmentCount  > 0 ? Limit(alignmentSum / alignmentCount, maxSteer) : alignmentSum;
-        _cohesion   = cohesionCount   > 0 ? Steer(cohesionSum  / cohesionCount,  false   ) : cohesionSum;
+        separation = separationCount > 0 ? separationSum      / separationCount           : separationSum;
+        alignment  = alignmentCount  > 0 ? Limit(alignmentSum / alignmentCount, maxSteer) : alignmentSum;
+        cohesion   = cohesionCount   > 0 ? Steer(cohesionSum  / cohesionCount,  false   ) : cohesionSum;
         _bounds     = boundsCount     > 0 ? Steer(boundsSum    / boundsCount,    false   ) : boundsSum;
     }
 
@@ -141,9 +141,9 @@ public class DroneBehavior : MonoBehaviour
     protected virtual Vector3 Steer(Vector3 target, bool slowDown)
     {
         // the steering vector
-        Vector3 steer           = Vector3.zero;
-        Vector3 targetDirection = target - transform.position;
-        float targetDistance    = targetDirection.magnitude;
+        var steer           = Vector3.zero;
+        var targetDirection = target - transform.position;
+        var targetDistance  = targetDirection.magnitude;
 
         transform.LookAt(target);
 
@@ -192,12 +192,12 @@ public class DroneBehavior : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, neighborRadius);
 
         Gizmos.color = Color.white;
-        Gizmos.DrawLine(transform.position, transform.position + _alignment.normalized * neighborRadius);
+        Gizmos.DrawLine(transform.position, transform.position + alignment.normalized  * neighborRadius);
 
         Gizmos.color = Color.magenta;
-        Gizmos.DrawLine(transform.position, transform.position + _separation.normalized * neighborRadius);
+        Gizmos.DrawLine(transform.position, transform.position + separation.normalized * neighborRadius);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, transform.position + _cohesion.normalized * neighborRadius);
+        Gizmos.DrawLine(transform.position, transform.position + cohesion.normalized   * neighborRadius);
     }
 }

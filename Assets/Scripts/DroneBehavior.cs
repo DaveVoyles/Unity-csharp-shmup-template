@@ -34,15 +34,30 @@ public class DroneBehavior : MonoBehaviour
     // Keep drones locked to player's Z position
     private Transform _playerXform;
 
+
     private void Start()
     {
         _playerXform = GameObject.Find("Player").transform;
+        StartCoroutine(StopMovementWhileSpawning());
+    }
+
+    /// <summary>
+    /// Prevent drones from running after the player as soon as they spawn
+    /// Give the player a moment to see the drones, then react
+    /// </summary>
+    private IEnumerator StopMovementWhileSpawning()
+    {
+        rigidbody.isKinematic = true;
+        yield return new WaitForSeconds(0.7f);
+        rigidbody.isKinematic = false;
     }
 
     void FixedUpdate()
     {
-        // we should always apply physics forces in FixedUpdate
-        Flock();
+        if (rigidbody.isKinematic == false){
+            // we should always apply physics forces in FixedUpdate
+            Flock();
+        }
     }
 
     public virtual void Flock()
@@ -51,9 +66,9 @@ public class DroneBehavior : MonoBehaviour
 
         CalculateVelocities();
 
-        newVelocity   += separation        * separationWeight;
-        newVelocity   += alignment         * alignmentWeight;
-        newVelocity   += cohesion          * cohesionWeight;
+        newVelocity   += separation         * separationWeight;
+        newVelocity   += alignment          * alignmentWeight;
+        newVelocity   += cohesion           * cohesionWeight;
         newVelocity   += _bounds            * boundsWeight;
         newVelocity   =  newVelocity        * speed;
         newVelocity   =  rigidbody.velocity + newVelocity;
@@ -130,7 +145,7 @@ public class DroneBehavior : MonoBehaviour
         separation = separationCount > 0 ? separationSum      / separationCount           : separationSum;
         alignment  = alignmentCount  > 0 ? Limit(alignmentSum / alignmentCount, maxSteer) : alignmentSum;
         cohesion   = cohesionCount   > 0 ? Steer(cohesionSum  / cohesionCount,  false   ) : cohesionSum;
-        _bounds     = boundsCount     > 0 ? Steer(boundsSum    / boundsCount,    false   ) : boundsSum;
+        _bounds    = boundsCount     > 0 ? Steer(boundsSum    / boundsCount,    false   ) : boundsSum;
     }
 
     /// <summary>

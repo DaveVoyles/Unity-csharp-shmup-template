@@ -43,7 +43,7 @@ public class SwarmBehavior : MonoBehaviour
         _pool            = PoolManager.Pools[_nameOfPool];
         _playerXform     = GameObject.Find("Player").transform;
 
-        InstantiateDrones();
+        StartCoroutine(InstantiateDrones());
     }
 
     /// <summary>
@@ -63,11 +63,23 @@ public class SwarmBehavior : MonoBehaviour
     /// <summary>
     /// instantiate the drones at a random spawn location
     /// </summary>
-    private void InstantiateDrones()
+    private IEnumerator InstantiateDrones()
     {
-        // Same spawn location for all enemies
+        // Generate the same random, spawn location for all enemies and draw particles
+        // Also, set a brief delay before enemies appear on screen
         var randomSpawnLocation = GeneratedSpawnPoint();
+        gameObject.GetComponent<SpawnEffects>().CreateSpawnEffects(randomSpawnLocation);
+        yield return new WaitForSeconds(.5f);
 
+        SpawnDrones(randomSpawnLocation);
+    }
+
+    /// <summary>
+    /// Creates a series of drones 
+    /// </summary>
+    /// <param name="randomSpawnLocation">Where should they spawn?</param>
+    private void SpawnDrones(Vector3 randomSpawnLocation)
+    {
         for (int i = 0; i < droneCount; i++)
         {
             Transform droneTemp = _pool.Spawn(prefab);
@@ -82,6 +94,7 @@ public class SwarmBehavior : MonoBehaviour
             drones.Add(droneTempToGameObject);
         }
     }
+
 
     /// <summary>
     /// Draw Gizmos for debugging

@@ -8,8 +8,9 @@ using System.Collections;
 
 public class Spawner : MonoBehaviour {
     
-    public Transform pathEnemyTransform;
-    public Transform enemyTransform;            
+    public Transform pathEnemyXform;
+    public Transform enemyXform;
+    public Transform droneXform;     
     public int pathOneSpawnAmount             = 0;
     public int pathTwoSpawnAmount             = 0;
     public int pathThreeSpawnAmount           = 0;  
@@ -23,16 +24,24 @@ public class Spawner : MonoBehaviour {
     public iTween.EaseType pathOneEaseType;
     public iTween.EaseType pathTwoEaseType;
     public iTween.EaseType pathThreeEaseType;
-    public bool bSpawnPathOne = false;
-    public bool bSpawnPathTwo = false;
-    public bool bSpawnPathThree = false;
-    public bool bSpawnRandomPath = false;
-    public int spawnAmount = 5;
+    public bool canSpawnPathOne              = false;
+    public bool canSpawnPathTwo              = false;
+    public bool canSpawnPathThree            = false;
+    public bool canSpawnRandomPath           = false;
+    public bool canSpawningStationary        = true;
+    public bool canSpawningDrones            = true;
+    public bool canSpawnImmediately          = true;
+    public int spawnAmount                   = 5;
+    public float IncrementSpawnInterval      = 1.1f;
+
 
     private string _nameOfPool = "BulletPool";  
-    private SpawnPool _pool    = null;
-    public bool _isSpawning   = true; // Continue to spawn until told otherwise
- 
+    private SpawnPool _pool            = null;
+
+    public int numberOfEnemiesToSpawn = 10;
+    private int _spawnSphereRadius = 3;
+    private Transform _playerXform;
+    private Transform _enemySpawnPointXform;
 
     /// <summary>
     /// Make the pool's group a child of this transform for demo purposes
@@ -40,24 +49,32 @@ public class Spawner : MonoBehaviour {
     /// </summary>
 	void Start ()
 	{
-        this._pool                     = PoolManager.Pools[_nameOfPool];
-        this._pool.group.parent        = gameObject.transform;
-        this._pool.group.localPosition = new Vector3(1.5f, 0, 0);
-        this._pool.group.localRotation = Quaternion.identity;
+        _pool                     = PoolManager.Pools[_nameOfPool];
+        _pool.group.parent        = gameObject.transform;
+        _pool.group.localPosition = new Vector3(1.5f, 0, 0);
+        _pool.group.localRotation = Quaternion.identity;
+        _playerXform              = GameObject.Find("Player").transform;
+        _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
 
-        if (bSpawnPathOne){
-            this.StartCoroutine(SpawnPathOne());
+
+        if (canSpawnPathOne){
+            StartCoroutine(SpawnPathOne());
         }
-        if (bSpawnPathTwo){
-            this.StartCoroutine(SpawnPathTwo());
+        if (canSpawnPathTwo){
+            StartCoroutine(SpawnPathTwo());
         }
-        if (bSpawnPathThree){
-            this.StartCoroutine(SpawnPathThree());
+        if (canSpawnPathThree){
+            StartCoroutine(SpawnPathThree());
         }
-        if (bSpawnRandomPath){
-            this.SpawnEnemyOnRandomPath();
+        if (canSpawnRandomPath){
+            SpawnEnemyOnRandomPath();
         }
-        this.StartCoroutine(SpawnStationaryEnemy());
+        if (canSpawningStationary){
+            StartCoroutine(SpawnStationaryEnemy());
+        }
+        if (canSpawnImmediately){
+            SpawnEnemiesImmediately();
+        }
 	}
 	
     /// <summary>
@@ -70,7 +87,7 @@ public class Spawner : MonoBehaviour {
         while (count >= 0)
         {
             // Grab an instance of the enemy transform
-            var _pathEnemyInstance = this._pool.Spawn(pathEnemyTransform);
+            var _pathEnemyInstance = this._pool.Spawn(pathEnemyXform);
             var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
             // Enemy follows this path
@@ -92,7 +109,7 @@ public class Spawner : MonoBehaviour {
         while (count >= 0)
         {
             // Grab an instance of the enemy transform
-            var _pathEnemyInstance = this._pool.Spawn(pathEnemyTransform);
+            var _pathEnemyInstance = this._pool.Spawn(pathEnemyXform);
             var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
             // Enemy follows this path
@@ -114,7 +131,7 @@ public class Spawner : MonoBehaviour {
         while (count >= 0)
         {
             // Grab an instance of the enemy transform
-            var _pathEnemyInstance = this._pool.Spawn(pathEnemyTransform);
+            var _pathEnemyInstance = this._pool.Spawn(pathEnemyXform);
             var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
             // Enemy follows this path
@@ -131,7 +148,7 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private IEnumerator SpawnStationaryEnemy()
     {
-        while (_isSpawning)
+        while (canSpawningStationary)
         {
             // How many enemies should we spawn?
             int count = this.spawnAmount;
@@ -141,7 +158,7 @@ public class Spawner : MonoBehaviour {
                 var randomY = Random.Range(-4.0f, 4.0f);
 
                 // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
-                Transform _enemyInstance = this._pool.Spawn(enemyTransform);
+                Transform _enemyInstance = this._pool.Spawn(enemyXform);
                 ;
 
                 // position, enable, then set velocity
@@ -168,11 +185,52 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private void SpawnEnemyOnRandomPath()
     {
-        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyTransform);
+        var _pathEnemyInstance = PoolManager.Pools[_nameOfPool].Spawn(pathEnemyXform);
         var _iTweenMoveToPath  = _pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
         _iTweenMoveToPath.FollowRandomPath();
-    }   
-  
+    }
+
+    /// <summary>
+    /// Spawns waves of enemies using enemyTypeXform at a set interval
+    /// </summary>
+    private IEnumerator SpawnEnemiesIncrementally()
+    {
+        // How many enemies should we spawn?
+        var count = numberOfEnemiesToSpawn;
+        while (count >= 0)
+        {
+            // Spawn an enemy & set spawn location within spawn radius
+            SpawnEnemies();
+            count--;
+
+            yield return new WaitForSeconds(IncrementSpawnInterval);
+        }
+    }
+
+    /// <summary>
+    /// Immediately Spawn _number ofEnemies within the size of _spawnSphereRadius
+    /// </summary>
+    private void SpawnEnemiesImmediately()
+    {
+        for (var i = 0; i < numberOfEnemiesToSpawn; i++)
+        {
+            SpawnEnemies();
+        }
+    }
+
+    /// <summary>
+    /// Spawns enemies at a given position 
+    /// </summary>
+    private void SpawnEnemies()
+    {
+        var enemyInstance = _pool.Spawn(enemyXform);
+        var newPos        = Random.insideUnitSphere * _spawnSphereRadius;
+        newPos.z          = _playerXform.position.z;
+        enemyInstance.transform.position = newPos;
+    }
+
+
+
     
 }

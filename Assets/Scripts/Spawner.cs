@@ -27,10 +27,11 @@ public class Spawner : MonoBehaviour {
     public bool bSpawnPathTwo = false;
     public bool bSpawnPathThree = false;
     public bool bSpawnRandomPath = false;
+    public int spawnAmount = 5;
 
     private string _nameOfPool = "BulletPool";  
     private SpawnPool _pool    = null;
-    private bool _isSpawning   = true; // Continue to spawn until told otherwise
+    public bool _isSpawning   = true; // Continue to spawn until told otherwise
  
 
     /// <summary>
@@ -128,29 +129,37 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// Spawns a stationary enemy
     /// </summary>
-    private IEnumerator SpawnStationaryEnemy() 
+    private IEnumerator SpawnStationaryEnemy()
     {
         while (_isSpawning)
         {
-            // spawn an enemy off screen at a random X position and set hit points
-            var randomY = Random.Range(-4.0f, 4.0f);
+            // How many enemies should we spawn?
+            int count = this.spawnAmount;
+            while (count >= 0)
+            {
+                // spawn an enemy off screen at a random X position and set hit points
+                var randomY = Random.Range(-4.0f, 4.0f);
 
-            // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
-            Transform _enemyInstance = this._pool.Spawn(enemyTransform); ;
+                // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
+                Transform _enemyInstance = this._pool.Spawn(enemyTransform);
+                ;
 
-            // position, enable, then set velocity
-            _enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
-            _enemyInstance.gameObject.SetActive(true);
+                // position, enable, then set velocity
+                _enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
+                _enemyInstance.gameObject.SetActive(true);
 
-            // Grab the "enemy" script, so that we can access the variables exposed
-            var scriptRef = _enemyInstance.GetComponent<Enemy>();
+                // Grab the "enemy" script, so that we can access the variables exposed
+                var scriptRef = _enemyInstance.GetComponent<Enemy>();
 
-            // waits a few seconds then shoots
-            var shootDelay = Random.Range(0.5f, 2.0f);
-            StartCoroutine(scriptRef.ShootTowardPlayer(shootDelay));
+                // waits a few seconds then shoots
+                var shootDelay = Random.Range(0.5f, 2.0f);
+                StartCoroutine(scriptRef.ShootTowardPlayer(shootDelay));
 
-            // Wait 3 seconds, then call this function again 
-            yield return new WaitForSeconds(stationaryEnemyInterval);
+                // Wait 3 seconds, then call this function again 
+                yield return new WaitForSeconds(stationaryEnemyInterval);
+                count--;
+
+            }
         }
     }
 

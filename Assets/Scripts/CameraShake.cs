@@ -18,14 +18,6 @@ public class CameraShake : MonoBehaviour
     private Transform  _transform;
 
 
-    void OnGUI()
-    {
-        if (GUI.Button(new Rect(20, 40, 80, 20), "Shake"))
-        {
-            Shake();
-        }
-    }
-
     void OnEnable()
     {
         _transform = transform;
@@ -63,7 +55,7 @@ public class CameraShake : MonoBehaviour
             _originRotation = _transform.localRotation;
         }
         // Reset shake values to defaults
-        _shaking = true;
+        _shaking        = true;
         _shakeIntensity = shakeIntensity;
         _shakeDecay     = shakeDecay;
     }

@@ -66,7 +66,7 @@ public class Spawner : MonoBehaviour {
     private IEnumerator SpawnPathOne()
     {
         // How many enemies should we spawn?
-        int count = this.pathOneSpawnAmount;
+        var count = this.pathOneSpawnAmount;
         while (count >= 0)
         {
             // Grab an instance of the enemy transform
@@ -88,7 +88,7 @@ public class Spawner : MonoBehaviour {
     private IEnumerator SpawnPathTwo()
     {
         // How many enemies should we spawn?
-        int count = this.pathTwoSpawnAmount;
+        var count = this.pathTwoSpawnAmount;
         while (count >= 0)
         {
             // Grab an instance of the enemy transform
@@ -110,7 +110,7 @@ public class Spawner : MonoBehaviour {
     private IEnumerator SpawnPathThree()
     {
         // How many enemies should we spawn?
-        int count = this.pathThreeSpawnAmount;
+        var count = this.pathThreeSpawnAmount;
         while (count >= 0)
         {
             // Grab an instance of the enemy transform

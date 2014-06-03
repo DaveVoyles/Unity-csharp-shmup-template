@@ -10,7 +10,7 @@ public class DroneBehavior : MonoBehaviour
     // max speed any particular drone can move at
     public float maxSpeed          = 8f;
     // maximum steering power
-    public float maxSteer          = .01f;
+    public float maxSteer          = 0.01f;
 
     // weights: used to modify the drone's movement
     public float separationWeight  = 1f;
@@ -31,7 +31,7 @@ public class DroneBehavior : MonoBehaviour
     public List<GameObject> drones;
     public SwarmBehavior    swarm;
 
-    // Keep drones locked to player's Z position
+    // Keep drones locked to player's Z position    
     private Transform _playerXform;
 
 

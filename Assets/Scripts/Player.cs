@@ -14,20 +14,18 @@ public class Player : MonoBehaviour
     private float        _playerSpeed             = 18;
     private float        _fireRate                = 0.035f;       // time between shots
     private float        _playerBulletSpeed       = 25;
-    private String       _particlePool            = "ParticlePool";
     private String       _bulletPool              = "BulletPool";
     private enum state  { Playing, Explosion, Invincible }
     private state        _state                   = state.Playing;
     private const float _bulletVelX               = 40f;
     private const int   _spreadWeaponYoffset      = 10;
     private Transform   _playerSpawnPoint;                        // Finds spawn point in editor
-    private float       _shipInvisibleTime        = 1f;
+    private float       _shipInvisibleTime        = 1.3f;
     
     public Transform playerBulletPrefab;
     public Transform playerMissilePrefab;
     public AudioClip sfxShoot;
     public Transform deathExplosionPrefab;                        // particle prefab
-    public Transform spawnParticlePrefab;                         // particle prefab
 
     void Start()
     {
@@ -35,6 +33,7 @@ public class Player : MonoBehaviour
         _soundManager             = SoundManager.GetSingleton();
         _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point (which is a child of Main Camera)
         _xform.position           = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
+        gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(_xform.position);
     }
 
     void Update()
@@ -168,52 +167,31 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// Particles and sound effects when object is destroyed
-    /// </summary>
-    public void Explode()
-    {
-        // TODO: play sound
-       var _explosionInstance = PoolManager.Pools[_particlePool].Spawn(deathExplosionPrefab, _xform.position, _xform.rotation);
-        // Shake Camera
-        Camera.main.GetComponent<CameraShake>().Shake();
-        // Despawn particle instance after 2 seconds
-        PoolManager.Pools[_particlePool].Despawn(_explosionInstance, 2);
-    }
-
-    /// <summary>
     /// Spawns object at SpawnPoint, which is set in the editor.
     /// Main Camera -> SpawnPoint (child of Main Camera)
     /// </summary>
     private IEnumerator OnBecameInvisible()
     {
         _state = state.Explosion;
-        Explode();
-        // Make player ship invisible
+
+        gameObject.GetComponent<ParticleEffectsManager>().CreatePlayerExplosionEffects(_xform.position);
+        // Make player ship invisible & move player to PlayerSpawnPoint
         gameObject.renderer.enabled = false;
-        // move player to PlayerSpawnPoint
-        transform.position = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y,
-            _xform.position.z);
-        // Wait a few seconds...
+        transform.position          = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, _xform.position.z);
         yield return new WaitForSeconds(_shipInvisibleTime);
 
         if (GameManager.lives > 0)
         {
-            // Player is invincible while flashing
-            _state = state.Invincible;
-            // Create particle effect at spawn point
-            var _particleInstance = PoolManager.Pools[_particlePool].Spawn(spawnParticlePrefab,
-                _xform.position, _xform.rotation);
+            // Set player to invincible while flashing & create particle effect at spawn point
+            _state = state.Invincible;;
+            gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(_xform.position);
+
             // Make player ship visible again
             gameObject.renderer.enabled = true;
 
             // Make ship flash
-            var flashScript = gameObject.GetComponent<FlashingObject>();
-            StartCoroutine(flashScript.Flash());
-            // Place particle back in pool after 2 seconds
-            PoolManager.Pools[_particlePool].Despawn(_particleInstance, 2);
+            StartCoroutine(gameObject.GetComponent<FlashingObject>().Flash());
 
-            // Wait a few seconds, and make player invincible until done flashing
-            _state = state.Invincible;
             yield return new WaitForSeconds(2.2f);
         }
         // Not flashing anymore? Now you can take hits

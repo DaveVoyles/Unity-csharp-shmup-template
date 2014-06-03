@@ -10,9 +10,8 @@ public class SpawnPoint : MonoBehaviour
     public AudioClip sfxSpawning;
     public int numberOfEnemiesToSpawn = 10;
     public Transform enemyTypeXform;
-    public float spawnInterval        = 1.1f;
-    public bool isSpawning            = false;
-
+    public float IncrementSpawnInterval        = 1.1f;
+    public bool isSpawning            = false;         // TODO: This is here for Debug -- remove for final build
 
     private String _particlePool      = "ParticlePool";
     private string _nameOfPool        = "BulletPool";
@@ -23,10 +22,10 @@ public class SpawnPoint : MonoBehaviour
 
 	private void Start ()
     {
-	    if (isSpawning){
-	        CreateSpawnEffects();
-	        InstantiateEnemies();
-	    }
+	    if (!isSpawning) return;
+        gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(_xform.position);
+	    SpawnEnemiesImmediately();
+	    StartCoroutine(SpawnEnemiesIncrementally());
     }
 
     private void Awake()
@@ -36,52 +35,44 @@ public class SpawnPoint : MonoBehaviour
         _playerXform = GameObject.Find("Player").transform;
     }
 
-
-    /// <summary>
-    /// Creates particles, de-spawns particles, and plays SFX for spawning
-    /// </summary>
-    private void CreateSpawnEffects()
-    {
-        var _particleInst = PoolManager.Pools[_particlePool].Spawn(particleXform, _xform.position,_xform.rotation);
-        PoolManager.Pools[_particlePool].Despawn(_particleInst, 2);
-
-        //TODO: _soundManager.PlayClip(sfxSpawning, false);                      
-    }
-
     /// <summary>
     /// Spawns waves of enemies using enemyTypeXform at a set interval
     /// </summary>
-    private IEnumerator SpawnEnemies()
+    private IEnumerator SpawnEnemiesIncrementally()
     {
         // How many enemies should we spawn?
-        int count = numberOfEnemiesToSpawn;
+        var count = numberOfEnemiesToSpawn;
         while (count >= 0)
         {
             // Spawn an enemy & set spawn location within spawn radius
-            var _enemyInstance  = _pool.Spawn(enemyTypeXform);
-            var newPos          = Random.insideUnitSphere*_spawnSphereRadius;
-            newPos.z            = _playerXform.position.z;  
-            _enemyInstance.transform.position = newPos;
+            SpawnEnemies();
             count--;
 
             // call this function, every (x) seconds
-            yield return new WaitForSeconds(spawnInterval);
+            yield return new WaitForSeconds(IncrementSpawnInterval);
         }
     }
 
+    /// <summary>
+    /// Immediately Spawn _number ofEnemies within the size of _spawnSphereRadius
+    /// </summary>
+    private void SpawnEnemiesImmediately()
+    {
+        for (var i = 0; i < numberOfEnemiesToSpawn; i++)
+        {
+            SpawnEnemies();
+        }
+    }
 
     /// <summary>
-    /// Spawn _number ofEnemies within the size of _spawnSphereRadius
+    /// Spawns enemies at a given position 
     /// </summary>
-    private void InstantiateEnemies()
+    private void SpawnEnemies()
     {
-        for (int i = 0; i < numberOfEnemiesToSpawn; i++)
-        {
-            var _enemyInstance  = _pool.Spawn(enemyTypeXform);
-            var newPos          = Random.insideUnitSphere * _spawnSphereRadius;
-            newPos.z            = _playerXform.position.z;
-            _enemyInstance.transform.position = newPos;
-        }
+        var enemyInstance                = _pool.Spawn(enemyTypeXform);
+        var newPos                       = Random.insideUnitSphere * _spawnSphereRadius;
+        newPos.z                         = _playerXform.position.z;
+        enemyInstance.transform.position = newPos;
     }
 
 }

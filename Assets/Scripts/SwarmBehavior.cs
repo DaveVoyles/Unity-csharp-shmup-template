@@ -30,7 +30,6 @@ public class SwarmBehavior : MonoBehaviour
     private Transform _spawnPointXform;
     private string _nameOfPool = "BulletPool";
     private SpawnPool _pool    = null;
-    private Transform _playerXform;
 
     protected virtual void Start()
     {
@@ -41,7 +40,6 @@ public class SwarmBehavior : MonoBehaviour
 
         _spawnPointXform = GameObject.Find("EnemySpawnPoint").transform;
         _pool            = PoolManager.Pools[_nameOfPool];
-        _playerXform     = GameObject.Find("Player").transform;
 
         StartCoroutine(InstantiateDrones());
     }
@@ -55,7 +53,7 @@ public class SwarmBehavior : MonoBehaviour
     {
         var position               = _spawnPointXform.position;
         const int randomRangeValue = 10;
-        var randomSpawnPoint = new Vector3(position.x + Random.Range(-randomRangeValue, randomRangeValue),
+        var randomSpawnPoint = new Vector3(position.x + Random.Range(0, randomRangeValue),
                                            position.y + Random.Range(-randomRangeValue, randomRangeValue), position.y);
         return randomSpawnPoint;
     }
@@ -68,7 +66,7 @@ public class SwarmBehavior : MonoBehaviour
         // Generate the same random, spawn location for all enemies and draw particles
         // Also, set a brief delay before enemies appear on screen
         var randomSpawnLocation = GeneratedSpawnPoint();
-        gameObject.GetComponent<SpawnEffects>().CreateSpawnEffects(randomSpawnLocation);
+        gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(randomSpawnLocation);
         yield return new WaitForSeconds(.5f);
 
         SpawnDrones(randomSpawnLocation);

@@ -9,32 +9,32 @@ using Random = UnityEngine.Random;
 public class Player : MonoBehaviour
 {
     private SoundManager _soundManager;                           // reference to global sound manager  
-    private float        _nextFire                = 0;            // used to time the next shot
-    private Transform    _xform;                                  // for caching
-    private float        _playerSpeed             = 18;
-    private float        _fireRate                = 0.035f;       // time between shots
-    private float        _playerBulletSpeed       = 25;
+    private float        _nextFire                  = 0;          // used to time the next shot
+    private Transform    _xform;                                  
+    private float        _playerSpeed               = 18;
+    private float        _fireRate                  = 0.035f;     // time between shots
+    private float        _playerBulletSpeed         = 25;
     private enum state  { Playing, Explosion, Invincible }
-    private state        _state                   = state.Playing;
-    private const float _bulletVelX               = 40f;
-    private const int   _spreadWeaponYoffset      = 10;
+    private state        _state                     = state.Playing;
+    private const float _bulletVelX                 = 40f;
+    private const int   _spreadWeaponYoffset        = 10;
     private Transform   _playerSpawnPoint;                        // Finds spawn point in editor
-    private float       _shipInvisibleTime        = 1.3f;
-    private SpawnPool _bulletPool                 = null;
+    private float       _shipInvisibleTime          = 1.3f;
+    private SpawnPool _bulletPool                   = null;
+    private ParticleEffectsManager _particleManager = null;
 
     public Transform playerBulletPrefab; 
     public Transform playerMissilePrefab;
     public AudioClip sfxShoot;
-    public Transform deathExplosionPrefab;                        // particle prefab
 
     void Start()
     {
-        _xform                    = transform;                                     // caching the transform is faster than accessing 'transform' directly
-        _soundManager             = SoundManager.GetSingleton();
-        _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point (which is a child of Main Camera)
+        _xform                    = transform;                                     
+        _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point Object
         _xform.position           = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
-        _bulletPool               = GameObject.Find("GameManager").transform.gameObject.GetComponent<GameManager>().BulletPool;
-        gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(_xform.position);
+        _bulletPool               = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
+        _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
+        _soundManager             = SoundManager.GetSingleton();
     }
 
     void Update()
@@ -71,8 +71,6 @@ public class Player : MonoBehaviour
         {
             // delay the next shot by the firing rate
             _nextFire = Time.time + _fireRate;
-
-          //  ShootBullets();
             ShootSpreadWeapon();
         }
     }
@@ -83,8 +81,8 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ShootBullets()
     {
-        Transform _bulletInst = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        _bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, transform.position.y, transform.position.z);   
+        var bulletInst                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, transform.position.y, transform.position.z);   
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -175,17 +173,17 @@ public class Player : MonoBehaviour
     {
         _state = state.Explosion;
 
-        gameObject.GetComponent<ParticleEffectsManager>().CreatePlayerExplosionEffects(_xform.position);
+        _particleManager.CreatePlayerExplosionEffects(_xform.position);
         // Make player ship invisible & move player to PlayerSpawnPoint
         gameObject.renderer.enabled = false;
-        transform.position          = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, _xform.position.z);
+        _xform.position             = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, _xform.position.z);
         yield return new WaitForSeconds(_shipInvisibleTime);
 
         if (GameManager.lives > 0)
         {
             // Set player to invincible while flashing & create particle effect at spawn point
             _state = state.Invincible;;
-            gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(_xform.position);
+            _particleManager.CreateSpawnEffects(_xform.position);
 
             // Make player ship visible again
             gameObject.renderer.enabled = true;

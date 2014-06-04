@@ -7,32 +7,32 @@ using UnityEngine.SocialPlatforms;
 [RequireComponent(typeof (Transform))]
 public class Enemy : MonoBehaviour
 {
-    public int       hitPoints = 10; 
-    public Vector3   motionDir;               // assigned when the enemy spawns
+    public int       hitPoints = 8; 
+    public Vector3   motionDir;      // assigned when the enemy spawns
     public Transform particlePrefab; // particle prefab
 
-    private Transform     _xform; // current transform of enemy, cached for perf during init
-    private SoundManager  _soundManager;
-    private Transform     _bulletPrefab;
-    private String        _particlePool = "ParticlePool";
-    private String        _bulletPool = "BulletPool";
-    private SpawnPool     _spawnPool;
-    private float         _bulletSpeed = -20f;  // neg, so that it goes from right to left
-    private Color         _startingColor;
+    private Transform              _xform; // current transform of enemy, cached for perf during init
+    private SoundManager           _soundManager;
+    public Transform               _bulletXform;
+    private ParticleEffectsManager _particleManager;
+    private SpawnPool              _spawnPool;
+    private float                  _bulletSpeed = -20f;  // neg, so that it goes from right to left
+    private Color                  _startingColor;
 
     private void Start()
     {
         if (particlePrefab == null){
             print("One of your prefabs in" + " " + this.name + " " + "are null");
         }
-        _xform         = transform; // cached for performance
-        _bulletPrefab  = PoolManager.Pools[_bulletPool].prefabs["EnemyBulletPrefab"];
-        _startingColor = renderer.material.color; 
+        _xform           = transform; 
+        _startingColor   = renderer.material.color; 
+        _spawnPool       = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
+        _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
     }
 
     private void Update()
     {
-        _xform.position += (motionDir*Time.deltaTime); // move
+        _xform.position += (motionDir*Time.deltaTime); 
     }
 
 
@@ -47,8 +47,7 @@ public class Enemy : MonoBehaviour
         StartCoroutine(flashScript.FlashWhite());
 
         hitPoints -= damage;
-        if (hitPoints <= 0)
-        {
+        if (hitPoints <= 0){
             Explode();
         }
     }
@@ -58,15 +57,10 @@ public class Enemy : MonoBehaviour
     /// </summary>
     public void Explode()
     {
-        // TODO: play sound
-        var _particleInstance = PoolManager.Pools[_particlePool].Spawn(particlePrefab,
-            transform.position, transform.rotation);
+        _particleManager.CreateExplodingEnemyEffects(_xform.position);
         // put this back on the stack for later re-use
-        PoolManager.Pools[_bulletPool].Despawn(transform);
-        // increment the score
+        _spawnPool.Despawn(_xform);
         GameManager.score++;
-        // Remove reference to particle effect after (x) seconds, otherwise it stays in the scene
-        PoolManager.Pools[_particlePool].Despawn(_particleInstance, 3);
         // Prevents enemy from re-spawning as white (stayed flashing on dead)
         renderer.material.color = _startingColor;
     }
@@ -80,7 +74,7 @@ public class Enemy : MonoBehaviour
         yield return new WaitForSeconds(delay);
 
         // Grabs current instance of bullet
-        Transform _bullletPrefab = PoolManager.Pools["BulletPool"].Spawn(_bulletPrefab,_xform.position, Quaternion.identity);
-        _bullletPrefab.rigidbody.velocity = new Vector3(_bulletSpeed,  0, 0);
+        var bullletPrefab                = _spawnPool.Spawn(_bulletXform,_xform.position, Quaternion.identity);
+        bullletPrefab.rigidbody.velocity = new Vector3(_bulletSpeed,  0, 0);
     }
 }

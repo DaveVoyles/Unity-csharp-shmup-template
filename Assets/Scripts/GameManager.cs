@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     private int          _respawnTime        = 3;
     private SoundManager _soundManager;
 
+    // Need to serialize these fields 
     public SpawnPool BulletPool;
     public SpawnPool ParticlePool;
 

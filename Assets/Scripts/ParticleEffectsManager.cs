@@ -9,7 +9,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     public Transform playerExplosionXform;
     public AudioClip sfxSpawning;
 
-    private String _particlePoolString = "ParticlePool";
+    private const String PARTICLEPOOLSTRING = "ParticlePool";
 
     ///<summary>
     /// Creates particles, de-spawns particles, and plays SFX for spawning
@@ -17,7 +17,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreateSpawnEffects(Vector3 spawnLocation)
     {
-        var pool         = PoolManager.Pools[_particlePoolString];
+        var pool         = PoolManager.Pools[PARTICLEPOOLSTRING];
         var particleInst = pool.Spawn(particleXform, spawnLocation, Quaternion.identity);
         pool.Despawn(particleInst, 2);    
 
@@ -30,7 +30,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreatePlayerExplosionEffects(Vector3 spawnLocation)
     {
-        var pool         = PoolManager.Pools[_particlePoolString];
+        var pool         = PoolManager.Pools[PARTICLEPOOLSTRING];
         var particleInst = pool.Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
         pool.Despawn(particleInst, 2);
         Camera.main.GetComponent<CameraShake>().Shake();
@@ -39,5 +39,19 @@ public class ParticleEffectsManager : MonoBehaviour {
     }
 
 
-	
+    /// <summary>
+    /// Creates explosive effects for enemies
+    /// </summary>
+    /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
+    public void CreateExplodingEnemyEffects(Vector3 spawnLocation)
+    {
+        var pool         = PoolManager.Pools[PARTICLEPOOLSTRING];
+        var particleInst = pool.Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
+        pool.Despawn(particleInst, 2);
+
+        //TODO: _soundManager.PlayClip(sfxSpawning, false);  
+    }
+
+
+
 }

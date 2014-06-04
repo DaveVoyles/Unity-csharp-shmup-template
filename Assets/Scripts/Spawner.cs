@@ -10,21 +10,26 @@ public class Spawner : MonoBehaviour {
     
     public Transform pathEnemyXform;
     public Transform enemyXform;
-    public Transform droneXform;     
-    public int pathOneSpawnAmount             = 0;
-    public int pathTwoSpawnAmount             = 0;
-    public int pathThreeSpawnAmount           = 0;  
+    public Transform droneXform;
+    public int pathSpawnAmount                = 1;
+    public int pathOneSpawnAmount             = 1;
+    public int pathTwoSpawnAmount             = 1;
+    public int pathThreeSpawnAmount           = 1;  
     public float pathOneSpawnInterval         = 1f;
     public float pathTwoSpawnInterval         = 1f;
     public float pathThreeSpawnInterval       = 1f;
+    public float pathSpawnInterval            = 1f;
     public float stationaryEnemyInterval      = 1f;
     public float incrementSpawnInterval       = 1.1f;
+    public float timeToRunPath                = 4.5f;
     public float timeToRunPathOne             = 4.5f;
     public float timeToRunPathTwo             = 4.5f;
     public float timeToRunPathThree           = 4.5f;
+    public iTween.EaseType pathEaseType;
     public iTween.EaseType pathOneEaseType;
     public iTween.EaseType pathTwoEaseType;
     public iTween.EaseType pathThreeEaseType;
+    public bool canSpawnPath                 = false;
     public bool canSpawnPathOne              = false;
     public bool canSpawnPathTwo              = false;
     public bool canSpawnPathThree            = false;
@@ -43,6 +48,12 @@ public class Spawner : MonoBehaviour {
     private Transform _enemySpawnPointXform         = null;
     private SwarmBehavior _swarmBehavior            = null;
     private Transform _xForm                        = null;
+    private string _pathName                        = "path1";
+
+    public enum pathNames
+    {
+
+    }
 
     /// <summary>
     /// Make the pool's group a child of this transform for demo purposes
@@ -82,6 +93,9 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private void ToggleWhichEnemiesCanSpawn()
     {
+        if (canSpawnPath){
+            StartCoroutine(SpawnOnAPath());
+        }
         if (canSpawnPathOne){
             StartCoroutine(SpawnPathOne());
         }
@@ -116,7 +130,7 @@ public class Spawner : MonoBehaviour {
     {
         // How many enemies should we spawn?
         var count = pathOneSpawnAmount;
-        while (count >= 0)
+        while (count > 0)
         {
             // Grab an instance of the enemy transform
             var pathEnemyInstance = _pool.Spawn(pathEnemyXform);
@@ -138,7 +152,7 @@ public class Spawner : MonoBehaviour {
     {
         // How many enemies should we spawn?
         var count = pathTwoSpawnAmount;
-        while (count >= 0)
+        while (count > 0)
         {
             // Grab an instance of the enemy transform
             var pathEnemyInstance = _pool.Spawn(pathEnemyXform);
@@ -160,7 +174,7 @@ public class Spawner : MonoBehaviour {
     {
         // How many enemies should we spawn?
         var count = pathThreeSpawnAmount;
-        while (count >= 0)
+        while (count > 0)
         {
             // Grab an instance of the enemy transform
             var pathEnemyInstance = _pool.Spawn(pathEnemyXform);
@@ -175,6 +189,25 @@ public class Spawner : MonoBehaviour {
         }
     }
 
+    private IEnumerator SpawnOnAPath()
+    {
+        // How many enemies should we spawn?
+        var count = pathSpawnAmount;
+        while (count > 0)
+        {
+            // Grab an instance of the enemy transform
+            var pathEnemyInstance = _pool.Spawn(pathEnemyXform);
+            var iTweenMoveToPath = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+
+            // Enemy follows this path
+            iTweenMoveToPath.FollowPath(_pathName, timeToRunPath, pathEaseType);
+            count--;
+
+            // call this function, every (x) seconds
+            yield return new WaitForSeconds(pathSpawnInterval);
+        }
+    }
+
     /// <summary>
     /// Spawns a stationary enemy
     /// </summary>
@@ -184,7 +217,7 @@ public class Spawner : MonoBehaviour {
         {
             // How many enemies should we spawn?
             var count = incrementSpawnAmount;
-            while (count >= 0)
+            while (count == 0)
             {
                 // spawn an enemy off screen at a random X position and set hit points
                 var randomY = Random.Range(-4.0f, 4.0f);

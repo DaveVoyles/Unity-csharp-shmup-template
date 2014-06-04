@@ -58,18 +58,31 @@ public class iTweenMoveToPath : MonoBehaviour
     }
 
     /// <summary>
+    /// Enemies can spawn on any path, passed in as a string
+    /// </summary>
+    /// <param name="pathName"></param>
+    /// <param name="timeToRunPath"></param>
+    /// <param name="easeType"></param>
+    public void FollowPath(string pathName, float timeToRunPath, iTween.EaseType easeType)
+    {
+        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath(pathName), "time", timeToRunPath,
+            "easetype", easeType, "movetopath", false, "oncomplete", "deactivate"));
+    }
+    
+
+    /// <summary>
     /// Builds a random path for the object to traverse, passing in the random path name and random length to traverse
     /// </summary>
-    /// <param name="_iTweenPathName"></param>
-    /// <param name="_timeToRunPath"></param>
-    private void RandomPathConstructor(string _iTweenPathName, int _timeToRunPath)
+    /// <param name="iTweenPathName"></param>
+    /// <param name="timeToRunPath"></param>
+    private void RandomPathConstructor(string iTweenPathName, int timeToRunPath)
     {
-        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath(_iTweenPathName),
-            "time", _timeToRunPath, "oncomplete", "deactivate"));
+        iTween.MoveTo(gameObject, iTween.Hash("path", iTweenPath.GetPath(iTweenPathName),
+            "time", timeToRunPath, "oncomplete", "deactivate"));
     }
 
     /// <summary>
-    /// If object gets to the end of path and isn't killed, then deactivate and return to pool.
+    /// DO NOT DELETE: If object gets to the end of path and isn't killed, then deactivate and return to pool.
     /// Used as a callback in the BuildRandomPath function
     /// </summary>
     private void deactivate()
@@ -82,9 +95,9 @@ public class iTweenMoveToPath : MonoBehaviour
     /// </summary>
     private string GeneratePathName()
     {
-        var _randomNum   = Random.Range(1, 3);   
-        var _intToString = _randomNum.ToString(); 
-        _iTweenPathName  = "path" + _intToString; 
+        var randomNum    = Random.Range(1, 3);   
+        var intToString  = randomNum.ToString(); 
+        _iTweenPathName  = "path" + intToString; 
 
         return _iTweenPathName;                   
     }

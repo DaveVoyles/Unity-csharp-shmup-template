@@ -21,9 +21,6 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
-        if (particlePrefab == null){
-            print("One of your prefabs in" + " " + this.name + " " + "are null");
-        }
         _xform           = transform; 
         _startingColor   = renderer.material.color; 
         _spawnPool       = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;

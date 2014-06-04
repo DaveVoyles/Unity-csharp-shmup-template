@@ -24,24 +24,34 @@ public class SwarmBehavior : MonoBehaviour
     /// <summary>
     /// Attach the drone prefab
     /// </summary>
-    public Transform prefab;
+    public Transform droneXform;
     public List<GameObject> drones;
 
     private Transform _spawnPointXform;
-    private string _nameOfPool = "BulletPool";
-    private SpawnPool _pool    = null;
+    private const string _nameOfPool = "BulletPool";
+    private SpawnPool _pool          = null;
+    private Transform _playerXform   = null;
+
 
     protected virtual void Start()
     {
-        if (prefab == null){
-            Debug.Log("Please assign a drone prefab, and assign the drone script to it.");
+        if (droneXform == null){
+            Debug.Log("Please assign a drone prefab.");
             return;
         }
 
         _spawnPointXform = GameObject.Find("EnemySpawnPoint").transform;
+        _playerXform     = GameObject.Find("Player").transform;
         _pool            = PoolManager.Pools[_nameOfPool];
 
-        StartCoroutine(InstantiateDrones());
+    }
+
+    /// <summary>
+    /// Keep the drone swarm  target constantly attached to the player
+    /// </summary>
+    private void Update()
+    {
+        transform.position = _playerXform.position;
     }
 
     /// <summary>
@@ -62,7 +72,7 @@ public class SwarmBehavior : MonoBehaviour
     /// Generate the same random, spawn location for all enemies and draw particles
     /// Also, set a brief delay before enemies appear on screen
     /// </summary>
-    private IEnumerator InstantiateDrones()
+    public IEnumerator InstantiateDrones()
     {
         var randomSpawnLocation = GeneratedSpawnPoint();
         gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(randomSpawnLocation);
@@ -79,7 +89,7 @@ public class SwarmBehavior : MonoBehaviour
     {
         for (int i = 0; i < droneCount; i++)
         {
-            Transform droneTemp = _pool.Spawn(prefab);
+            var droneTemp       = _pool.Spawn(droneXform);
             var db              = droneTemp.gameObject.GetComponent<DroneBehavior>();
             db.drones           = drones;
             db.swarm            = this;

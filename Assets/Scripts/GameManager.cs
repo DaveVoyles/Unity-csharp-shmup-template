@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
             return (GameManager)GMGameObj.AddComponent(typeof(GameManager));
         }
         return (GameManager)GMGameObj.GetComponent(typeof(GameManager));
-    }
+    }   
 
     private void Start()
     {

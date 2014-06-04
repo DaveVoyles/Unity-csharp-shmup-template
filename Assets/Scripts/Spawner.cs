@@ -14,13 +14,14 @@ public class Spawner : MonoBehaviour {
     public int pathOneSpawnAmount             = 0;
     public int pathTwoSpawnAmount             = 0;
     public int pathThreeSpawnAmount           = 0;  
-    public float pathOneSpawnInterval         = 0f;
-    public float pathTwoSpawnInterval         = 0f;
-    public float pathThreeSpawnInterval       = 0f;
-    public float stationaryEnemyInterval      = 0f;
-    public float timeToRunPathOne             = 0;
-    public float timeToRunPathTwo             = 0;
-    public float timeToRunPathThree           = 0;
+    public float pathOneSpawnInterval         = 1f;
+    public float pathTwoSpawnInterval         = 1f;
+    public float pathThreeSpawnInterval       = 1f;
+    public float stationaryEnemyInterval      = 1f;
+    public float incrementSpawnInterval       = 1.1f;
+    public float timeToRunPathOne             = 4.5f;
+    public float timeToRunPathTwo             = 4.5f;
+    public float timeToRunPathThree           = 4.5f;
     public iTween.EaseType pathOneEaseType;
     public iTween.EaseType pathTwoEaseType;
     public iTween.EaseType pathThreeEaseType;
@@ -28,20 +29,19 @@ public class Spawner : MonoBehaviour {
     public bool canSpawnPathTwo              = false;
     public bool canSpawnPathThree            = false;
     public bool canSpawnRandomPath           = false;
-    public bool canSpawningStationary        = true;
-    public bool canSpawningDrones            = true;
-    public bool canSpawnImmediately          = true;
+    public bool canSpawningStationary        = false;
+    public bool canSpawningDrones            = false;
+    public bool canSpawnGroup                = false;
+    public bool canSpawnIncrementally        = false;
     public int spawnAmount                   = 5;
-    public float IncrementSpawnInterval      = 1.1f;
+    public int numOfEnemiesToSpawnInGroup    = 8;
 
-
-    private string _nameOfPool = "BulletPool";  
-    private SpawnPool _pool            = null;
-
-    public int numberOfEnemiesToSpawn = 10;
-    private int _spawnSphereRadius = 3;
+    private string _nameOfPool               = "BulletPool";  
+    private SpawnPool _pool                  = null;
+    private int _spawnSphereRadius           = 3;
     private Transform _playerXform;
     private Transform _enemySpawnPointXform;
+    private SwarmBehavior _swarmBehavior;
 
     /// <summary>
     /// Make the pool's group a child of this transform for demo purposes
@@ -49,14 +49,36 @@ public class Spawner : MonoBehaviour {
     /// </summary>
 	void Start ()
 	{
+        SetProperties();
+        ToggleWhichEnemiesCanSpawn();
+    }
+
+    /// <summary>
+    /// Instantiates the values for all private properties
+    /// </summary>
+    private void SetProperties()
+    {
         _pool                     = PoolManager.Pools[_nameOfPool];
         _pool.group.parent        = gameObject.transform;
         _pool.group.localPosition = new Vector3(1.5f, 0, 0);
         _pool.group.localRotation = Quaternion.identity;
         _playerXform              = GameObject.Find("Player").transform;
         _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
+        _swarmBehavior            = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
+        if (_swarmBehavior == null)
+        {
+            var swarmObject = new GameObject();
+            swarmObject.AddComponent<SwarmBehavior>();
+            swarmObject.AddComponent<ParticleEffectsManager>();
+            _swarmBehavior = swarmObject.GetComponent<SwarmBehavior>();
+        }
+    }
 
-
+    /// <summary>
+    /// A boolean controls which enemies / groups can and can't spawn
+    /// </summary>
+    private void ToggleWhichEnemiesCanSpawn()
+    {
         if (canSpawnPathOne){
             StartCoroutine(SpawnPathOne());
         }
@@ -72,11 +94,18 @@ public class Spawner : MonoBehaviour {
         if (canSpawningStationary){
             StartCoroutine(SpawnStationaryEnemy());
         }
-        if (canSpawnImmediately){
-            SpawnEnemiesImmediately();
+        if (canSpawnGroup){
+            SpawnGroup();
         }
-	}
-	
+        if (canSpawnIncrementally){
+            StartCoroutine(SpawnEnemiesIncrementally());
+        }
+        if (canSpawningDrones){
+            StartCoroutine(_swarmBehavior.InstantiateDrones());
+        }
+    }
+
+
     /// <summary>
     /// Spawn an (this.pathOneSpawnAmount) instances of  every this.pathOneSpawnInterval
     /// </summary>
@@ -197,23 +226,23 @@ public class Spawner : MonoBehaviour {
     private IEnumerator SpawnEnemiesIncrementally()
     {
         // How many enemies should we spawn?
-        var count = numberOfEnemiesToSpawn;
+        var count = numOfEnemiesToSpawnInGroup;
         while (count >= 0)
         {
             // Spawn an enemy & set spawn location within spawn radius
             SpawnEnemies();
             count--;
 
-            yield return new WaitForSeconds(IncrementSpawnInterval);
+            yield return new WaitForSeconds(incrementSpawnInterval);
         }
     }
 
     /// <summary>
     /// Immediately Spawn _number ofEnemies within the size of _spawnSphereRadius
     /// </summary>
-    private void SpawnEnemiesImmediately()
+    private void SpawnGroup()
     {
-        for (var i = 0; i < numberOfEnemiesToSpawn; i++)
+        for (var i = 0; i < numOfEnemiesToSpawnInGroup; i++)
         {
             SpawnEnemies();
         }

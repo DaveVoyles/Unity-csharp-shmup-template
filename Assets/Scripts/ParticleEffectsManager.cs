@@ -52,6 +52,19 @@ public class ParticleEffectsManager : MonoBehaviour {
         //TODO: _soundManager.PlayClip(sfxSpawning, false);  
     }
 
+    /// <summary>
+    /// Creates explosive effects for enemies
+    /// </summary>
+    /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
+    public void CreatePowerupParticleEffects(Vector3 spawnLocation)
+    {
+        var pool = PoolManager.Pools[PARTICLEPOOLSTRING];
+        var particleInst = pool.Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
+        pool.Despawn(particleInst, 2);
+
+        //TODO: _soundManager.PlayClip(sfxSpawning, false);  
+    }
+
 
 
 }

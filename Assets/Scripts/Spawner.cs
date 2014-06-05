@@ -40,6 +40,8 @@ public class Spawner : MonoBehaviour {
     public bool canSpawnIncrementally        = false;
     public int incrementSpawnAmount          = 5;
     public int numOfEnemiesToSpawnInGroup    = 8;
+
+    public Transform powerup                 = null;
  
     private SpawnPool _pool                         = null;
     private int _spawnSphereRadius                  = 3;
@@ -63,7 +65,9 @@ public class Spawner : MonoBehaviour {
 	{
         SetProperties();
         ToggleWhichEnemiesCanSpawn();
-    }
+ 
+        _pool.Spawn(powerup);
+	}
 
     /// <summary>
     /// Instantiates the values for all private properties

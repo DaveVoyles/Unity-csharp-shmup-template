@@ -41,6 +41,7 @@ public class Spawner : MonoBehaviour {
     public int incrementSpawnAmount          = 5;
     public int numOfEnemiesToSpawnInGroup    = 8;
 
+    public bool canSpawnPickup               = false;
     public Transform powerup                 = null;
  
     private SpawnPool _pool                         = null;
@@ -65,9 +66,7 @@ public class Spawner : MonoBehaviour {
 	{
         SetProperties();
         ToggleWhichEnemiesCanSpawn();
- 
-        _pool.Spawn(powerup);
-	}
+ }
 
     /// <summary>
     /// Instantiates the values for all private properties
@@ -123,6 +122,9 @@ public class Spawner : MonoBehaviour {
         }
         if (canSpawningDrones){
             StartCoroutine(_swarmBehavior.InstantiateDrones());
+        }
+        if (canSpawnPickup){
+            _pool.Spawn(powerup);
         }
     }
 

@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
     private const int    _spreadWeaponYoffset       = 10;
     private Transform    _playerSpawnPoint;                        // Finds spawn point in editor
     private float        _shipInvisibleTime         = 1.3f;
-    private SpawnPool    _bulletPool                 = null;
+    private SpawnPool    _pool                      = null;
     private ParticleEffectsManager _particleManager = null;
     private const float DEFAULT_FIRE_RATE           = 0.035f;
     private const float DEFAULT_PLAYER_SPEED        = 18f;
@@ -32,9 +32,9 @@ public class Player : MonoBehaviour
 
 
 
-    /**************************************************
-     ***************** POWER-UPS **********************
-     *************************************************/
+    //-------------------------------------------------
+    // POWER-UPS    
+    //------------------------------------------------
     public float GetFireRate(){
         return _fireRate;
     }
@@ -85,7 +85,7 @@ public class Player : MonoBehaviour
         _xform                    = transform;                                     
         _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point Object
         _xform.position           = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
-        _bulletPool               = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
+        _pool                     = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
         _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _soundManager             = SoundManager.GetSingleton();
     }
@@ -134,7 +134,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ShootBullets()
     {
-        var bulletInst                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        var bulletInst                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
         bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, transform.position.y, transform.position.z);   
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
@@ -146,13 +146,13 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ShootSpreadWeapon()
     {
-        var bulletInst                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        var bulletInst                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
         bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y - _spreadWeaponYoffset, _xform.position.z);
 
-        var bulletInst2                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        var bulletInst2                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
         bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y, _xform.position.z);
 
-        var bulletInst3                = _bulletPool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
+        var bulletInst3                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
         bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y + _spreadWeaponYoffset, _xform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX

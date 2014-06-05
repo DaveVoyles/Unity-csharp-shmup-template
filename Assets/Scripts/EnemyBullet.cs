@@ -16,14 +16,6 @@ public class EnemyBullet : MonoBehaviour
         _xform = transform;
     }
 
-    private void Update()
-    {
-        if (renderer.isVisible == false){
-            PoolManager.Pools["BulletPool"].Despawn(this.transform);
-        }
-    }
-
-
     private void OnCollisionEnter(Collision other)
     {
         // Hit an enemy

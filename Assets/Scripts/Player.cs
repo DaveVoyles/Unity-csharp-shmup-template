@@ -13,8 +13,8 @@ public class Player : MonoBehaviour
     private Transform    _xform;
     private float        _playerSpeed               = 18f;
     private float        _fireRate                  = 0.035f;     // time between shots
-    private enum state  { Playing, Explosion, Invincible }
-    private state        _state                     = state.Playing;
+    private enum State  { Playing, Explosion, Invincible }
+    private State        _state                     = State.Playing;
     private float        _bulletVelX                = 40f;
     private int          _bulletDmg                 = 1;
     private const int    _spreadWeaponYoffset       = 10;
@@ -29,56 +29,9 @@ public class Player : MonoBehaviour
     public Transform playerBulletPrefab; 
     public Transform playerMissilePrefab;
     public AudioClip sfxShoot;
+    public enum Weapon{ Single, Triple}
+    private Weapon _weapon = Weapon.Single;
 
-
-
-    //-------------------------------------------------
-    // POWER-UPS    
-    //------------------------------------------------
-    public float GetFireRate(){
-        return _fireRate;
-    }
-
-    public void SetFireRate(float fireRate){
-        _fireRate = fireRate;
-    }
-
-    public float GetPlayerSpeed(){
-        return _playerSpeed;
-    }
-
-    public void SetPlayerSpeed(float playerSpeed){
-        _playerSpeed = playerSpeed;
-    }
-
-    public float GetBulletVelocity(){
-        return _bulletVelX;
-    }
-
-    public void  SetBulletVelocity(float bulletVelocity){
-        _bulletVelX = bulletVelocity;
-    }
-
-    public int GetBulletDmg()
-    {
-        return _bulletDmg;
-    }
-
-    public void SetBulletDmg(int bulletDmg)
-    {
-        _bulletDmg = bulletDmg;
-    }
-
-    /// <summary>
-    /// Resets all player variables for powerups, upon death
-    /// </summary>
-    private void ResetDefaultValues()
-    {
-        _fireRate    = DEFAULT_FIRE_RATE;
-        _playerSpeed = DEFAULT_PLAYER_SPEED;
-        _bulletVelX  = DEFAULT_BULLET_VEL_X;
-        _bulletDmg   = DEFAULT_BULLET_DMG;
-    }
 
     void Start()
     {
@@ -93,10 +46,11 @@ public class Player : MonoBehaviour
     void Update()
     {   
         // Is the player isn't alive, return
-        if (_state == state.Explosion) return;
+        if (_state == State.Explosion) return;
 
         HandlePlayerMovement();
         CheckIfShooting();
+        CheckWhichWeaponIsInUse();
     }
 
     /// <summary>
@@ -120,7 +74,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void CheckIfShooting()
     {
-        if (Input.GetButton("Fire1") && Time.time > _nextFire && _state == state.Playing)
+        if (Input.GetButton("Fire1") && Time.time > _nextFire && _state == State.Playing)
         {
             // delay the next shot by the firing rate
             _nextFire = Time.time + _fireRate;
@@ -132,7 +86,7 @@ public class Player : MonoBehaviour
     /// Shoots one row of bullets in a straight line
     /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
     /// </summary>
-    private void ShootBullets()
+    private void ShootSingleShot()
     {
         var bulletInst                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
         bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, transform.position.y, transform.position.z);   
@@ -176,7 +130,7 @@ public class Player : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         // Is the player doing anything but playing? Get out of here.
-        if (_state != state.Playing) return;    
+        if (_state != State.Playing) return;    
 
         // check if it was a bullet we hit, if so put it back on its stack
         if (other.CompareTag("EnemyBullet"))
@@ -206,7 +160,7 @@ public class Player : MonoBehaviour
     public void KillPlayer(Collider other)
     {
         // If player isn't alive, then return
-        if (_state == state.Playing)
+        if (_state == State.Playing)
         {
             // Call enemy's Explode function for particles / sfx
             if (other.CompareTag("Enemy"))
@@ -224,7 +178,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private IEnumerator OnBecameInvisible()
     {
-        _state = state.Explosion;
+        _state = State.Explosion;
 
         _particleManager.CreatePlayerExplosionEffects(_xform.position);
         // Make player ship invisible & move player to PlayerSpawnPoint
@@ -236,7 +190,7 @@ public class Player : MonoBehaviour
         {
             ResetDefaultValues();
             // Set player to invincible while flashing & create particle effect at spawn point
-            _state = state.Invincible;;
+            _state = State.Invincible;;
             _particleManager.CreateSpawnEffects(_xform.position);
 
             // Make player ship visible again
@@ -248,8 +202,67 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(2.2f);
         }
         // Not flashing anymore? Now you can take hits
-        _state = state.Playing;
+        _state = State.Playing;
     }
+
+
+
+    //-------------------------------------------------
+    // POWER-UPS    
+    //------------------------------------------------
+    public float GetFireRate()
+    {
+        return _fireRate;
+    }
+
+    public void SetFireRate(float fireRate)
+    {
+        _fireRate = fireRate;
+    }
+
+    public float GetPlayerSpeed()
+    {
+        return _playerSpeed;
+    }
+
+    public void SetPlayerSpeed(float playerSpeed)
+    {
+        _playerSpeed = playerSpeed;
+    }
+
+    public float GetBulletVelocity()
+    {
+        return _bulletVelX;
+    }
+
+    public void SetBulletVelocity(float bulletVelocity)
+    {
+        _bulletVelX = bulletVelocity;
+    }
+
+    public int GetBulletDmg()
+    {
+        return _bulletDmg;
+    }
+
+    public void SetBulletDmg(int bulletDmg)
+    {
+        _bulletDmg = bulletDmg;
+    }
+
+    /// <summary>
+    /// Resets all player variables for powerups, upon death
+    /// </summary>
+    private void ResetDefaultValues()
+    {
+        _fireRate    = DEFAULT_FIRE_RATE;
+        _playerSpeed = DEFAULT_PLAYER_SPEED;
+        _bulletVelX  = DEFAULT_BULLET_VEL_X;
+        _bulletDmg   = DEFAULT_BULLET_DMG;
+    }
+
+
+
 
 }
 

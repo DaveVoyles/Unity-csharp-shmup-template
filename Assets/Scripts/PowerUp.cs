@@ -14,6 +14,7 @@ public class PowerUp : MonoBehaviour {
     private Transform _xForm;
     private SpawnPool _pool = null;
     private Vector3[] _path = null;
+    private Weapons   _weapons = null;
 
 
 	void Start ()
@@ -22,9 +23,14 @@ public class PowerUp : MonoBehaviour {
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
 	    _xForm           = transform;
         _pool            = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
+	    _weapons         = _player.GetComponent<Weapons>();
         CreatePaths();
 	}
 
+    /// <summary>
+    /// Draws and runs through a path of points
+    /// Gradually bouncing up and down, as it moves towards the left side of screen
+    /// </summary>
     private void CreatePaths()
     {
         _path = new Vector3[30];
@@ -71,11 +77,6 @@ public class PowerUp : MonoBehaviour {
         iTween.DrawPath(_path);
     }
 
-    // Update is called once per frame
-	void Update () {
-	
-	}
-
     private void OnTriggerEnter(Collider other)
     {
         if (!other.gameObject.CompareTag("Player")) return;
@@ -89,14 +90,14 @@ public class PowerUp : MonoBehaviour {
 
     private void IncreaseFireRate()
     {
-        _player.SetFireRate(FIRE_RATE);
-        print("setting fire rate to:" + "" + _player.GetFireRate());
+        _weapons.SetFireRate(FIRE_RATE);
+        print("setting fire rate to:" + "" + _weapons.GetFireRate());
     }
 
     private void IncreaseBulletVelocity()
     {
-        _player.SetBulletVelocity(BULLET_VELOCITY);
-        print("setting bullet velocity to:" + "" + _player.GetBulletVelocity());
+        _weapons.SetBulletVelocity(BULLET_VELOCITY);
+        print("setting bullet velocity to:" + "" + _weapons.GetBulletVelocity());
     }
 
     private void IncreasePlayerSpeed()
@@ -108,8 +109,8 @@ public class PowerUp : MonoBehaviour {
 
     private void IncreaseBulletDmg()
     {
-        _player.SetBulletDmg(BULLET_DMG);
-        print("setting bullet damage to" + "" + _player.GetBulletDmg());
+        _weapons.SetBulletDmg(BULLET_DMG);
+        print("setting bullet damage to" + "" + _weapons.GetBulletDmg());
     }
 
 

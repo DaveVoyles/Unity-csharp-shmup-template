@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using PathologicalGames;
+using UnityEngine;
 using System.Collections;
 
 public class Weapons : MonoBehaviour {
@@ -6,15 +7,29 @@ public class Weapons : MonoBehaviour {
         SingleShot,
         SpreadWeapon
     }
-    private bool[]    _weaponInventory;
+    private bool[]     _weaponInventory;
+    private Player     _player;
+    private SpawnPool  _pool                  = null;
+    private float      _bulletVelX            = 40f;
+    private int        _bulletDmg             = 1;
+    private const int  SPREAD_WEAPON_OFFSET_Y = 10;
+    private const float DEFAULT_BULLET_VEL_X  = 40f;
+    private const int   DEFAULT_BULLET_DMG    = 1;
+    private const float DEFAULT_FIRE_RATE     = 0.035f;
+    private float       _fireRate             = 0.035f;     // time between shots
+
+    public Transform playerBulletPrefab;
+    public Transform playerMissilePrefab;
+    public AudioClip sfxShoot;
     public WeaponType currentWeapon = WeaponType.SingleShot;
-    private Player _player;
+
 
     private void  Start ()
     {
         // Create an inventory, and store the first weapon in there
         _weaponInventory = new bool[ System.Enum.GetValues(typeof (WeaponType)).Length];
-        _player = gameObject.GetComponent<Player>();
+        _player          = gameObject.GetComponent<Player>();
+        _pool            = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
     }
  
     public void  SwitchToWeapon ( int weapon  ){
@@ -62,11 +77,94 @@ public class Weapons : MonoBehaviour {
     {
         if (currentWeapon == WeaponType.SingleShot)
         {
-         _player.ShootSingleShot();   
+            ShootSingleShot();   
         }
         if (currentWeapon == WeaponType.SpreadWeapon)
         {
-            _player.ShootSpreadWeapon();
+            ShootSpreadWeapon();
         }
     }
+
+    /// <summary>
+    /// Shoots one row of bullets in a straight line
+    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+    /// </summary>
+    public void ShootSingleShot()
+    {
+        var bulletInst = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0, _player.xform.position.z);
+
+        // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
+    }
+
+    /// <summary>
+    /// Shoots three bullets at once, like the spread weapon in Contra.
+    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+    /// </summary>
+    public void ShootSpreadWeapon()
+    {
+        var bulletInst = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0 - SPREAD_WEAPON_OFFSET_Y, _player.xform.position.z);
+
+        var bulletInst2 = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, 0, _player.xform.position.z);
+
+        var bulletInst3 = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, 0 + SPREAD_WEAPON_OFFSET_Y, _player.xform.position.z);
+
+        // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
+    }
+
+
+    //-------------------------------------------------
+    // POWER-UPS    
+    //------------------------------------------------
+    public float GetFireRate()
+    {
+        return _fireRate;
+    }
+
+    public void SetFireRate(float fireRate)
+    {
+        _fireRate = fireRate;
+    }
+
+    public void SetDefaultFireRate()
+    {
+        _fireRate = DEFAULT_FIRE_RATE;
+    }
+
+    public float GetBulletVelocity()
+    {
+        return _bulletVelX;
+    }
+
+    public void SetBulletVelocity(float bulletVelocity)
+    {
+        _bulletVelX = bulletVelocity;
+    }
+
+    public void SetDefaultBulletVel()
+    {
+        _bulletVelX = DEFAULT_BULLET_VEL_X;
+    }
+
+    public int GetBulletDmg()
+    {
+        return _bulletDmg;
+    }
+
+    public void SetBulletDmg(int bulletDmg)
+    {
+        _bulletDmg = bulletDmg;
+    }
+
+    public void SetDefaultBulletDmg()
+    {
+        _bulletDmg = DEFAULT_BULLET_DMG;
+    }
+
+
+
+    
 }

@@ -10,34 +10,26 @@ public class Player : MonoBehaviour
 {
     private SoundManager _soundManager;                           // reference to global sound manager  
     private float        _nextFire                  = 0;          // used to time the next shot
-    private Transform    _xform;
     private float        _playerSpeed               = 18f;
-    private float        _fireRate                  = 0.035f;     // time between shots
     private enum State  { Playing, Explosion, Invincible }
     private State        _state                     = State.Playing;
-    private float        _bulletVelX                = 40f;
-    private int          _bulletDmg                 = 1;
-    private const int    _spreadWeaponYoffset       = 10;
     private Transform    _playerSpawnPoint;                        // Finds spawn point in editor
     private float        _shipInvisibleTime         = 1.3f;
     private SpawnPool    _pool                      = null;
     private ParticleEffectsManager _particleManager = null;
-    private const float DEFAULT_FIRE_RATE           = 0.035f;
     private const float DEFAULT_PLAYER_SPEED        = 18f;
-    private const float DEFAULT_BULLET_VEL_X        = 40f;
-    private const int   DEFAULT_BULLET_DMG          = 1;
-    public Transform playerBulletPrefab; 
-    public Transform playerMissilePrefab;
-    public AudioClip sfxShoot;
+
     [HideInInspector]
     public Weapons weapons                          = null;
+    [HideInInspector]
+    public Transform xform;
 
 
     void Start()
     {
-        _xform                    = transform;                                     
+        xform                     = transform;                                     
         _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point Object
-        _xform.position           = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
+        xform.position            = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
         _pool                     = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
         _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _soundManager             = SoundManager.GetSingleton();
@@ -67,7 +59,7 @@ public class Player : MonoBehaviour
         moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); 
 
         // move the player
-        _xform.Translate(moveVector);
+        xform.Translate(moveVector);
     }
 
     private void CheckIfSwitchingWeapon()
@@ -88,43 +80,13 @@ public class Player : MonoBehaviour
         if (Input.GetButton("Fire1") && Time.time > _nextFire && _state == State.Playing)
         {
             // delay the next shot by the firing rate
-            _nextFire = Time.time + _fireRate;
+            _nextFire = Time.time + weapons.GetFireRate();
            // ShootSpreadWeapon();
             weapons.ShootWeapon();
 
         }
     }
-
-    /// <summary>
-    /// Shoots one row of bullets in a straight line
-    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-    /// </summary>
-    public void ShootSingleShot()
-    {
-        var bulletInst                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0, _xform.position.z);   
-
-        // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
-    }
-
-    /// <summary>
-    /// Shoots three bullets at once, like the spread weapon in Contra.
-    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
-    /// </summary>
-    public void ShootSpreadWeapon()
-    {
-        var bulletInst                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0 - _spreadWeaponYoffset, _xform.position.z);
-
-        var bulletInst2                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, 0, _xform.position.z);
-
-        var bulletInst3                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, 0 + _spreadWeaponYoffset, _xform.position.z);
-
-        // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
-    }
-
+    
 
     private void ShootMissiles()
     {
@@ -193,10 +155,10 @@ public class Player : MonoBehaviour
     {
         _state = State.Explosion;
 
-        _particleManager.CreatePlayerExplosionEffects(_xform.position);
+        _particleManager.CreatePlayerExplosionEffects(xform.position);
         // Make player ship invisible & move player to PlayerSpawnPoint
         gameObject.renderer.enabled = false;
-        _xform.position             = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, _xform.position.z);
+        xform.position             = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, xform.position.z);
         yield return new WaitForSeconds(_shipInvisibleTime);
 
         if (GameManager.lives > 0)
@@ -204,7 +166,7 @@ public class Player : MonoBehaviour
             ResetDefaultValues();
             // Set player to invincible while flashing & create particle effect at spawn point
             _state = State.Invincible;;
-            _particleManager.CreateSpawnEffects(_xform.position);
+            _particleManager.CreateSpawnEffects(xform.position);
 
             // Make player ship visible again
             gameObject.renderer.enabled = true;
@@ -219,20 +181,6 @@ public class Player : MonoBehaviour
     }
 
 
-
-    //-------------------------------------------------
-    // POWER-UPS    
-    //------------------------------------------------
-    public float GetFireRate()
-    {
-        return _fireRate;
-    }
-
-    public void SetFireRate(float fireRate)
-    {
-        _fireRate = fireRate;
-    }
-
     public float GetPlayerSpeed()
     {
         return _playerSpeed;
@@ -243,35 +191,17 @@ public class Player : MonoBehaviour
         _playerSpeed = playerSpeed;
     }
 
-    public float GetBulletVelocity()
-    {
-        return _bulletVelX;
-    }
-
-    public void SetBulletVelocity(float bulletVelocity)
-    {
-        _bulletVelX = bulletVelocity;
-    }
-
-    public int GetBulletDmg()
-    {
-        return _bulletDmg;
-    }
-
-    public void SetBulletDmg(int bulletDmg)
-    {
-        _bulletDmg = bulletDmg;
-    }
+  
 
     /// <summary>
-    /// Resets all player variables for powerups, upon death
+    /// Resets all player variables for powerups, upon player death
     /// </summary>
     private void ResetDefaultValues()
     {
-        _fireRate    = DEFAULT_FIRE_RATE;
         _playerSpeed = DEFAULT_PLAYER_SPEED;
-        _bulletVelX  = DEFAULT_BULLET_VEL_X;
-        _bulletDmg   = DEFAULT_BULLET_DMG;
+        weapons.SetDefaultFireRate();
+        weapons.SetDefaultBulletVel();
+        weapons.SetDefaultBulletDmg();
     }
 
 

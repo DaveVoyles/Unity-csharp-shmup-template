@@ -24,13 +24,13 @@ public class Player : MonoBehaviour
     private ParticleEffectsManager _particleManager = null;
     private const float DEFAULT_FIRE_RATE           = 0.035f;
     private const float DEFAULT_PLAYER_SPEED        = 18f;
-    private const float DEFAULT_BULLET_VEL_X       = 40f;
+    private const float DEFAULT_BULLET_VEL_X        = 40f;
     private const int   DEFAULT_BULLET_DMG          = 1;
     public Transform playerBulletPrefab; 
     public Transform playerMissilePrefab;
     public AudioClip sfxShoot;
-    public enum Weapon{ Single, Triple}
-    private Weapon _weapon = Weapon.Single;
+    [HideInInspector]
+    public Weapons weapons                          = null;
 
 
     void Start()
@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
         _pool                     = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
         _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _soundManager             = SoundManager.GetSingleton();
+        weapons                   = GetComponent<Weapons>();
     }
 
     void Update()
@@ -50,7 +51,7 @@ public class Player : MonoBehaviour
 
         HandlePlayerMovement();
         CheckIfShooting();
-        CheckWhichWeaponIsInUse();
+        CheckIfSwitchingWeapon();
     }
 
     /// <summary>
@@ -69,6 +70,16 @@ public class Player : MonoBehaviour
         _xform.Translate(moveVector);
     }
 
+    private void CheckIfSwitchingWeapon()
+    {
+        if (Input.GetButtonDown("SwitchWeapon"))
+        {
+            weapons.SwitchToNextWeapon();
+            print("Switching weapon");
+        }
+
+    }
+
     /// <summary>
     /// Is the player shooting? Left-click for bullets, right-click for missiles
     /// </summary>
@@ -78,7 +89,9 @@ public class Player : MonoBehaviour
         {
             // delay the next shot by the firing rate
             _nextFire = Time.time + _fireRate;
-            ShootSpreadWeapon();
+           // ShootSpreadWeapon();
+            weapons.ShootWeapon();
+
         }
     }
 
@@ -86,10 +99,10 @@ public class Player : MonoBehaviour
     /// Shoots one row of bullets in a straight line
     /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
     /// </summary>
-    private void ShootSingleShot()
+    public void ShootSingleShot()
     {
         var bulletInst                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, transform.position.y, transform.position.z);   
+        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0, _xform.position.z);   
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }
@@ -98,16 +111,16 @@ public class Player : MonoBehaviour
     /// Shoots three bullets at once, like the spread weapon in Contra.
     /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
     /// </summary>
-    private void ShootSpreadWeapon()
+    public void ShootSpreadWeapon()
     {
         var bulletInst                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y - _spreadWeaponYoffset, _xform.position.z);
+        bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0 - _spreadWeaponYoffset, _xform.position.z);
 
         var bulletInst2                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y, _xform.position.z);
+        bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, 0, _xform.position.z);
 
         var bulletInst3                = _pool.Spawn(playerBulletPrefab, _xform.position, Quaternion.identity);
-        bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, _xform.position.y + _spreadWeaponYoffset, _xform.position.z);
+        bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, 0 + _spreadWeaponYoffset, _xform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
     }

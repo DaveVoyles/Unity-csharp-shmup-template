@@ -19,7 +19,6 @@ public class EnemyMovementBehavior : MonoBehaviour {
         MoveToPlayerFast,
         MoveToPlayerSlow,
         Wander,
-        Stalk
     };
     private CurrentState _currentState = CurrentState.Stopped;
 
@@ -29,15 +28,16 @@ public class EnemyMovementBehavior : MonoBehaviour {
         var targetable   = GetComponent<Targetable>();
 
         // Triggered once when this target is first detected by a TargetTracker 
-        targetable.AddOnDetectedDelegate(MoveToPlayerQuickly);
+        targetable.AddOnDetectedDelegate(MoveToPlayerSlowly);
 
         // Triggered once when this target is no longer detected by a TargetTracker
         targetable.AddOnNotDetectedDelegate(WanderAround);
     }
     
 
-    /* Functions for event handlers 
-     ************************************************/
+
+    //-----------------------------------------------------------------
+    // Functions for event handlers 
     private void StopMovement(TargetTracker source){
         _currentState = CurrentState.Stopped;
     }
@@ -49,9 +49,6 @@ public class EnemyMovementBehavior : MonoBehaviour {
     }
     private void MoveToPlayerQuickly(TargetTracker source){
         _currentState = CurrentState.MoveToPlayerFast;
-    }
-    private void Stalk(TargetTracker source){
-        _currentState = CurrentState.Stalk;
     }
 
 
@@ -66,29 +63,29 @@ public class EnemyMovementBehavior : MonoBehaviour {
     /// </summary>
     private void HandleMovementStates()
     {
-
-        if (_currentState == CurrentState.Stopped){
-            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-        }
-        if (_currentState == CurrentState.Wander){
-            //TODO: How do I create wandering logic?
-            print("Wandering");
-        }
-        if (_currentState == CurrentState.MoveToPlayerSlow){
-            iTween.MoveUpdate(gameObject, _playerXform.position, _slowMoveSpeed);
-        }
-        if (_currentState == CurrentState.MoveToPlayerFast)
+        switch (_currentState)
         {
-            //   iTween.PunchScale(gameObject, new Vector3(2,2,2), _slowMoveSpeed);
-            iTween.PunchScale(gameObject, iTween.Hash(
-                "time", _slowMoveSpeed,
-                "amount", new Vector3(2, 2, 2),
-                "oncomplete", "DashToPlayer"
-                ));
-
-        }
-        if (_currentState == CurrentState.Stalk){
-            //TODO: Implement functionality 
+            case  CurrentState.Stopped:
+                transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+                break;
+            case CurrentState.Wander:
+                //TODO: How do I create wandering logic?
+                print("Wandering");
+                break;
+            case CurrentState.MoveToPlayerFast:
+                iTween.MoveUpdate(gameObject, _playerXform.position, _slowMoveSpeed);
+                break;
+            case CurrentState.MoveToPlayerSlow:
+                //   iTween.PunchScale(gameObject, new Vector3(2,2,2), _slowMoveSpeed);
+                iTween.PunchScale(gameObject, iTween.Hash(
+                    "time", _slowMoveSpeed,
+                    "amount", new Vector3(2, 2, 2),
+                    "oncomplete", "DashToPlayer"
+                    ));
+                break;
+            default:
+                DebugUtils.Assert(false);
+                break;
         }
     }
 

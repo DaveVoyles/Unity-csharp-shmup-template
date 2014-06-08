@@ -73,15 +73,22 @@ public class Weapons : MonoBehaviour {
         _weaponInventory[(int) weapon] = false;
     }
 
+    /// <summary>
+    /// Shoot, based on current weapon selected
+    /// </summary>
     public void ShootWeapon()
     {
-        if (currentWeapon == WeaponType.SingleShot)
+        switch (currentWeapon)
         {
-            ShootSingleShot();   
-        }
-        if (currentWeapon == WeaponType.SpreadWeapon)
-        {
-            ShootSpreadWeapon();
+            case WeaponType.SingleShot:
+                ShootSingleShot();
+                break;
+            case WeaponType.SpreadWeapon:
+                ShootSpreadWeapon();
+                break;
+            default:
+                DebugUtils.Assert(false);
+                break;
         }
     }
 
@@ -92,6 +99,7 @@ public class Weapons : MonoBehaviour {
     public void ShootSingleShot()
     {
         var bulletInst = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst.GetComponent<Bullet>().SetDmg(_bulletDmg);
         bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0, _player.xform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX
@@ -99,17 +107,20 @@ public class Weapons : MonoBehaviour {
 
     /// <summary>
     /// Shoots three bullets at once, like the spread weapon in Contra.
-    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool
+    /// Grabs current instance of bullet, by retrieving bullet prefab from spawn pool & sets damage
     /// </summary>
     public void ShootSpreadWeapon()
     {
         var bulletInst = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst.GetComponent<Bullet>().SetDmg(_bulletDmg);
         bulletInst.rigidbody.velocity = new Vector3(_bulletVelX, 0 - SPREAD_WEAPON_OFFSET_Y, _player.xform.position.z);
 
         var bulletInst2 = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst.GetComponent<Bullet>().SetDmg(_bulletDmg);
         bulletInst2.rigidbody.velocity = new Vector3(_bulletVelX, 0, _player.xform.position.z);
 
         var bulletInst3 = _pool.Spawn(playerBulletPrefab, _player.xform.position, Quaternion.identity);
+        bulletInst.GetComponent<Bullet>().SetDmg(_bulletDmg);
         bulletInst3.rigidbody.velocity = new Vector3(_bulletVelX, 0 + SPREAD_WEAPON_OFFSET_Y, _player.xform.position.z);
 
         // _soundManager.PlayClip(sfxShoot, false);                      // play shooting SFX

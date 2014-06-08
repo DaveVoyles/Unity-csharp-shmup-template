@@ -34,12 +34,12 @@ public class Spawner : MonoBehaviour {
     public bool canSpawnPathTwo              = false;
     public bool canSpawnPathThree            = false;
     public bool canSpawnRandomPath           = false;
-    public bool canSpawningStationary        = false;
-    public bool canSpawningDrones            = false;
+    public bool canSpawnStationary           = false;
+    public bool canSpawnDrones               = false;
     public bool canSpawnGroup                = false;
     public bool canSpawnIncrementally        = false;
-    public int incrementSpawnAmount          = 5;
-    public int numOfEnemiesToSpawnInGroup    = 8;
+    public int stationaryEnemyAmount         = 1;
+    public int numOfEnemiesToSpawnInGroup    = 4;
 
     public bool canSpawnPickup               = false;
     public Transform powerup                 = null;
@@ -82,6 +82,8 @@ public class Spawner : MonoBehaviour {
         _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
         _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _swarmBehavior            = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
+
+        // Create a new swarm behavior if it is null
         if (_swarmBehavior == null)
         {
             var swarmObject = new GameObject();
@@ -111,7 +113,7 @@ public class Spawner : MonoBehaviour {
         if (canSpawnRandomPath){
             SpawnEnemyOnRandomPath();
         }
-        if (canSpawningStationary){
+        if (canSpawnStationary){
             StartCoroutine(SpawnStationaryEnemy());
         }
         if (canSpawnGroup){
@@ -120,7 +122,7 @@ public class Spawner : MonoBehaviour {
         if (canSpawnIncrementally){
             StartCoroutine(SpawnEnemiesIncrementally());
         }
-        if (canSpawningDrones){
+        if (canSpawnDrones){
             StartCoroutine(_swarmBehavior.InstantiateDrones());
         }
         if (canSpawnPickup){
@@ -203,7 +205,7 @@ public class Spawner : MonoBehaviour {
         {
             // Grab an instance of the enemy transform
             var pathEnemyInstance = _pool.Spawn(pathEnemyXform);
-            var iTweenMoveToPath = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+            var iTweenMoveToPath  = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
             // Enemy follows this path
             iTweenMoveToPath.FollowPath(_pathName, timeToRunPath, pathEaseType);
@@ -219,34 +221,30 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private IEnumerator SpawnStationaryEnemy()
     {
-        while (canSpawningStationary)
+        // How many enemies should we spawn?
+        var count = stationaryEnemyAmount;
+        while (count > 0)
         {
-            // How many enemies should we spawn?
-            var count = incrementSpawnAmount;
-            while (count == 0)
-            {
-                // spawn an enemy off screen at a random X position and set hit points
-                var randomY = Random.Range(-4.0f, 4.0f);
+            print(count);
+            // spawn an enemy off screen at a random X position and set hit points
+            var randomY = Random.Range(-4.0f, 4.0f);
 
-                // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
-                var enemyInstance = _pool.Spawn(enemyXform);
+            // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
+            var enemyInstance = _pool.Spawn(enemyXform);
 
-                // position, enable, then set velocity
-                enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
-                enemyInstance.gameObject.SetActive(true);
+            // position then set velocity
+            enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
 
-                // Grab the "enemy" script, so that we can access the variables exposed
-                var scriptRef = enemyInstance.GetComponent<Enemy>();
+            // Grab the "enemy" script, so that we can access the variables exposed
+            var enemyScript = enemyInstance.GetComponent<Enemy>();
 
-                // waits a few seconds then shoots
-                var shootDelay = Random.Range(0.5f, 2.0f);
-                StartCoroutine(scriptRef.ShootTowardPlayer(shootDelay));
+            // waits a few seconds then shoots
+            var shootDelay = Random.Range(0.5f, 2.0f);
+            StartCoroutine(enemyScript.ShootTowardPlayer(shootDelay));
 
-                // Wait 3 seconds, then call this function again 
-                yield return new WaitForSeconds(stationaryEnemyInterval);
-                count--;
-
-            }
+            // Wait 3 seconds, then call this function again 
+            yield return new WaitForSeconds(stationaryEnemyInterval);
+            count--;
         }
     }
 
@@ -269,7 +267,7 @@ public class Spawner : MonoBehaviour {
         _particleManager.CreateSpawnEffects(_xForm.position);
         // How many enemies should we spawn?
         var count = numOfEnemiesToSpawnInGroup;
-        while (count >= 0)
+        while (count > 0)
         {
             // Spawn an enemy & set spawn location within spawn radius
             SpawnEnemies();

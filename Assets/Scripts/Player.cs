@@ -53,7 +53,7 @@ public class Player : MonoBehaviour
     { 
         var horizontalMove = (_playerSpeed * Input.GetAxis("Horizontal"))    * Time.deltaTime;
         var verticalMove   = (_playerSpeed * Input.GetAxis("Vertical"))      * Time.deltaTime;
-        var moveVector     = new Vector3(horizontalMove, 0, verticalMove);
+        var moveVector     = new Vector3(horizontalMove, verticalMove, 0);
         // prevents the player moving above its max speed on diagonals
         moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime);
         moveVector         = Vector3.ClampMagnitude(moveVector, _playerSpeed * Time.deltaTime); 
@@ -67,7 +67,6 @@ public class Player : MonoBehaviour
         if (Input.GetButtonDown("SwitchWeapon"))
         {
             weapons.SwitchToNextWeapon();
-            print("Switching weapon");
         }
 
     }
@@ -87,18 +86,6 @@ public class Player : MonoBehaviour
         }
     }
     
-
-    private void ShootMissiles()
-    {
-        // Grabs current instance of bullet, by retrieving missile prefab from spawn pool
-//        Transform __playerMissileInstance = PoolManager.Pools[_bulletPool].Spawn(playerMissilePrefab);
-
-        // position, enable, then set velocity
-   //     __playerMissileInstance.gameObject.transform.position = _playerTransform.position;
-    //    __playerMissileInstance.gameObject.SetActive(true);
-       // __playerMissileInstance.gameObject.GetComponent<Projectile>().velocity = new Vector3(playerBulletSpeed, 0, 0);
-    }
-
     /// <summary>
     /// Check what we are colliding with
     /// </summary>
@@ -134,17 +121,15 @@ public class Player : MonoBehaviour
     /// <param name="other"> Who are we colliding with?</param>
     public void KillPlayer(Collider other)
     {
-        // If player isn't alive, then return
-        if (_state == State.Playing)
+        if (_state != State.Playing) return;
+
+        // Call enemy's Explode function for particles / sfx
+        if (other.CompareTag("Enemy"))
         {
-            // Call enemy's Explode function for particles / sfx
-            if (other.CompareTag("Enemy"))
-            {
-                other.GetComponent<Enemy>().Explode();
-            }
-            GameManager.lives--;
-            StartCoroutine(OnBecameInvisible());
+            other.GetComponent<Enemy>().Explode();
         }
+        GameManager.lives--;
+        StartCoroutine(OnBecameInvisible());
     }
 
     /// <summary>
@@ -158,7 +143,7 @@ public class Player : MonoBehaviour
         _particleManager.CreatePlayerExplosionEffects(xform.position);
         // Make player ship invisible & move player to PlayerSpawnPoint
         gameObject.renderer.enabled = false;
-        xform.position             = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, xform.position.z);
+        xform.position              = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, xform.position.z);
         yield return new WaitForSeconds(_shipInvisibleTime);
 
         if (GameManager.lives > 0)
@@ -180,7 +165,6 @@ public class Player : MonoBehaviour
         _state = State.Playing;
     }
 
-
     public float GetPlayerSpeed()
     {
         return _playerSpeed;
@@ -190,8 +174,6 @@ public class Player : MonoBehaviour
     {
         _playerSpeed = playerSpeed;
     }
-
-  
 
     /// <summary>
     /// Resets all player variables for powerups, upon player death
@@ -203,9 +185,6 @@ public class Player : MonoBehaviour
         weapons.SetDefaultBulletVel();
         weapons.SetDefaultBulletDmg();
     }
-
-
-
 
 }
 

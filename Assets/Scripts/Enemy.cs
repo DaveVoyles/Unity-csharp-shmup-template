@@ -8,6 +8,7 @@ using UnityEngine.SocialPlatforms;
 public class Enemy : MonoBehaviour
 {
     public int       hitPoints = 8; 
+    [HideInInspector]
     public Vector3   motionDir;      // assigned when the enemy spawns
     public Transform particlePrefab; // particle prefab
 

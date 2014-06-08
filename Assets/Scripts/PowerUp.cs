@@ -73,6 +73,9 @@ public class PowerUp : MonoBehaviour {
         rigidbody.velocity = new Vector3(-8, 0, 0);
     }
 
+    /// <summary>
+    /// Debug path drawing
+    /// </summary>
     public virtual void OnDrawGizmos(){
         iTween.DrawPath(_path);
     }

@@ -155,11 +155,7 @@ public class EnemyMovementBehavior : MonoBehaviour {
                 break;
         }
     }
+   
 
-
-    private void DashStopShoot()
-    {
-        iTween.MoveUpdate(gameObject, _playerXform.position, FAST_MOVE_SPEED);
-    }
 }
 

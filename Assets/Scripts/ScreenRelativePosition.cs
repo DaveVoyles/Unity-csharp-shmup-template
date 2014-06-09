@@ -13,7 +13,18 @@ public class ScreenRelativePosition : MonoBehaviour {
     public float      xOffset;
 
 
-	void Start () {
+	void Start ()
+    {
+        CalculatePosition();
+	}
+
+
+    /// <summary>
+    /// Let SpawnManager access this, so that we can set a new spawning location for groups of enemies
+    /// </summary>
+    public void CalculatePosition()
+    {
+
         Vector3 newPosition = transform.position;
         Camera camera       = Camera.main;
 
@@ -37,5 +48,7 @@ public class ScreenRelativePosition : MonoBehaviour {
                 break;
         }
         transform.position = newPosition;
-	}
+    }
+
+
 }

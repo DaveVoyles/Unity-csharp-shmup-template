@@ -84,13 +84,11 @@ public class Spawner : MonoBehaviour {
         _swarmBehavior            = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
         // Create a new swarm behavior if it is null
-        if (_swarmBehavior == null)
-        {
-            var swarmObject = new GameObject();
-            swarmObject.AddComponent<SwarmBehavior>();
-            swarmObject.AddComponent<ParticleEffectsManager>();
-            _swarmBehavior = swarmObject.GetComponent<SwarmBehavior>();
-        }
+        if (_swarmBehavior != null) return;
+        var swarmObject = new GameObject();
+        swarmObject.AddComponent<SwarmBehavior>();
+        swarmObject.AddComponent<ParticleEffectsManager>();
+        _swarmBehavior = swarmObject.GetComponent<SwarmBehavior>();
     }
 
     /// <summary>
@@ -221,11 +219,11 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private IEnumerator SpawnStationaryEnemy()
     {
+        MoveSpawnPoint();
         // How many enemies should we spawn?
         var count = stationaryEnemyAmount;
         while (count > 0)
         {
-            print(count);
             // spawn an enemy off screen at a random X position and set hit points
             var randomY = Random.Range(-4.0f, 4.0f);
 
@@ -264,13 +262,14 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private IEnumerator SpawnEnemiesIncrementally()
     {
+        MoveSpawnPoint();
         _particleManager.CreateSpawnEffects(_xForm.position);
         // How many enemies should we spawn?
         var count = numOfEnemiesToSpawnInGroup;
         while (count > 0)
         {
             // Spawn an enemy & set spawn location within spawn radius
-            SpawnEnemies();
+            SpawnEnemiesWithinSphere();
             count--;
 
             yield return new WaitForSeconds(incrementSpawnInterval);
@@ -282,16 +281,17 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private void SpawnGroup()
     {
+        MoveSpawnPoint();
         _particleManager.CreateSpawnEffects(_xForm.position);
         for (var i = 0; i < numOfEnemiesToSpawnInGroup; i++){
-            SpawnEnemies();
+            SpawnEnemiesWithinSphere();
         }
     }
 
     /// <summary>
-    /// Spawns enemies at a given position 
+    /// Spawns enemies within a sphere radius, & locked to player-Z pos  
     /// </summary>
-    private void SpawnEnemies()
+    private void SpawnEnemiesWithinSphere()
     {
         var enemyInstance                = _pool.Spawn(enemyXform);
         var newPos                       = Random.insideUnitSphere * _spawnSphereRadius;
@@ -300,6 +300,20 @@ public class Spawner : MonoBehaviour {
     }
 
 
+    /// <summary>
+    /// Relocates enemy spawn point to random location on the map, relative to the camera's position
+    /// </summary>
+    private void MoveSpawnPoint()
+    {
+        // Get relative position script and set X & Y offset values 
+       var relativePos     = _enemySpawnPointXform.gameObject.GetComponent<ScreenRelativePosition>();
+       relativePos.xOffset = Random.Range(-25f, -10f);
+       relativePos.yOffset = Random.Range(-7f, 7f);
 
-    
+        // Move the camera, now that we have offsets
+        relativePos.CalculatePosition();
+    }
+
+
+
 }

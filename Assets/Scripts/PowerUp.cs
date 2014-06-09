@@ -12,26 +12,64 @@ public class PowerUp : MonoBehaviour {
     private const int   BULLET_DMG      = 3;
     private ParticleEffectsManager _particleManager = null;
     private Transform _xForm;
-    private SpawnPool _pool = null;
-    private Vector3[] _path = null;
-    private Weapons   _weapons = null;
+    private SpawnPool _pool             = null;
+    private Vector3[] _path             = null;
+    private Weapons   _weapons          = null;
+    
+    /// <summary>  The enemy being killed determines the type when killed </summary>
+    public enum PickupType
+    {
+        FireRate,
+        BulletVel,
+        SpeedBoost,
+        BulletDmg
+    }
+    public PickupType pickupType = PickupType.FireRate;
 
-
-	void Start ()
+    void Start ()
 	{
 	    _player          = GameObject.Find("Player").GetComponent<Player>();
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
 	    _xForm           = transform;
         _pool            = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
 	    _weapons         = _player.GetComponent<Weapons>();
-        CreatePaths();
+        CreatePath();
+        pickupType = PickupType.BulletVel;
+        SetPickupType();
 	}
+
+
+    /// <summary>
+    /// Set the pickup type during initialization. This is set by the enemy
+    /// </summary>
+    private void SetPickupType()
+    {
+        switch (pickupType)
+        {
+            case PickupType.FireRate:
+                renderer.material.color = Color.grey;
+                break;
+            case PickupType.BulletVel:
+                renderer.material.color = Color.blue;
+                break;
+            case PickupType.SpeedBoost:
+                renderer.material.color = Color.green;
+                break;
+            case PickupType.BulletDmg:
+                renderer.material.color = Color.white;
+                break;
+            default:
+                DebugUtils.Assert(false);
+                break;
+        }
+    }
+
 
     /// <summary>
     /// Draws and runs through a path of points
     /// Gradually bouncing up and down, as it moves towards the left side of screen
     /// </summary>
-    private void CreatePaths()
+    private void CreatePath()
     {
         _path = new Vector3[30];
         _path[0]  = new Vector3(-1,   1,  0);
@@ -80,16 +118,41 @@ public class PowerUp : MonoBehaviour {
         iTween.DrawPath(_path);
     }
 
+
+    /// <summary>
+    /// Check for pickup type and set powerup effect 
+    /// </summary>
+    /// <param name="other">What are we colliding with? Should only check for player</param>
     private void OnTriggerEnter(Collider other)
     {
         if (!other.gameObject.CompareTag("Player")) return;
-        IncreaseFireRate();
-        IncreasePlayerSpeed();
-        IncreaseBulletVelocity();
-        IncreaseBulletDmg();
+
+        switch (pickupType)
+        {
+            case PickupType.FireRate:
+                IncreaseFireRate();
+                break;
+            case PickupType.BulletVel:
+                IncreaseBulletVelocity();
+                break;
+            case PickupType.SpeedBoost:
+                IncreasePlayerSpeed();
+                break;
+            case PickupType.BulletDmg:
+                IncreaseBulletDmg();
+                break;
+            default:
+                DebugUtils.Assert(false);
+                break;
+        }
         _particleManager.CreatePowerupParticleEffects(_xForm.position);
         _pool.Despawn(transform);
     }
+
+
+
+    //------------------------------------------------------------
+    //  Power up effects
 
     private void IncreaseFireRate()
     {

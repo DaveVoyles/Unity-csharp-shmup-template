@@ -50,7 +50,6 @@ public class Weapons : MonoBehaviour {
         {
             currentWeapon = 0;
         }
-        print(currentWeapon);
     }
 
     public void  PickupWeapon ( int weapon  )

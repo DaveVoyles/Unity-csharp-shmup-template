@@ -8,21 +8,31 @@ using Random = UnityEngine.Random;
 
 public class Player : MonoBehaviour
 {
-    private SoundManager _soundManager;                           // reference to global sound manager  
-    private float        _nextFire                  = 0;          // used to time the next shot
+    private SoundManager _soundManager              = null;        
+    private float        _nextFire                  = 0;          
     private float        _playerSpeed               = 18f;
-    private enum State  { Playing, Explosion, Invincible }
+    private enum State                                { Playing, Explosion, Invincible }
     private State        _state                     = State.Playing;
-    private Transform    _playerSpawnPoint;                        // Finds spawn point in editor
+    private Transform    _playerSpawnPoint          = null;        
     private float        _shipInvisibleTime         = 1.3f;
     private SpawnPool    _pool                      = null;
     private ParticleEffectsManager _particleManager = null;
     private const float DEFAULT_PLAYER_SPEED        = 18f;
 
-    [HideInInspector]
-    public Weapons weapons                          = null;
-    [HideInInspector]
-    public Transform xform;
+    [HideInInspector] public Weapons weapons        = null;
+    [HideInInspector] public Transform xform        = null;
+
+    //-------------------------------------------------------------
+    // Used for power ups
+    public float GetPlayerSpeed()
+    {
+        return _playerSpeed;
+    }
+
+    public void SetPlayerSpeed(float playerSpeed)
+    {
+        _playerSpeed = playerSpeed;
+    }
 
 
     void Start()
@@ -36,6 +46,7 @@ public class Player : MonoBehaviour
         weapons                   = GetComponent<Weapons>();
     }
 
+
     void Update()
     {   
         // Is the player isn't alive, return
@@ -45,6 +56,7 @@ public class Player : MonoBehaviour
         CheckIfShooting();
         CheckIfSwitchingWeapon();
     }
+
 
     /// <summary>
     /// Checks for inputs from player handles player movement
@@ -62,14 +74,18 @@ public class Player : MonoBehaviour
         xform.Translate(moveVector);
     }
 
+
+    /// <summary>
+    /// Check for user input and switch weapons accordingly 
+    /// </summary>
     private void CheckIfSwitchingWeapon()
     {
-        if (Input.GetButtonDown("SwitchWeapon"))
-        {
+        if (Input.GetButtonDown("SwitchWeapon")){
             weapons.SwitchToNextWeapon();
         }
 
     }
+
 
     /// <summary>
     /// Is the player shooting? Left-click for bullets, right-click for missiles
@@ -80,12 +96,12 @@ public class Player : MonoBehaviour
         {
             // delay the next shot by the firing rate
             _nextFire = Time.time + weapons.GetFireRate();
-           // ShootSpreadWeapon();
             weapons.ShootWeapon();
 
         }
     }
     
+
     /// <summary>
     /// Check what we are colliding with
     /// </summary>
@@ -115,6 +131,7 @@ public class Player : MonoBehaviour
         }
     }
 
+
     /// <summary>
     /// Kill player, make invisible & invisible, spawn at spawn point, and create particles
     /// </summary>
@@ -128,31 +145,41 @@ public class Player : MonoBehaviour
         {
             other.GetComponent<Enemy>().Explode();
         }
+
         GameManager.lives--;
         StartCoroutine(OnBecameInvisible());
     }
 
+
     /// <summary>
-    /// Spawns object at SpawnPoint, which is set in the editor.
-    /// Main Camera -> SpawnPoint (child of Main Camera)
+    /// Spawns object at SpawnPoint, which is set in the editor
     /// </summary>
     private IEnumerator OnBecameInvisible()
     {
+        // Set state and draw particles where player just died
         _state = State.Explosion;
-
         _particleManager.CreatePlayerExplosionEffects(xform.position);
-        // Make player ship invisible & move player to PlayerSpawnPoint
+
+        // Make player ship invisible 
         gameObject.renderer.enabled = false;
-        xform.position              = new Vector3(_playerSpawnPoint.position.x, _playerSpawnPoint.position.y, xform.position.z);
+        // Move spawn point and set player location to that point 
+        MoveSpawnPoint();
+
         yield return new WaitForSeconds(_shipInvisibleTime);
 
         if (GameManager.lives > 0)
         {
+            // Remove any power ups, if they were applied
             ResetDefaultValues();
-            // Set player to invincible while flashing & create particle effect at spawn point
-            _state = State.Invincible;;
-            _particleManager.CreateSpawnEffects(xform.position);
 
+
+            xform.position = _playerSpawnPoint.position;
+
+            // Set player to invincible while flashing & create particle effect at spawn point
+            _state = State.Invincible;
+            _particleManager.CreateSpawnEffects(xform.position); //TODO: Why is this called twice??
+
+        
             // Make player ship visible again
             gameObject.renderer.enabled = true;
 
@@ -165,18 +192,9 @@ public class Player : MonoBehaviour
         _state = State.Playing;
     }
 
-    public float GetPlayerSpeed()
-    {
-        return _playerSpeed;
-    }
-
-    public void SetPlayerSpeed(float playerSpeed)
-    {
-        _playerSpeed = playerSpeed;
-    }
 
     /// <summary>
-    /// Resets all player variables for powerups, upon player death
+    /// Resets all player variables for power ups, upon player death
     /// </summary>
     private void ResetDefaultValues()
     {
@@ -184,6 +202,22 @@ public class Player : MonoBehaviour
         weapons.SetDefaultFireRate();
         weapons.SetDefaultBulletVel();
         weapons.SetDefaultBulletDmg();
+    }
+
+
+    /// <summary>
+    /// Relocates spawn point to random location on the map, relative to the camera's position
+    /// </summary>
+    private void MoveSpawnPoint()
+    {
+        // Get relative position script and set X & Y offset values 
+        var relativePos        = _playerSpawnPoint.GetComponent<ScreenRelativePosition>();
+        relativePos.screenEdge = ScreenRelativePosition.ScreenEdge.RIGHT;
+        relativePos.xOffset    = Random.Range(-25f, -10f);
+        relativePos.yOffset    = Random.Range(-7f, 7f);
+
+        // Move the camera, now that we have offsets
+        relativePos.CalculatePosition();
     }
 
 }

@@ -9,12 +9,11 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof (Transform))]
 public class Enemy : MonoBehaviour
 {
-    public int       hitPoints = 8; 
+    public int                    hitPoints = 8; 
     [HideInInspector]
-    public Vector3   motionDir;      // assigned when the enemy spawns
-    public Transform particlePrefab; // particle prefab
-    public Transform powerupXform;
-
+    public Vector3                 motionDir;      // assigned when the enemy spawns
+    public Transform               particlePrefab; // particle prefab
+    public Transform               powerupXform;
 
     private Transform              _xform; // current transform of enemy, cached for perf during init
     private SoundManager           _soundManager;
@@ -23,6 +22,17 @@ public class Enemy : MonoBehaviour
     private SpawnPool              _spawnPool;
     private float                  _bulletSpeed = -20f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
+
+    /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
+    public enum EnemyType
+    {
+        Drone,
+        Path,
+        PathCreator,
+        Seeker,
+        Stationary 
+    }
+    public EnemyType enemyType = EnemyType.Stationary;
 
 
     private void Start()
@@ -62,9 +72,11 @@ public class Enemy : MonoBehaviour
     public void Explode()
     {
         _particleManager.CreateExplodingEnemyEffects(_xform.position);
+
         // put this back on the stack for later re-use
         _spawnPool.Despawn(_xform);
         GameManager.score++;
+
         // Prevents enemy from re-spawning as white (stayed flashing on dead)
         renderer.material.color = _startingColor;
     }
@@ -85,7 +97,7 @@ public class Enemy : MonoBehaviour
 
     /// <summary>
     /// Roll a random number to determine if power up can be dropped upon death
-    /// TODO: Change this based on game difficulty
+    /// TODO: Change drop rate based on game difficulty
     /// </summary>
     private void CheckIfPowerupCanBeDropped()
     {
@@ -99,7 +111,7 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// Roll a random number to determine which powerup type will be dropped upon death
+    /// Roll a random number to determine which powerup type will be dropped upon enemy death
     /// </summary>
     private void SetPowerupType()
     {

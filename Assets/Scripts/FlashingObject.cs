@@ -12,8 +12,9 @@ public class FlashingObject : MonoBehaviour
 
     void Start()
     {
+        // Set starting color so that we can return to it when done flashing
         _startingColor = renderer.material.color; 
-        _mat = GetComponent<MeshRenderer>().material;
+        _mat           = GetComponent<MeshRenderer>().material;
     }
 
     /// <summary>
@@ -24,16 +25,20 @@ public class FlashingObject : MonoBehaviour
     /// <returns></returns>
     public IEnumerator Flash(float timeToFlash = _lengthOfTimeToFlash, float intervalTime = _flashSpeed)
     {
-        float elapsedTime = 0f;
-        int index         = 0;
+        var elapsedTime   = 0f;
+        var index         = 0;
+        
+        // Flash back and forth over a set period of time
         while (elapsedTime < timeToFlash)
         {
             _mat.color  = _colors[index % 2];
-
             elapsedTime += Time.deltaTime;
             index++;
+
+            // Wait a moment before switching colors 
             yield return new WaitForSeconds(intervalTime);
         }
+
         // Return to starting color
         renderer.material.color = _startingColor;
     }

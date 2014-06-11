@@ -29,13 +29,18 @@ public class EnemyMovementBehavior : MonoBehaviour {
     };
     private CurrentState _currentState = CurrentState.Stopped;
 
+    private Enemy _enemy;
 
-
-
+    /// <summary>
+    /// Initializes variables and set references to objects used by the script 
+    /// </summary>
     private void Awake()
     {
         _playerXform     = GameObject.Find("Player").transform;
         var targetable   = GetComponent<Targetable>();
+
+        // Figure out which enemy type we are during initialization
+        _enemy = GetComponent<Enemy>();
 
         // Triggered once when this target is first detected by a TargetTracker 
         targetable.AddOnDetectedDelegate(CreatePathToFollow);
@@ -43,11 +48,42 @@ public class EnemyMovementBehavior : MonoBehaviour {
         // Triggered once when this target is no longer detected by a TargetTracker
     //    targetable.AddOnNotDetectedDelegate(CreatePathToFollow);
     }
-    
+   
+
+    /// <summary>
+    /// Movement behaviors are determined by the type of enemy it is.
+    /// Enemy type is set by spawner during initialization
+    /// </summary>
+    private void MovementsBasedOnEnemyType()
+    {
+        switch (_enemy.enemyType)
+        {
+            case Enemy.EnemyType.Drone:
+                break;
+            case Enemy.EnemyType.Path:
+                // TODO: Logic for path followers
+                break;
+            case Enemy.EnemyType.PathCreator:
+                _currentState = CurrentState.CreatePath;
+                break;
+            case Enemy.EnemyType.Seeker:
+                _currentState = CurrentState.MoveToPlayerSlow;
+                break;
+            case Enemy.EnemyType.Stationary:
+                break;
+            default:
+                DebugUtils.Assert(false);
+                break;
+        }
+
+    }
+
+
 
 
     //---------------------------------------------------------------------
-    // Functions for event handlers 
+    // Functions for event delegates via TargetTracker script
+
     private void StopMovement(TargetTracker source){
         _currentState = CurrentState.Stopped;
     }
@@ -62,6 +98,9 @@ public class EnemyMovementBehavior : MonoBehaviour {
     }
 
 
+    /// <summary>
+    /// Handles all movement and path updates
+    /// </summary>
     private void Update()
     {
         HandleMovementStates();

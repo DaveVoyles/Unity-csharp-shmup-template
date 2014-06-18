@@ -152,7 +152,11 @@ public class Player : MonoBehaviour
             other.GetComponent<Enemy>().Explode();
         }
 
+        // Subtract a life, and update the UI
         GameManager.lives--;
+        GameEventManager.TriggerUpdateLives();
+
+        // Set the player temporarily invincible, flash colors, and re-spawn at a new location
         StartCoroutine(OnBecameInvisible());
     }
 

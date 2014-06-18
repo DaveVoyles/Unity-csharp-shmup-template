@@ -11,11 +11,14 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof (Transform))]
 public class Enemy : MonoBehaviour
 {
-    public int                    hitPoints = 8; 
     [HideInInspector]
-    public Vector3                 motionDir;      // assigned when the enemy spawns
-    public Transform               particlePrefab; // particle prefab
+    public int                    hitPoints = 8;
+    /// <summary> assigned when the enemy spawns </summary>
+    [HideInInspector]
+    public Vector3                 motionDir;      
+    public Transform               particlePrefab; 
     public Transform               powerupXform;
+    /// <summary> How many points is this enemy worth when destroyed? </summary>
     public int                     scoreValue = 1;
 
     private Transform              _xform; // current transform of enemy, cached for perf during init
@@ -25,7 +28,7 @@ public class Enemy : MonoBehaviour
     private SpawnPool              _spawnPool;
     private float                  _bulletSpeed = -20f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
-
+   
 
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
     public enum EnemyType
@@ -59,10 +62,11 @@ public class Enemy : MonoBehaviour
     /// <param name="damage">How much damage should be deducted from health?</param>
     public void TakeDamage(int damage)
     {
-        // Make ship flash
+        // Grab a reference to the flash script, then have the object flash white when hit
         var flashScript = gameObject.GetComponent<FlashWhenHit>();
         StartCoroutine(flashScript.FlashWhite());
 
+        // Subtract health, and if the object has 0hp or less, destroy it
         hitPoints -= damage;
         if (hitPoints <= 0){
             Explode();
@@ -80,16 +84,14 @@ public class Enemy : MonoBehaviour
         // put this back on the stack for later re-use
         _spawnPool.Despawn(_xform);
 
-        // Update the score, which is displayed by the UI
-        GameEventManager.UpdateScore += IncreaseScore;
+        // Update the score in the GameManager, then set it in the UI
+        GameManager.score += scoreValue;
+        GameEventManager.TriggerUpdateScore();
 
-        //TODO: I need to flip these. I need this to trigger lives, AND update lives....
-
-
-        GameEventManager.TriggerUpdateLives();
         // Prevents enemy from re-spawning as white (stayed flashing on dead)
         renderer.material.color = _startingColor;
     }
+
 
     /// <summary>
     /// Increases global score, based on the value of the enemy
@@ -98,6 +100,7 @@ public class Enemy : MonoBehaviour
     {
         GameManager.score += scoreValue;
     }
+
 
     /// <summary>
     ///  waits for 'delay' seconds, then shoots directly at the player
@@ -133,7 +136,7 @@ public class Enemy : MonoBehaviour
     private void SetPowerupType()
     {
         var randomNum = Random.Range(1, 4);
-        print(randomNum);
+        print("Random number rolled for setting up the powerup type is:" + " " + randomNum);
 
         switch (randomNum)
         {

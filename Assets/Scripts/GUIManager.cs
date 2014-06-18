@@ -1,5 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿/* Handles all of the GUI and menu logic for the game
+ * Can update the score and player lives, based on events it listens for in the GameEventManager
+ * Dave Voyles - June 2014
+ */
+
+using UnityEngine;
 
 public class GUIManager : MonoBehaviour
 {
@@ -9,22 +13,19 @@ public class GUIManager : MonoBehaviour
 
     private string    _scoreString = "score";
 
-	// Use this for initialization
 	void Start ()
     {      
+        // Listen for the following events, and call these functions when the event is triggered
 	    GameEventManager.GameStart   += SetScoreString;
 	    GameEventManager.UpdateScore += UpdateScoreString;
     }
-	
-	// Update is called once per frame
-	void Update () 
-    {
 
-	}
-
+    /// <summary>
+    /// Updates the player's score on the UI
+    /// </summary>
     private void UpdateScoreString()
     {
-        uiScoreScript._lbl.text = _scoreString;
+        uiScoreScript._lbl.text = _scoreString + "" + GameManager.score;
     }
 
     /// <summary>

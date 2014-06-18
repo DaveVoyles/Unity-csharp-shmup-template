@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Runtime.Serialization.Formatters;
 using System.Security.Cryptography;
 using PathologicalGames;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SocialPlatforms;
+using UnityEngine.SocialPlatforms.Impl;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof (Transform))]
@@ -14,6 +16,7 @@ public class Enemy : MonoBehaviour
     public Vector3                 motionDir;      // assigned when the enemy spawns
     public Transform               particlePrefab; // particle prefab
     public Transform               powerupXform;
+    public int                     scoreValue = 1;
 
     private Transform              _xform; // current transform of enemy, cached for perf during init
     private SoundManager           _soundManager;
@@ -22,6 +25,7 @@ public class Enemy : MonoBehaviour
     private SpawnPool              _spawnPool;
     private float                  _bulletSpeed = -20f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
+
 
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
     public enum EnemyType
@@ -75,10 +79,24 @@ public class Enemy : MonoBehaviour
 
         // put this back on the stack for later re-use
         _spawnPool.Despawn(_xform);
-        GameManager.score++;
 
+        // Update the score, which is displayed by the UI
+        GameEventManager.UpdateScore += IncreaseScore;
+
+        //TODO: I need to flip these. I need this to trigger lives, AND update lives....
+
+
+        GameEventManager.TriggerUpdateLives();
         // Prevents enemy from re-spawning as white (stayed flashing on dead)
         renderer.material.color = _startingColor;
+    }
+
+    /// <summary>
+    /// Increases global score, based on the value of the enemy
+    /// </summary>
+    private void IncreaseScore()
+    {
+        GameManager.score += scoreValue;
     }
 
     /// <summary>
@@ -102,13 +120,12 @@ public class Enemy : MonoBehaviour
     private void CheckIfPowerupCanBeDropped()
     {
         var randomNum = Random.Range(1, 10);
-        print(randomNum);
         if (randomNum == 1)
         {
             SetPowerupType();
         }
-
     }
+
 
     /// <summary>
     /// Roll a random number to determine which powerup type will be dropped upon enemy death

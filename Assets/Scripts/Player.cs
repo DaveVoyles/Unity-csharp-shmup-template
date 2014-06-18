@@ -48,13 +48,19 @@ public class Player : MonoBehaviour
 
 
     void Update()
-    {   
+    {
         // Is the player isn't alive, return
         if (_state == State.Explosion) return;
 
         HandlePlayerMovement();
         CheckIfShooting();
         CheckIfSwitchingWeapon();
+
+        //TODO: Debug for triggering the Game start. REMOVE ME
+        if (Input.GetButtonDown("Jump"))
+        {
+            GameEventManager.TriggerGameStart();
+        }
     }
 
 

@@ -1,6 +1,11 @@
-﻿using PathologicalGames;
+﻿/* Manages all of the weapons in a player's inventory. Can add, remove, and use weapons from here.
+ * Also considering adding all weapon functionality here, too 
+
+ * Dave Voyles - June 2014
+ */
+
+using PathologicalGames;
 using UnityEngine;
-using System.Collections;
 
 public class Weapons : MonoBehaviour {
     public enum WeaponType {

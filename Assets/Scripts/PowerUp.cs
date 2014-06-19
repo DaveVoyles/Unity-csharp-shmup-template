@@ -1,7 +1,11 @@
-﻿using System;
+﻿/* A modular powerup system, which alters the vatriables store in a character on it's weapons.
+ * We need to add a public getter and setter to each object we want to modify. 
+ * 
+ * Dave Voyles - June 2014
+ */
+
 using PathologicalGames;
 using UnityEngine;
-using System.Collections;
 
 public class PowerUp : MonoBehaviour {
 
@@ -16,6 +20,7 @@ public class PowerUp : MonoBehaviour {
     private Vector3[] _path             = null;
     private Weapons   _weapons          = null;
     
+    [HideInInspector]
     /// <summary>  The enemy being killed determines the type when killed </summary>
     public enum PickupType
     {
@@ -24,15 +29,16 @@ public class PowerUp : MonoBehaviour {
         SpeedBoost,
         BulletDmg
     }
+    [HideInInspector]
     public PickupType pickupType = PickupType.FireRate;
 
     void Start ()
 	{
-	    _player          = GameObject.Find("Player").GetComponent<Player>();
+	    _player          = GameObject.Find("Player").         GetComponent<Player>();
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
 	    _xForm           = transform;
-        _pool            = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
-	    _weapons         = _player.GetComponent<Weapons>();
+        _pool            = GameObject.Find("GameManager").    GetComponent<GameManager>().BulletPool;
+	    _weapons         = _player.                           GetComponent<Weapons>();
         CreatePath();
         pickupType = PickupType.BulletVel;
         SetPickupType();
@@ -106,6 +112,9 @@ public class PowerUp : MonoBehaviour {
         iTween.MoveTo(gameObject, iTween.Hash("path", _path, "time", 12, "easetype", "linear", "onComplete", "MoveTowardsLeftEdgeOfScreen"));
     }
 
+    /// <summary>
+    /// Callback function used in CreatePath()
+    /// </summary>
     private void MoveTowardsLeftEdgeOfScreen()
     {
         rigidbody.velocity = new Vector3(-8, 0, 0);
@@ -170,7 +179,6 @@ public class PowerUp : MonoBehaviour {
     {
         _player.SetPlayerSpeed(PLAYER_SPEED);
         print("setting player speed to:" + "" + _player.GetPlayerSpeed());
-
     }
 
     private void IncreaseBulletDmg()

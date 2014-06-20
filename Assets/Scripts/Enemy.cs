@@ -28,7 +28,6 @@ public class Enemy : MonoBehaviour
     private SpawnPool              _spawnPool;
     private float                  _bulletSpeed = -20f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
-   
 
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
     public enum EnemyType
@@ -37,9 +36,11 @@ public class Enemy : MonoBehaviour
         Path,
         PathCreator,
         Seeker,
-        Stationary 
+        WaitForPlayer,
+        StationaryShooter,
+ 
     }
-    public EnemyType enemyType = EnemyType.Stationary;
+    public EnemyType enemyType = EnemyType.WaitForPlayer;
 
 
     private void Start()
@@ -48,6 +49,7 @@ public class Enemy : MonoBehaviour
         _startingColor   = renderer.material.color; 
         _spawnPool       = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
+        print("enemytype:" + "" + enemyType);
     }
 
     private void Update()

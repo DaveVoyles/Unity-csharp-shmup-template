@@ -281,7 +281,7 @@ public class SpawnManager : MonoBehaviour {
             var enemyInstance = _pool.Spawn(enemyXform);
 
             // Set enemy type
-            enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Stationary;
+            enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.WaitForPlayer;
 
             // position then set velocity
             enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
@@ -383,7 +383,7 @@ public class SpawnManager : MonoBehaviour {
         enemyInstance.transform.position              = newPos;
 
         // Set enemy type //TODO: What type of enemy should this be?
-        enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Stationary;
+        enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.WaitForPlayer;
     }
 
 

@@ -16,7 +16,7 @@ public class Cont : MonoBehaviour {
         _playerXform = GameObject.Find("Player").transform;
     }
  
-    void UpdateO(){
+    void Update(){
         target = _playerXform;
         LookAtTarget();
         MoveToTarget();

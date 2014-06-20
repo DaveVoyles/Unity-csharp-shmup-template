@@ -9,50 +9,77 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(Targetable))]
-public class EnemyMovementBehavior : MonoBehaviour {
+public class EnemyMovementBehavior : MonoBehaviour
+{
 
-    private Transform   _playerXform     = null;
-    private const float FAST_MOVE_SPEED  = 2.5f;
-    private const float SLOW_MOVE_SPEED  = 8f;
-    private const float MAX_ANGLE_OFFSET = 20.0f; // Maximum angle offset for new point on paths
-    private const float RUN_PATH_SPEED   = 1.5f;  // Speed to run the path
-    private const int   PATH_LENGTH      = 10;
-    private const float SEG_LENGTH       = 2.0f;
-    private float       _pos             = 0.0f;
-    private Vector3[]   _path            = null;
+    [SerializeField] private Enemy       _enemy           = null;
+    private Transform   _playerXform       = null;
+    private const float FAST_MOVE_SPEED    = 4f;
+    private const float MAX_ANGLE_OFFSET   = 20.0f; // Maximum angle offset for new point on paths
+    private const float RUN_PATH_SPEED     = 1.5f;  // Speed to run the path
+    private const int   PATH_LENGTH        = 10;
+    private const float SEG_LENGTH         = 2.0f;
+    private float       _pos               = 0.0f;
+    private float       _sawPlayerDistance = 4f;
+    private bool        _canSetNewPath     = true;
+    private Vector3[]   _path              = null;
+    private Transform   _xform             = null;
     private enum CurrentState
     {
         Stopped,
-        MoveToPlayerFast,
-        MoveToPlayerSlow,
+        MoveToPlayer,
+        MoveUpdatePlayer,
         CreatePath,
     };
-    private CurrentState _currentState = CurrentState.Stopped;
+    private CurrentState _currentState     = CurrentState.Stopped;
 
-    private Enemy _enemy;
+    // Used for constant movement toward player
+    private float movementSpeed = 2.0f;
+    private float rotationSpeed = 10.0f;
+    private Transform target    = null;
+    private CharacterController controller;
+
 
     /// <summary>
     /// Initializes variables and set references to objects used by the script 
     /// </summary>
     private void Awake()
     {
+        _xform           = transform;
+        // MUST keep this reference here. W/ out it, enemies only chance player's starting pos 
         _playerXform     = GameObject.Find("Player").transform;
         var targetable   = GetComponent<Targetable>();
+        controller       = GetComponent<CharacterController>();
 
         // Figure out which enemy type we are during initialization
         _enemy = GetComponent<Enemy>();
 
-        // Triggered once when this target is first detected by a TargetTracker 
-        targetable.AddOnDetectedDelegate(CreatePathToFollow);
+            targetable.AddOnDetectedDelegate(CreatePathToFollow);
+        //targetable.AddOnNotDetectedDelegate(MoveToPlayerSlowly);
 
-        // Triggered once when this target is no longer detected by a TargetTracker
-    //    targetable.AddOnNotDetectedDelegate(CreatePathToFollow);
     }
-   
+
+    void LookAtTarget()
+    {
+        if (target == null) { return; }
+
+        Vector3 direction     = target.position - transform.position;
+        transform.rotation    = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+    }
+
+    void MoveToTarget()
+    {
+        if (target == null) { return; }
+
+        var dir = (target.position - transform.position).normalized;
+        controller.Move(dir * movementSpeed * Time.deltaTime);
+    }
 
     /// <summary>
     /// Movement behaviors are determined by the type of enemy it is.
     /// Enemy type is set by spawner during initialization
+    /// TODO: Set this in Awake()?
     /// </summary>
     private void MovementsBasedOnEnemyType()
     {
@@ -67,7 +94,7 @@ public class EnemyMovementBehavior : MonoBehaviour {
                 _currentState = CurrentState.CreatePath;
                 break;
             case Enemy.EnemyType.Seeker:
-                _currentState = CurrentState.MoveToPlayerSlow;
+                _currentState = CurrentState.MoveUpdatePlayer;
                 break;
             case Enemy.EnemyType.Stationary:
                 break;
@@ -75,14 +102,12 @@ public class EnemyMovementBehavior : MonoBehaviour {
                 DebugUtils.Assert(false);
                 break;
         }
-
     }
 
 
 
-
-    //---------------------------------------------------------------------
-    // Functions for event delegates via TargetTracker script
+    //------------------------------------------------------------------------------------------------------
+    // ------------------ Functions for event delegates via TargetTracker script ---------------------------
 
     private void StopMovement(TargetTracker source){
         _currentState = CurrentState.Stopped;
@@ -90,26 +115,64 @@ public class EnemyMovementBehavior : MonoBehaviour {
     private void CreatePathToFollow(TargetTracker source){
         _currentState = CurrentState.CreatePath;
     }
-    private void MoveToPlayerSlowly(TargetTracker source){
-        _currentState = CurrentState.MoveToPlayerSlow;
+    private void MoveUpdatePlayer(TargetTracker source){
+        _currentState = CurrentState.MoveUpdatePlayer;
     }
-    private void MoveToPlayerQuickly(TargetTracker source){
-        _currentState = CurrentState.MoveToPlayerFast;
+    private void MoveToPlayer(TargetTracker source){
+        _currentState = CurrentState.MoveToPlayer;
+    }
+
+    /// <summary>
+    /// Change the movement behavior of the enemy, based on the distance from player
+    /// </summary>
+    private void CheckStateChange()
+    {
+        // Get current distance from player 
+        var distanceToPlayer = Vector3.Distance(_xform.position, _playerXform.position);
+
+        if (distanceToPlayer < _sawPlayerDistance)
+        {
+            _currentState = CurrentState.MoveUpdatePlayer;
+        }
+        else
+        {
+            _currentState = CurrentState.CreatePath;
+        }
     }
 
 
     /// <summary>
     /// Handles all movement and path updates
     /// </summary>
-    private void Update()
+    private void FixedUpdate()
     {
         HandleMovementStates();
         HandlePathMovement();
+        CheckStateChange();
+    }
+
+
+
+    /// <summary>
+    /// Only used once, sets up the length of the first path for wandering enemies to follow
+    /// </summary>
+    private void SetPathStartingPoint()
+    {
+        // Prevents us from constantly generating new paths
+        if (_canSetNewPath != true) return;
+
+        // Set the path starting point
+        _path = new Vector3[PATH_LENGTH];
+        _path[_path.Length - 2] = Vector3.right;
+        _path[_path.Length - 1] = new Vector3(-SEG_LENGTH, 0, 0);
+
+        // Create a new path to follow
+        CalculatePath();
     }
 
 
     /// <summary>
-    /// Move enemy along randomly generated paths
+    /// Once a path has been created, attach the enemy to it, and then move it along the path
     /// </summary>
     private void HandlePathMovement()
     {
@@ -124,27 +187,14 @@ public class EnemyMovementBehavior : MonoBehaviour {
 
         // If we've reached the end of the path, calculate a new one to follow
         if (!(_pos >= 1.0)) return;
-        _pos -= 1.0f;
+        _canSetNewPath = true;
+        _pos           -= 1.0f;
         CalculatePath();
     }
 
 
     /// <summary>
-    /// Set sup the length of the paths for wandering enemies to follow
-    /// </summary>
-    private void SetUpPaths()
-    {
-        _path                   = new Vector3[PATH_LENGTH];
-        _path[_path.Length - 2] = Vector3.right;
-        _path[_path.Length - 1] = new Vector3(-SEG_LENGTH, 0, 0);
-
-        // Create a new path to follow
-        CalculatePath();
-    }
-
-
-    /// <summary>
-    /// Recalculates the paths for wandering enemies
+    /// Helper function to recalculate the paths for wandering enemies
     /// </summary>
     private void CalculatePath()
     {
@@ -158,6 +208,9 @@ public class EnemyMovementBehavior : MonoBehaviour {
             vector3  = q * vector3;
             _path[i] = _path[i - 1] + vector3;
         }
+
+        // We just made a new path, so don't create a new one until we reach the end of this one
+        _canSetNewPath = false;
     }
 
 
@@ -177,17 +230,25 @@ public class EnemyMovementBehavior : MonoBehaviour {
     {
         switch (_currentState)
         {
-            case  CurrentState.Stopped:
+            case CurrentState.Stopped:
                 transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+                print("stopping");
                 break;
             case CurrentState.CreatePath:
-                SetUpPaths();
+                SetPathStartingPoint();
+                gameObject.transform.localScale = (new Vector3(1, 1, 1));
+                print("setting up a path");
                 break;
-            case CurrentState.MoveToPlayerFast:
-                iTween.MoveUpdate(gameObject, _playerXform.position, FAST_MOVE_SPEED);
+            case CurrentState.MoveToPlayer:
+                iTween.MoveTo(gameObject, _playerXform.position, FAST_MOVE_SPEED);
+                print("Moving to player fast");
                 break;
-            case CurrentState.MoveToPlayerSlow:
-                iTween.MoveUpdate(gameObject, _playerXform.position, SLOW_MOVE_SPEED);
+            case CurrentState.MoveUpdatePlayer:
+                gameObject.transform.localScale = (new Vector3(3, 3, 3));
+                target = _playerXform;
+                LookAtTarget();
+                MoveToTarget(); 
+                print("moving to player slow");
                 break;
             default:
                 DebugUtils.Assert(false);

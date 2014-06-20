@@ -13,15 +13,17 @@
  * 
  * Example:
  * 
+ * Player.cs
+ * 
  * 	void Start () {
 		GameEventManager.GameOver += GameOver;
-		gameOverText.enabled = false;
+		gameOverText.enabled      = false;
 	}
 
 	private void GameOver () {
-		gameOverText.enabled = true;
+		gameOverText.    enabled = true;
 		instructionsText.enabled = true;
-		enabled = true;
+		enabled                  = true;
 	}
  * 
  * TRIGGERING EVENTS:

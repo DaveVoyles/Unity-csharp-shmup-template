@@ -1,15 +1,21 @@
 ﻿/* Handles all spawning routines for all enemies. Transforms are grabbed from the object pool, and returned after destruction
- * Author: Dave Voyles
- * Date: May 2014
+ * Contains all of the functions and types of spawning that can occur.
+ * SpawnTimer manages how frequently enemies spawn, based on difficulty.
+ * 
+ * @Author: Dave Voyles - May 2014
  */
+
 using PathologicalGames;
 using UnityEngine;
 using System.Collections;
 
-public class Spawner : MonoBehaviour {
-    
+public class SpawnManager : MonoBehaviour {
+
+    [SerializeField]
     public Transform pathEnemyXform;
+    [SerializeField]
     public Transform enemyXform;
+    [SerializeField]
     public Transform droneXform;
     public int pathSpawnAmount                = 1;
     public int pathOneSpawnAmount             = 1;
@@ -52,11 +58,17 @@ public class Spawner : MonoBehaviour {
     private SwarmBehavior _swarmBehavior            = null;
     private Transform _xForm                        = null;
     private string _pathName                        = "path1";
- 
-    public enum pathNames
-    {
 
-    }
+    [SerializeField]
+    private ScreenRelativePosition screenRelativePos = null;
+    [SerializeField]
+    public ParticleEffectsManager  particleManager   = null;
+    [SerializeField]
+    public SpawnPool               spawnPool         = null;
+    [SerializeField] 
+    public Transform               playerXform       = null;
+ 
+
 
     /// <summary>
     /// Make the pool's group a child of this transform for demo purposes
@@ -66,7 +78,7 @@ public class Spawner : MonoBehaviour {
 	{
         SetProperties();
         ToggleWhichEnemiesCanSpawn();
- }
+    }
 
     /// <summary>
     /// Instantiates the values for all private properties
@@ -115,10 +127,10 @@ public class Spawner : MonoBehaviour {
             StartCoroutine(SpawnStationaryEnemy());
         }
         if (canSpawnGroup){
-            SpawnGroup();
+            SpawnGroup(enemyXform, numOfEnemiesToSpawnInGroup);
         }
         if (canSpawnIncrementally){
-            StartCoroutine(SpawnEnemiesIncrementally());
+            StartCoroutine(SpawnEnemiesIncrementally(enemyXform, numOfEnemiesToSpawnInGroup));
         }
         if (canSpawnDrones){
             StartCoroutine(_swarmBehavior.InstantiateDrones());
@@ -129,10 +141,14 @@ public class Spawner : MonoBehaviour {
     }
 
 
+    //----------------------------------------------------------------------------------------------
+    //------------------------------------- Path Enemies--------------------------------------------
+
+
     /// <summary>
-    /// Spawn an (pathOneSpawnAmount) instances of  every pathOneSpawnInterval
+    /// Spawn an (pathOneSpawnAmount) instances of  every pathOneSpawnIntervmal
     /// </summary>
-    private IEnumerator SpawnPathOne()
+    public IEnumerator SpawnPathOne()
     {
         // How many enemies should we spawn?
         var count = pathOneSpawnAmount;
@@ -157,7 +173,7 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// Spawn an (pathOneSpawnAmount) instances of  every pathTwoSpawnInterval
     /// </summary>
-    private IEnumerator SpawnPathTwo()
+    public IEnumerator SpawnPathTwo()
     {
         // How many enemies should we spawn?
         var count = pathTwoSpawnAmount;
@@ -179,10 +195,11 @@ public class Spawner : MonoBehaviour {
         }
     }
 
+
     /// <summary>
     /// Spawn an (pathOneSpawnAmount) instances of  every pathThreeSpawnInterval
     /// </summary>
-    private IEnumerator SpawnPathThree()
+    public IEnumerator SpawnPathThree()
     {
         // How many enemies should we spawn?
         var count = pathThreeSpawnAmount;
@@ -204,7 +221,11 @@ public class Spawner : MonoBehaviour {
         }
     }
 
-    private IEnumerator SpawnOnAPath()
+
+    /// <summary>
+    /// Spawn on whichever path you pass in as a variable
+    /// </summary>
+    public IEnumerator SpawnOnAPath()
     {
         // How many enemies should we spawn?
         var count = pathSpawnAmount;
@@ -223,10 +244,30 @@ public class Spawner : MonoBehaviour {
         }
     }
 
+
+    /// <summary>
+    /// Spawns enemies on a random path at random intervals
+    /// </summary>
+    public void SpawnEnemyOnRandomPath()
+    {
+        // Spawn enemy and set type
+        var enemyInstance = _pool.Spawn(pathEnemyXform);
+        enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Path;
+
+        // Move enemy onto the path
+        var iTweenMoveToPath = enemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+        iTweenMoveToPath.FollowRandomPath();
+    }
+
+
+
+    //----------------------------------------------------------------------------------------------
+    //------------------------------- Stationary or Moving -----------------------------------------
+
     /// <summary>
     /// Spawns a stationary enemy
     /// </summary>
-    private IEnumerator SpawnStationaryEnemy()
+    public IEnumerator SpawnStationaryEnemy()
     {
         MoveSpawnPoint();
         // How many enemies should we spawn?
@@ -234,7 +275,7 @@ public class Spawner : MonoBehaviour {
         while (count > 0)
         {
             // spawn an enemy off screen at a random X position and set hit points
-            var randomY = Random.Range(-4.0f, 4.0f);
+            var randomY       = Random.Range(-4.0f, 4.0f);
 
             // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
             var enemyInstance = _pool.Spawn(enemyXform);
@@ -246,10 +287,10 @@ public class Spawner : MonoBehaviour {
             enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
 
             // Grab the "enemy" script, so that we can access the variables exposed
-            var enemyScript = enemyInstance.GetComponent<Enemy>();
+            var enemyScript   = enemyInstance.GetComponent<Enemy>();
 
             // waits a few seconds then shoots
-            var shootDelay = Random.Range(0.5f, 2.0f);
+            var shootDelay    = Random.Range(0.5f, 2.0f);
             StartCoroutine(enemyScript.ShootTowardPlayer(shootDelay));
 
             // call this function recursively, every (x) seconds
@@ -258,37 +299,33 @@ public class Spawner : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Spawns enemies on a random path at random intervals
-    /// </summary>
-    private void SpawnEnemyOnRandomPath()
-    {
-        // Spawn enemy and set type
-        var enemyInstance     = _pool.Spawn(pathEnemyXform);
-            enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Path;
-
-        // Move enemy onto the path
-        var iTweenMoveToPath  = enemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-            iTweenMoveToPath.FollowRandomPath();
-    }
 
     /// <summary>
     /// Spawns waves of enemies using enemyTypeXform at a set interval
     /// </summary>
-    private IEnumerator SpawnEnemiesIncrementally()
+    public IEnumerator SpawnEnemiesIncrementally(Transform EnemyXform, int NumOfEnemiesToSpawnInGroup)
     {
+        // Set default params
+        if (EnemyXform == null){
+            EnemyXform = this.enemyXform;
+        }
+        if (NumOfEnemiesToSpawnInGroup == null){
+            NumOfEnemiesToSpawnInGroup = this.numOfEnemiesToSpawnInGroup;
+        }
+
         // Resets spawn point to new location
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(_xForm.position);
+        //_particleManager.CreateSpawnEffects(_xForm.position);
+        particleManager.CreateSpawnEffects(EnemyXform.position);
 
         // How many enemies should we spawn?
-        var count = numOfEnemiesToSpawnInGroup;
+        var count = NumOfEnemiesToSpawnInGroup;
         while (count > 0)
         {
             // Spawn an enemy & set spawn location within spawn radius
-            SpawnEnemiesWithinSphere();
+            SpawnEnemiesWithinSphere(EnemyXform);
             count--;
 
             // call this function recursively, every (x) seconds
@@ -296,11 +333,19 @@ public class Spawner : MonoBehaviour {
         }
     }
 
+
     /// <summary>
     /// Immediately Spawn _number ofEnemies within the size of _spawnSphereRadius
     /// </summary>
-    private void SpawnGroup()
+    public void SpawnGroup(Transform EnemyXform, int NumOfEnemiesToSpawnInGroup)
     {
+        // Set default params
+        if (EnemyXform == null){
+            EnemyXform = this.enemyXform;
+        }
+        if (NumOfEnemiesToSpawnInGroup == null){
+            NumOfEnemiesToSpawnInGroup = this.numOfEnemiesToSpawnInGroup;
+        }
         // Resets spawn point to new location
         MoveSpawnPoint();
 
@@ -308,22 +353,33 @@ public class Spawner : MonoBehaviour {
         _particleManager.CreateSpawnEffects(_xForm.position);
 
         // Spawn some enemies
-        for (var i = 0; i < numOfEnemiesToSpawnInGroup; i++){
-            SpawnEnemiesWithinSphere();
+        for (var i = 0; i < NumOfEnemiesToSpawnInGroup; i++){
+            SpawnEnemiesWithinSphere(EnemyXform);
         }
     }
+
+
+    //----------------------------------------------------------------------------------------------
+    //---------------------------- Private Support Functions ---------------------------------------
+
 
     /// <summary>
     /// Spawns enemies within a sphere radius, & locked to player-Z pos  
     /// </summary>
-    private void SpawnEnemiesWithinSphere()
-    {  
+    private void SpawnEnemiesWithinSphere(Transform EnemyXform)
+    {
+        if (EnemyXform == null){
+            EnemyXform = this.enemyXform;
+        }
+
         // Spawn enemy
-        var enemyInstance                             = _pool.Spawn(enemyXform);
+        //var enemyInstance                             = _pool.Spawn(EnemyXform);
+        var enemyInstance = spawnPool.Spawn(EnemyXform);
 
         // Set spawn location
         var newPos                                    = Random.insideUnitSphere * _spawnSphereRadius;
-        newPos.z                                      = _playerXform.position.z;
+        //newPos.z = _playerXform.position.z;
+        newPos.z = playerXform.position.z;
         enemyInstance.transform.position              = newPos;
 
         // Set enemy type //TODO: What type of enemy should this be?
@@ -337,7 +393,8 @@ public class Spawner : MonoBehaviour {
     private void MoveSpawnPoint()
     {
         // Get relative position script and set X & Y offset values 
-       var relativePos     = _enemySpawnPointXform.gameObject.GetComponent<ScreenRelativePosition>();
+       //var relativePos     = _enemySpawnPointXform.gameObject.GetComponent<ScreenRelativePosition>();
+        var relativePos    = screenRelativePos;
        relativePos.xOffset = Random.Range(-25f, -10f);
        relativePos.yOffset = Random.Range(-7f, 7f);
 

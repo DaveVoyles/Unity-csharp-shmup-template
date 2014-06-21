@@ -5,6 +5,8 @@
  * 
  * @Author: Dave Voyles - May 2014  
  */
+
+using System.IO;
 using PathologicalGames;
 using UnityEngine;
 using System.Collections;
@@ -230,11 +232,13 @@ public class EnemyMovementBehavior : MonoBehaviour
 
 
     /// <summary>
-    /// Debug code for drawing paths
+    /// Debug code for drawing paths, if a path exists
     /// </summary>
     protected virtual void OnDrawGizmos()
     {
-        iTween.DrawPath(_path);
+        if (_path != null){
+            iTween.DrawPath(_path);
+        }
     }
 
 
@@ -265,6 +269,9 @@ public class EnemyMovementBehavior : MonoBehaviour
     /// </summary>
     private void HandlePathMovement()
     {
+        // Don't call this function if we don't have a path to follow 
+        if (_path == null) return;
+
         iTween.PutOnPath(gameObject, _path, _pos);
         var vector3 = iTween.PointOnPath(_path, Mathf.Clamp01(_pos + .01f));
 

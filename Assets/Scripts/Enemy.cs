@@ -19,7 +19,8 @@ public class Enemy : MonoBehaviour
     public Transform               particlePrefab; 
     public Transform               powerupXform;
     /// <summary> How many points is this enemy worth when destroyed? </summary>
-    public int                     scoreValue = 1;
+    public int                     scoreValue          = 1;
+    public int                     numOfBulletsToShoot = 2;
 
     private Transform              _xform; // current transform of enemy, cached for perf during init
     private SoundManager           _soundManager;
@@ -49,35 +50,19 @@ public class Enemy : MonoBehaviour
         _startingColor   = renderer.material.color; 
         _spawnPool       = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
-        print("enemytype:" + "" + enemyType);
     }
 
-    private void Update()
-    {
-        _xform.position += (motionDir*Time.deltaTime); 
-    }
 
+    /// <summary>
+    /// Draw debug text above enemies 
+    /// </summary>
     private void OnGUI()
     {
       //  DrawTextOnObject();
-        DebugUtils.DrawTextOnObject(this.gameObject, enemyType);
+        DebugUtils.DrawEnemyTypeAboveObject(this.gameObject, enemyType);
 
     }
 
-
-
-    //private void DrawTextOnObject(int offsetX = 40, int offsetY = 40, int rectWidth = 90, int rectHeight = 40)
-    //{
-    //     var objectPos = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-
-    //    // BeginArea positioned in relation to my character
-    //    GUILayout.BeginArea(new Rect((objectPos.x - offsetX) , (Screen.height - objectPos.y) - offsetY, Screen.width, Screen.height));
-
-    //    // Draw the text above the enemy
-    //    GUI.      Label(new Rect(gameObject.transform.position.x, gameObject.transform.position.y, rectWidth, rectHeight), enemyType.ToString());
-
-    //    GUILayout.EndArea();
-    //}
 
     /// <summary>
     /// subtract damage and check if it's dead
@@ -126,16 +111,22 @@ public class Enemy : MonoBehaviour
 
 
     /// <summary>
-    ///  waits for 'delay' seconds, then shoots directly at the player
+    ///  waits for 'delay' seconds, then shoots bullets directly at the player
     /// </summary>
     /// <param name="delay">Time between shots</param>
     public IEnumerator ShootTowardPlayer(float delay)
     {
-        yield return new WaitForSeconds(delay);
+        var count = numOfBulletsToShoot;
+        while (count > 0)
+        {
+            // wait  few moments
+            yield return new WaitForSeconds(delay);
 
-        // Grabs current instance of bullet
-        var bullletPrefab                = _spawnPool.Spawn(_bulletXform,_xform.position, Quaternion.identity);
-        bullletPrefab.rigidbody.velocity = new Vector3(_bulletSpeed,  0, 0);
+            // Grabs current instance of bullet
+            var bullletPrefab                = _spawnPool.Spawn(_bulletXform, _xform.position, Quaternion.identity);
+            bullletPrefab.rigidbody.velocity = new Vector3(_bulletSpeed, 0, 0);
+            count--;
+        }
     }
 
 

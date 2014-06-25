@@ -21,12 +21,13 @@ public class DebugUtils
     
 
     /// <summary>
-    /// Draws text above an object. Currently used to draw the enemyType
+    /// Draws text above an object. Currently used to draw the enemyType, but can draw anything you pass in as second param.
+    /// Create a new function to draw different objects above enemes
     /// </summary>
     /// <param name="gameObject">Target object we are drawing on top of </param>
     /// <param name="enemyType">should consider moving this to a different object, instead of enemyType</param>
     //[Conditional("DEBUG")]
-    public static void DrawTextOnObject(GameObject gameObject, Enemy.EnemyType enemyType, int offsetX = 40, int offsetY = 40, int rectWidth = 90, int rectHeight = 40)
+    public static void DrawEnemyTypeAboveObject(GameObject gameObject, Enemy.EnemyType enemyType, int offsetX = 40, int offsetY = 40, int rectWidth = 90, int rectHeight = 40)
     {
         // Converts 3d space to 2d, to create a plane to draw text to
         var objectPos = Camera.main.WorldToScreenPoint(gameObject.transform.position);

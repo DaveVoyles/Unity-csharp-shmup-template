@@ -9,7 +9,7 @@ public class SpawnTimings : MonoBehaviour
     [SerializeField]
     public SpawnManager _spawnManager                      = null;
 
-    // Should I pass in different enemy Xform types as vars?
+    //TODO: Should I pass in different enemy Xform types as vars?
 
 
 	
@@ -26,6 +26,11 @@ public class SpawnTimings : MonoBehaviour
     private void SpawnWave_1()
     {
         StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(null, 2));
+        StartCoroutine(_spawnManager.SpawnPathOne());
+         StartCoroutine(_spawnManager.SpawnStationaryEnemy());
+        _spawnManager.SpawnGroup(null, 3);
+
+
     }
 
     //public IEnumerator SpawnEnemies()

@@ -17,7 +17,7 @@ public class EnemyMovementBehavior : MonoBehaviour
     [SerializeField]
     private Enemy       _enemy             = null;
     private Transform   _playerXform       = null;
-    private const float FAST_MOVE_SPEED    = 4f;
+    private const float FAST_MOVE_SPEED    = 5f;
     private const float MAX_ANGLE_OFFSET   = 20.0f; // Maximum angle offset for new point on paths
     private const float RUN_PATH_SPEED     = 1.5f;  // Speed to run the randomly generated paths
     private const int   PATH_LENGTH        = 10;
@@ -38,9 +38,9 @@ public class EnemyMovementBehavior : MonoBehaviour
     private CurrentState _currentState     = CurrentState.StopThenMoveUpdatePlayer;
 
     // Used for constant movement toward player
-    private float movementSpeed      = 6.0f;
+    private float movementSpeed      = 4.0f;
     private float rotationSpeed      = 10.0f;
-    private float _sawPlayerDistance = 6f;
+    private float _sawPlayerDistance = 8f;
     private Transform target         = null;
     private CharacterController controller;
 
@@ -60,7 +60,6 @@ public class EnemyMovementBehavior : MonoBehaviour
 
         // Enemies will move according to the type they were initialized as 
         SetMovementsBasedOnEnemyType();
-
     }
 
 
@@ -145,7 +144,6 @@ public class EnemyMovementBehavior : MonoBehaviour
     {
         HandleMovementStates();
         HandlePathMovement();
-        WaitForPlayerFunc();
     }
 
 
@@ -202,7 +200,6 @@ public class EnemyMovementBehavior : MonoBehaviour
         {
             transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         }
-        print(_currentState);
     }
 
 

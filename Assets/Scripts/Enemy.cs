@@ -57,6 +57,27 @@ public class Enemy : MonoBehaviour
         _xform.position += (motionDir*Time.deltaTime); 
     }
 
+    private void OnGUI()
+    {
+      //  DrawTextOnObject();
+        DebugUtils.DrawTextOnObject(this.gameObject, enemyType);
+
+    }
+
+
+
+    //private void DrawTextOnObject(int offsetX = 40, int offsetY = 40, int rectWidth = 90, int rectHeight = 40)
+    //{
+    //     var objectPos = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+
+    //    // BeginArea positioned in relation to my character
+    //    GUILayout.BeginArea(new Rect((objectPos.x - offsetX) , (Screen.height - objectPos.y) - offsetY, Screen.width, Screen.height));
+
+    //    // Draw the text above the enemy
+    //    GUI.      Label(new Rect(gameObject.transform.position.x, gameObject.transform.position.y, rectWidth, rectHeight), enemyType.ToString());
+
+    //    GUILayout.EndArea();
+    //}
 
     /// <summary>
     /// subtract damage and check if it's dead

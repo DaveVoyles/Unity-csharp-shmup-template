@@ -52,8 +52,6 @@ public class SpawnManager : MonoBehaviour {
  
     private SpawnPool _pool                         = null;
     private int _spawnSphereRadius                  = 3;
-    private ParticleEffectsManager _particleManager = null;
-    private Transform _playerXform                  = null;
     private Transform _enemySpawnPointXform         = null;
     private SwarmBehavior _swarmBehavior            = null;
     private Transform _xForm                        = null;
@@ -62,11 +60,11 @@ public class SpawnManager : MonoBehaviour {
     [SerializeField]
     private ScreenRelativePosition screenRelativePos = null;
     [SerializeField]
-    public ParticleEffectsManager  particleManager   = null;
+    public ParticleEffectsManager  _particleManager  = null;
     [SerializeField]
     public SpawnPool               spawnPool         = null;
     [SerializeField] 
-    public Transform               playerXform       = null;
+    public Transform               _playerXform      = null;
  
 
 
@@ -90,9 +88,7 @@ public class SpawnManager : MonoBehaviour {
         _pool.group.parent        = gameObject.transform;
         _pool.group.localPosition = new Vector3(1.5f, 0, 0);
         _pool.group.localRotation = Quaternion.identity;
-        _playerXform              = GameObject.Find("Player").transform;
         _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
-        _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _swarmBehavior            = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
         // Create a new swarm behavior if it is null
@@ -303,9 +299,12 @@ public class SpawnManager : MonoBehaviour {
     /// <summary>
     /// Spawns waves of enemies using enemyTypeXform at a set interval
     /// </summary>
+    /// <param name="EnemyXform">Type of enemy to spawn. Default is Xform used in SpawnMananger</param>
+    /// <param name="NumOfEnemiesToSpawnInGroup"></param>
+    /// <returns></returns>
     public IEnumerator SpawnEnemiesIncrementally(Transform EnemyXform, int NumOfEnemiesToSpawnInGroup)
     {
-        // Set default params
+        // Set default params if new ones aren't passed in
         if (EnemyXform == null){
             EnemyXform = this.enemyXform;
         }
@@ -317,8 +316,7 @@ public class SpawnManager : MonoBehaviour {
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        //_particleManager.CreateSpawnEffects(_xForm.position);
-        particleManager.CreateSpawnEffects(EnemyXform.position);
+        _particleManager.CreateSpawnEffects(EnemyXform.position);
 
         // How many enemies should we spawn?
         var count = NumOfEnemiesToSpawnInGroup;
@@ -373,13 +371,11 @@ public class SpawnManager : MonoBehaviour {
         }
 
         // Spawn enemy
-        //var enemyInstance                             = _pool.Spawn(EnemyXform);
         var enemyInstance = spawnPool.Spawn(EnemyXform);
 
         // Set spawn location
         var newPos                                    = Random.insideUnitSphere * _spawnSphereRadius;
-        //newPos.z = _playerXform.position.z;
-        newPos.z = playerXform.position.z;
+        newPos.z = _playerXform.position.z;
         enemyInstance.transform.position              = newPos;
 
         // Set enemy type //TODO: What type of enemy should this be?
@@ -393,8 +389,7 @@ public class SpawnManager : MonoBehaviour {
     private void MoveSpawnPoint()
     {
         // Get relative position script and set X & Y offset values 
-       //var relativePos     = _enemySpawnPointXform.gameObject.GetComponent<ScreenRelativePosition>();
-        var relativePos    = screenRelativePos;
+       var relativePos     = screenRelativePos;
        relativePos.xOffset = Random.Range(-25f, -10f);
        relativePos.yOffset = Random.Range(-7f, 7f);
 

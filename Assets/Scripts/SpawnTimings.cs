@@ -6,13 +6,15 @@ public class SpawnTimings : MonoBehaviour
     [HideInInspector] public float spawnFrequency          = 3f;
     [HideInInspector] public int numberOfEnemiesToSpawn    = 3;
 
-    public SpawnManager _spawnManager = null;
+    [SerializeField]
+    public SpawnManager _spawnManager                      = null;
+
+    // Should I pass in different enemy Xform types as vars?
 
 
 	
 	void Start () {
         // Reference to SpawnMananger script
-      //  _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
         SpawnWave_1();
 	}
 

@@ -9,14 +9,8 @@ using PathologicalGames;
 using UnityEngine;
 using System.Collections;
 
-public class SpawnManager : MonoBehaviour {
-
-    [SerializeField]
-    public Transform pathEnemyXform;
-    [SerializeField]
-    public Transform enemyXform;
-    [SerializeField]
-    public Transform droneXform;
+public class SpawnManager : MonoBehaviour
+{
     public int pathSpawnAmount                = 1;
     public int pathOneSpawnAmount             = 1;
     public int pathTwoSpawnAmount             = 1;
@@ -46,17 +40,24 @@ public class SpawnManager : MonoBehaviour {
     public bool canSpawnIncrementally        = false;
     public int stationaryEnemyAmount         = 1;
     public int numOfEnemiesToSpawnInGroup    = 4;
+    public SwarmBehavior swarmBehavior       = null;
 
     public bool canSpawnPickup               = false;
     public Transform powerup                 = null;
  
-    private SpawnPool _pool                         = null;
-    private int _spawnSphereRadius                  = 3;
-    private Transform _enemySpawnPointXform         = null;
-    private SwarmBehavior _swarmBehavior            = null;
-    private Transform _xForm                        = null;
-    private string _pathName                        = "path1";
+    private SpawnPool _pool                  = null;
+    private int _spawnSphereRadius           = 3;
+    private Transform _enemySpawnPointXform  = null;
+    private Transform _xForm                 = null;
+    private string _pathName                 = "path1";
 
+    // Expose these to the editor
+    [SerializeField]
+    private Transform pathEnemyXform                 = null;
+    [SerializeField]
+    private Transform enemyXform                     = null;
+    [SerializeField]
+    private Transform droneXform                     = null;
     [SerializeField]
     private ScreenRelativePosition screenRelativePos = null;
     [SerializeField]
@@ -89,14 +90,14 @@ public class SpawnManager : MonoBehaviour {
         _pool.group.localPosition = new Vector3(1.5f, 0, 0);
         _pool.group.localRotation = Quaternion.identity;
         _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
-        _swarmBehavior            = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
+        swarmBehavior            = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
         // Create a new swarm behavior if it is null
-        if (_swarmBehavior != null) return;
+        if (swarmBehavior != null) return;
         var swarmObject = new GameObject();
         swarmObject.AddComponent<SwarmBehavior>();
         swarmObject.AddComponent<ParticleEffectsManager>();
-        _swarmBehavior = swarmObject.GetComponent<SwarmBehavior>();
+        swarmBehavior = swarmObject.GetComponent<SwarmBehavior>();
     }
 
     /// <summary>
@@ -129,7 +130,7 @@ public class SpawnManager : MonoBehaviour {
             StartCoroutine(SpawnEnemiesIncrementally(enemyXform, numOfEnemiesToSpawnInGroup));
         }
         if (canSpawnDrones){
-            StartCoroutine(_swarmBehavior.InstantiateDrones());
+            StartCoroutine(swarmBehavior.InstantiateDrones());
         }
         if (canSpawnPickup){
             _pool.Spawn(powerup);

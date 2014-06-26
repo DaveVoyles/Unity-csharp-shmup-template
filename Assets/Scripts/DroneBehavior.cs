@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 public class DroneBehavior : MonoBehaviour
 {
-    // the overall speed of the simulation
+    /// <summary> the overall speed of the simulation </summary>
     public float speed             = 4f;
-    // max speed any particular drone can move at
+    /// <summary>  max speed any particular drone can move at  </summary>
     public float maxSpeed          = 8f;
-    // maximum steering power
+    /// <summary>  maximum steering power </summary>
     public float maxSteer          = 0.01f;
 
     // weights: used to modify the drone's movement
@@ -22,43 +22,40 @@ public class DroneBehavior : MonoBehaviour
     public float desiredSeparation = 1f;
 
     // velocity influences
+    [HideInInspector]
     public Vector3 separation;
+    [HideInInspector]
     public Vector3 alignment;
+    [HideInInspector]
     public Vector3 cohesion;
+    [HideInInspector]
     public Vector3 _bounds;
 
     // other members of my swarm
+    [HideInInspector]
     public List<GameObject> drones;
+    [HideInInspector]
     public SwarmBehavior    swarm;
 
-    // Keep drones locked to player's Z position    
+    // Keep drones locked to player's Z position. Only need to reference this once, so
+    // that's why it is private. No need to constantly update.
     private Transform _playerXform;
 
 
     private void Start()
     {
         _playerXform = GameObject.Find("Player").transform;
-        StartCoroutine(StopMovementWhileSpawning());
     }
+
 
     /// <summary>
-    /// Prevent drones from running after the player as soon as they spawn
-    /// Give the player a moment to see the drones, then react
+    /// Calculate physics here
     /// </summary>
-    private IEnumerator StopMovementWhileSpawning()
-    {
-        rigidbody.isKinematic = true;
-        yield return new WaitForSeconds(0.7f);
-        rigidbody.isKinematic = false;
-    }
-
     void FixedUpdate()
     {
-        if (rigidbody.isKinematic == false){
-            // we should always apply physics forces in FixedUpdate
             Flock();
-        }
     }
+
 
     public virtual void Flock()
     {
@@ -76,6 +73,7 @@ public class DroneBehavior : MonoBehaviour
 
         rigidbody.velocity = Limit(newVelocity, maxSpeed);
     }
+
 
     /// <summary>
     /// Calculates the influence velocities for the drone. We do this in one big loop for efficiency.
@@ -97,7 +95,9 @@ public class DroneBehavior : MonoBehaviour
 
         for (int i = 0; i < this.drones.Count; i++)
         {
-            if (drones[i] == null) continue;
+            if (drones[i] == null)
+            {
+            }
 
             float distance = Vector3.Distance(transform.position, drones[i].transform.position);
 

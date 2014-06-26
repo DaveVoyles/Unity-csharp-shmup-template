@@ -25,11 +25,11 @@ public class SpawnTimings : MonoBehaviour
 
     private void SpawnWave_1()
     {
-        StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(null, 2));
-        StartCoroutine(_spawnManager.SpawnPathOne());
-         StartCoroutine(_spawnManager.SpawnStationaryEnemy());
-        _spawnManager.SpawnGroup(null, 3);
-
+        //StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(null, 2));
+        //StartCoroutine(_spawnManager.SpawnPathOne());
+        //StartCoroutine(_spawnManager.SpawnStationaryEnemy());
+        //_spawnManager.SpawnGroup(null, 3);
+        StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(15));
 
     }
 

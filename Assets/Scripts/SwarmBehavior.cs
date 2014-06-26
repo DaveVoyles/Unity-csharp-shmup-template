@@ -11,7 +11,7 @@ public class SwarmBehavior : MonoBehaviour
     /// <summary>
     /// the number of drones we want in this swarm
     /// </summary>
-    public int droneCount      = 10;
+    public int droneCount      = 1;
     /// <summary>
     /// Size of area that drones can spawn within. Ideally you want to keep this small (~4f)
     /// </summary>
@@ -72,22 +72,27 @@ public class SwarmBehavior : MonoBehaviour
     /// Generate the same random, spawn location for all enemies and draw particles
     /// Also, set a brief delay before enemies appear on screen
     /// </summary>
-    public IEnumerator InstantiateDrones()
+    /// <param name="numToSpawn">How many drones should we spawn?</param>
+    public IEnumerator InstantiateDrones(int numToSpawn = 3)
     {
         var randomSpawnLocation = GeneratedSpawnPoint();
         gameObject.GetComponent<ParticleEffectsManager>().CreateSpawnEffects(randomSpawnLocation);
         yield return new WaitForSeconds(.5f);
 
-        SpawnDrones(randomSpawnLocation);
+        SpawnDrones(randomSpawnLocation, numToSpawn);
     }
 
     /// <summary>
     /// Creates a series of drones 
     /// </summary>
     /// <param name="randomSpawnLocation">Where should they spawn?</param>
-    private void SpawnDrones(Vector3 randomSpawnLocation)
+    /// <param name="numToSpawn">Passed in from Instantiate drone. How many should we spawn?</param>
+    private void SpawnDrones(Vector3 randomSpawnLocation, int numToSpawn = 3)
     {
-        for (int i = 0; i < droneCount; i++)
+        // How many drones should we spawn?
+        droneCount = numToSpawn;
+
+        for (var i = 0; i < droneCount; i++)
         {
             var droneTemp       = _pool.Spawn(droneXform);
             var db              = droneTemp.gameObject.GetComponent<DroneBehavior>();

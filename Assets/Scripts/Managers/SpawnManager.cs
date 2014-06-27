@@ -12,27 +12,12 @@ using System.Collections;
 public class SpawnManager : MonoBehaviour
 {
     public int pathSpawnAmount                = 1;
-    public int pathOneSpawnAmount             = 1;
-    public int pathTwoSpawnAmount             = 1;
-    public int pathThreeSpawnAmount           = 1;  
-    public float pathOneSpawnInterval         = 1f;
-    public float pathTwoSpawnInterval         = 1f;
-    public float pathThreeSpawnInterval       = 1f;
     public float pathSpawnInterval            = 1f;
     public float stationaryEnemyInterval      = 1f;
     public float incrementSpawnInterval       = 1.1f;
     public float timeToRunPath                = 4.5f;
-    public float timeToRunPathOne             = 4.5f;
-    public float timeToRunPathTwo             = 4.5f;
-    public float timeToRunPathThree           = 4.5f;
     public iTween.EaseType pathEaseType;
-    public iTween.EaseType pathOneEaseType;
-    public iTween.EaseType pathTwoEaseType;
-    public iTween.EaseType pathThreeEaseType;
     public bool canSpawnPath                 = false;
-    public bool canSpawnPathOne              = false;
-    public bool canSpawnPathTwo              = false;
-    public bool canSpawnPathThree            = false;
     public bool canSpawnRandomPath           = false;
     public bool canSpawnStationary           = false;
     public bool canSpawnDrones               = false;
@@ -49,15 +34,15 @@ public class SpawnManager : MonoBehaviour
     private int _spawnSphereRadius           = 3;
     private Transform _enemySpawnPointXform  = null;
     private Transform _xForm                 = null;
-    private string _pathName                 = "path1";
+    private string _pathOne                  = "path1";
 
     // Expose these to the editor
     [SerializeField]
-    private Transform pathEnemyXform                 = null;
+    private Transform              pathEnemyXform    = null;
     [SerializeField]
-    private Transform enemyXform                     = null;
+    private Transform              enemyXform        = null;
     [SerializeField]
-    private Transform droneXform                     = null;
+    private Transform              droneXform        = null;
     [SerializeField]
     private ScreenRelativePosition screenRelativePos = null;
     [SerializeField]
@@ -90,32 +75,23 @@ public class SpawnManager : MonoBehaviour
         _pool.group.localPosition = new Vector3(1.5f, 0, 0);
         _pool.group.localRotation = Quaternion.identity;
         _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
-        swarmBehavior            = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
+        swarmBehavior             = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
         // Create a new swarm behavior if it is null
         if (swarmBehavior != null) return;
         var swarmObject = new GameObject();
         swarmObject.AddComponent<SwarmBehavior>();
         swarmObject.AddComponent<ParticleEffectsManager>();
-        swarmBehavior = swarmObject.GetComponent<SwarmBehavior>();
+        swarmBehavior   = swarmObject.GetComponent<SwarmBehavior>();
     }
 
     /// <summary>
-    /// A boolean controls which enemies / groups can and can't spawn
+    /// DEBUG booleans to control which enemies / groups can and can't spawn
     /// </summary>
     private void ToggleWhichEnemiesCanSpawn()
     {
         if (canSpawnPath){
-            StartCoroutine(SpawnOnAPath());
-        }
-        if (canSpawnPathOne){
-            StartCoroutine(SpawnPathOne());
-        }
-        if (canSpawnPathTwo){
-            StartCoroutine(SpawnPathTwo());
-        }
-        if (canSpawnPathThree){
-            StartCoroutine(SpawnPathThree());
+            StartCoroutine(SpawnOnAPath(pathEnemyXform, 1, timeToRunPath, pathSpawnInterval, _pathOne));
         }
         if (canSpawnRandomPath){
             SpawnEnemyOnRandomPath();
@@ -143,101 +119,29 @@ public class SpawnManager : MonoBehaviour
 
 
     /// <summary>
-    /// Spawn an (pathOneSpawnAmount) instances of  every pathOneSpawnIntervmal
+    /// Spawn enemies on the path, incrementally
     /// </summary>
-    public IEnumerator SpawnPathOne()
+    /// <param name="enemyTransform">Which type should we spawn?</param>
+    /// <param name="numToSpawn">How many?</param>
+    /// <param name="speed">How quickly should it run this path?</param>
+    /// <param name="timeBetweenSpawns">How much separation between enemy spawns?</param>
+    /// <param name="pathName">which path should we spawn on?</param>
+    public IEnumerator SpawnOnAPath(Transform enemyTransform, int numToSpawn, float speed, float timeBetweenSpawns, string pathName)
     {
         // How many enemies should we spawn?
-        var count = pathOneSpawnAmount;
-        while (count > 0)
-        {
-            // Grab an instance of the enemy transform & set enemy type
-            var enemyInstance     = _pool.Spawn(pathEnemyXform);
-                enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Path;
-
-            // Move the enemy to the path it should follow
-            var iTweenMoveToPath  = enemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-
-            // Enemy follows this path
-            iTweenMoveToPath.FollowPathOne(timeToRunPathOne, pathOneEaseType);
-            count--;
-            
-            // call this function, every (x) seconds
-            yield return new WaitForSeconds(pathOneSpawnInterval);
-        }
-    }
-
-    /// <summary>
-    /// Spawn an (pathOneSpawnAmount) instances of  every pathTwoSpawnInterval
-    /// </summary>
-    public IEnumerator SpawnPathTwo()
-    {
-        // How many enemies should we spawn?
-        var count = pathTwoSpawnAmount;
-        while (count > 0)
-        {
-            // Grab an instance of the enemy transform & set enemy type
-            var enemyInstance   = _pool.Spawn(pathEnemyXform);
-            enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Path;
-
-            // Move the enemy to the path it should follow
-            var iTweenMoveToPath = enemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-
-            // Enemy follows this path
-            iTweenMoveToPath.FollowPathTwo(timeToRunPathTwo, pathTwoEaseType);
-            count--;
-
-            // call this function, every (x) seconds
-            yield return new WaitForSeconds(pathTwoSpawnInterval);
-        }
-    }
-
-
-    /// <summary>
-    /// Spawn an (pathOneSpawnAmount) instances of  every pathThreeSpawnInterval
-    /// </summary>
-    public IEnumerator SpawnPathThree()
-    {
-        // How many enemies should we spawn?
-        var count = pathThreeSpawnAmount;
-        while (count > 0)
-        {
-            // Grab an instance of the enemy transform & enemy type
-            var enemyInstance    = _pool.Spawn(pathEnemyXform);
-            enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Path;
-
-            // Move the enemy to the path it should follow
-            var iTweenMoveToPath = enemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-
-            // Enemy follows this path
-            iTweenMoveToPath.FollowPathThree(timeToRunPathThree, pathThreeEaseType);
-            count--;
-
-            // call this function recursively, every (x) seconds
-            yield return new WaitForSeconds(pathThreeSpawnInterval);
-        }
-    }
-
-
-    /// <summary>
-    /// Spawn on whichever path you pass in as a variable
-    /// </summary>
-    public IEnumerator SpawnOnAPath()
-    {
-        // How many enemies should we spawn?
-        var count = pathSpawnAmount;
+        var count = numToSpawn;
         while (count > 0)
         {
             // Grab an instance of the enemy transform
-            var pathEnemyInstance = _pool.Spawn(pathEnemyXform);
+            var pathEnemyInstance = _pool.Spawn(enemyTransform);
             var iTweenMoveToPath  = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
             // Enemy follows this path
-            iTweenMoveToPath.FollowPath(_pathName, timeToRunPath, pathEaseType);
+            iTweenMoveToPath.FollowPath(pathName, speed, pathEaseType);
             count--;
 
             // call this function, every (x) seconds
-            yield return new WaitForSeconds(pathSpawnInterval);
+            yield return new WaitForSeconds(timeBetweenSpawns);
         }
     }
 
@@ -302,17 +206,8 @@ public class SpawnManager : MonoBehaviour
     /// </summary>
     /// <param name="EnemyXform">Type of enemy to spawn. Default is Xform used in SpawnMananger</param>
     /// <param name="NumOfEnemiesToSpawnInGroup"></param>
-    /// <returns></returns>
     public IEnumerator SpawnEnemiesIncrementally(Transform EnemyXform, int NumOfEnemiesToSpawnInGroup)
     {
-        // Set default params if new ones aren't passed in
-        if (EnemyXform == null){
-            EnemyXform = this.enemyXform;
-        }
-        if (NumOfEnemiesToSpawnInGroup == null){
-            NumOfEnemiesToSpawnInGroup = this.numOfEnemiesToSpawnInGroup;
-        }
-
         // Resets spawn point to new location
         MoveSpawnPoint();
 
@@ -338,13 +233,6 @@ public class SpawnManager : MonoBehaviour
     /// </summary>
     public void SpawnGroup(Transform EnemyXform, int NumOfEnemiesToSpawnInGroup)
     {
-        // Set default params
-        if (EnemyXform == null){
-            EnemyXform = this.enemyXform;
-        }
-        if (NumOfEnemiesToSpawnInGroup == null){
-            NumOfEnemiesToSpawnInGroup = this.numOfEnemiesToSpawnInGroup;
-        }
         // Resets spawn point to new location
         MoveSpawnPoint();
 
@@ -367,10 +255,6 @@ public class SpawnManager : MonoBehaviour
     /// </summary>
     private void SpawnEnemiesWithinSphere(Transform EnemyXform)
     {
-        if (EnemyXform == null){
-            EnemyXform = this.enemyXform;
-        }
-
         // Spawn enemy
         var enemyInstance = spawnPool.Spawn(EnemyXform);
 

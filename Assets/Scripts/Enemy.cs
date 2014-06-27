@@ -1,11 +1,7 @@
-﻿using System;
-using System.Runtime.Serialization.Formatters;
-using System.Security.Cryptography;
+﻿
 using PathologicalGames;
 using UnityEngine;
 using System.Collections;
-using UnityEngine.SocialPlatforms;
-using UnityEngine.SocialPlatforms.Impl;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof (Transform))]
@@ -48,7 +44,7 @@ public class Enemy : MonoBehaviour
     {
         _xform           = transform; 
         _startingColor   = renderer.material.color; 
-        _spawnPool       = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
+        _spawnPool       = GameObject.Find("GameManager").    GetComponent<GameManager>().BulletPool;
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
     }
 

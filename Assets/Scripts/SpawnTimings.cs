@@ -16,6 +16,7 @@ public class SpawnTimings : MonoBehaviour
                      private string       _pathOne               = "path1";
                      private string       _pathTwo               = "path2";
                      private string       _pathThree             = "path3";
+                     private float        _bulletSpeed           = -16f;  // neg, so that it goes from right to left
 
 	
 	void Start () {
@@ -32,9 +33,9 @@ public class SpawnTimings : MonoBehaviour
     {
 //        StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemyPrefabThree, 2));
  //       StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
-        StartCoroutine(_spawnManager.SpawnStationaryEnemy());
+        StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f,3,_bulletSpeed));
         _spawnManager.SpawnGroup(_enemyPrefabTwo, 3);
-        StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
+  //      StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
 
     }
 

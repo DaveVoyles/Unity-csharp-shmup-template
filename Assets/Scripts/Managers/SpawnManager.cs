@@ -35,6 +35,7 @@ public class SpawnManager : MonoBehaviour
     private Transform _enemySpawnPointXform  = null;
     private Transform _xForm                 = null;
     private string _pathOne                  = "path1";
+    private float _bulletSpeed               = -16f;  // neg, so that it goes from right to left
 
     // Expose these to the editor
     [SerializeField]
@@ -98,7 +99,7 @@ public class SpawnManager : MonoBehaviour
             StartCoroutine(SpawnEnemyOnRandomPath(enemyXform, 3, timeToRunPath, pathSpawnInterval));
         }
         if (canSpawnStationary){
-            StartCoroutine(SpawnStationaryEnemy());
+            StartCoroutine(SpawnStationaryEnemy(3,3,_bulletSpeed));
         }
         if (canSpawnGroup){
             SpawnGroup(enemyXform, numOfEnemiesToSpawnInGroup);
@@ -182,7 +183,10 @@ public class SpawnManager : MonoBehaviour
     /// <summary>
     /// Spawns a stationary enemy
     /// </summary>
-    public IEnumerator SpawnStationaryEnemy()
+    /// <param name="delay">Time between shots</param>
+    /// <param name="numOfBullets">How many bullets should we shoot?></param>
+    /// <param name="bulletSpeed">How fast should the bullets go?</param>
+    public IEnumerator SpawnStationaryEnemy(float delay, int numOfBullets, float bulletSpeed)
     {
         MoveSpawnPoint();
         // How many enemies should we spawn?
@@ -195,9 +199,6 @@ public class SpawnManager : MonoBehaviour
             // Grabs current instance of enemy, by retrieving enemy prefab from spawn pool
             var enemyInstance = _pool.Spawn(enemyXform);
 
-            // Set enemy type
-            enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.WaitForPlayer;
-
             // position then set velocity
             enemyInstance.gameObject.transform.position = new Vector3(10, randomY, 0);
 
@@ -206,7 +207,7 @@ public class SpawnManager : MonoBehaviour
 
             // waits a few seconds then shoots
             var shootDelay    = Random.Range(0.5f, 2.0f);
-            StartCoroutine(enemyScript.ShootTowardPlayer(shootDelay));
+            StartCoroutine(enemyScript.ShootTowardPlayer(delay, numOfBullets, bulletSpeed));
 
             // call this function recursively, every (x) seconds
             yield return new WaitForSeconds(stationaryEnemyInterval);
@@ -280,9 +281,6 @@ public class SpawnManager : MonoBehaviour
         var newPos                                    = Random.insideUnitSphere * _spawnSphereRadius;
         newPos.z                                      = 0;
         enemyInstance.transform.position              = newPos;
-
-        // Set enemy type //TODO: Should enemy type be set in prefab?
-    //    enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.WaitForPlayer;
     }
 
 

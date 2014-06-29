@@ -23,7 +23,7 @@ public class Enemy : MonoBehaviour
     public Transform               _bulletXform;
     private ParticleEffectsManager _particleManager;
     private SpawnPool              _spawnPool;
-    private float                  _bulletSpeed        = -20f;  // neg, so that it goes from right to left
+    private float                  _bulletSpeed        = -16f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
 
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
@@ -50,7 +50,7 @@ public class Enemy : MonoBehaviour
 
 
     /// <summary>
-    /// Draw debug text above enemies 
+    /// DEBUG: Draw debug text above enemies 
     /// </summary>
     private void OnGUI()
     {
@@ -110,9 +110,11 @@ public class Enemy : MonoBehaviour
     ///  waits for 'delay' seconds, then shoots bullets directly at the player
     /// </summary>
     /// <param name="delay">Time between shots</param>
-    public IEnumerator ShootTowardPlayer(float delay)
+    /// <param name="numOfBullets">How many bullets should we shoot?></param>
+    /// <param name="bulletSpeed">How fast should the bullets go?</param>
+    public IEnumerator ShootTowardPlayer(float delay, int numOfBullets, float bulletSpeed)
     {
-        var count = numOfBulletsToShoot;
+        var count = numOfBullets;
         while (count > 0)
         {
             // wait  few moments
@@ -124,6 +126,10 @@ public class Enemy : MonoBehaviour
             count--;
         }
     }
+
+
+    //----------------------------------------------------------------------------------------------
+    //-------------------------------------- Power ups ---------------------------------------------
 
 
     /// <summary>

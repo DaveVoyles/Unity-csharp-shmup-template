@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 public class Enemy : MonoBehaviour
 {
     [HideInInspector]
-    public int                    hitPoints = 8;
+    public int                    hitPoints           = 8;
     /// <summary> assigned when the enemy spawns </summary>
     [HideInInspector]
     public Vector3                 motionDir;      
@@ -23,7 +23,7 @@ public class Enemy : MonoBehaviour
     public Transform               _bulletXform;
     private ParticleEffectsManager _particleManager;
     private SpawnPool              _spawnPool;
-    private float                  _bulletSpeed = -20f;  // neg, so that it goes from right to left
+    private float                  _bulletSpeed        = -20f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
 
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>

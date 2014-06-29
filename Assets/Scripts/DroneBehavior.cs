@@ -37,17 +37,6 @@ public class DroneBehavior : MonoBehaviour
     [HideInInspector]
     public SwarmBehavior    swarm;
 
-    // Keep drones locked to player's Z position. Only need to reference this once, so
-    // that's why it is private. No need to constantly update.
-    private Transform _playerXform;
-
-
-    private void Start()
-    {
-        _playerXform = GameObject.Find("Player").transform;
-    }
-
-
     /// <summary>
     /// Calculate physics here
     /// </summary>
@@ -107,9 +96,9 @@ public class DroneBehavior : MonoBehaviour
             if (distance > 0 && distance < desiredSeparation)
             {
                 // calculate vector headed away from myself
-                var direction = transform.position - drones[i].transform.position;
+                var direction      = transform.position - drones[i].transform.position;
                 direction.Normalize();
-                direction         = direction / distance; // weight by distance
+                direction          = direction / distance; // weight by distance
                 separationSum     += direction;
                 separationCount++;
             }
@@ -188,8 +177,8 @@ public class DroneBehavior : MonoBehaviour
     /// <summary>
     /// Limit the magnitude of a vector to the specified max
     /// </summary>
-    /// <param type="Vector3" name="v"></param>
-    /// <param type="float" name="max"></param>
+    /// <param type="Vector3" name="v">  </param>
+    /// <param type="float"   name="max"></param>
     protected virtual Vector3 Limit(Vector3 v, float max)
     {
         if (v.magnitude > max){

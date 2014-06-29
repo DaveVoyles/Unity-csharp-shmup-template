@@ -77,12 +77,13 @@ public class SpawnManager : MonoBehaviour
         _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
         swarmBehavior             = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
+        // SWARM BEHAVIORS
         // Create a new swarm behavior if it is null
         if (swarmBehavior != null) return;
-        var swarmObject = new GameObject();
+        var swarmObject           = new GameObject();
         swarmObject.AddComponent<SwarmBehavior>();
         swarmObject.AddComponent<ParticleEffectsManager>();
-        swarmBehavior   = swarmObject.GetComponent<SwarmBehavior>();
+        swarmBehavior             = swarmObject.GetComponent<SwarmBehavior>();
     }
 
     /// <summary>
@@ -94,7 +95,7 @@ public class SpawnManager : MonoBehaviour
             StartCoroutine(SpawnOnAPath(pathEnemyXform, 1, timeToRunPath, pathSpawnInterval, _pathOne));
         }
         if (canSpawnRandomPath){
-            SpawnEnemyOnRandomPath();
+            StartCoroutine(SpawnEnemyOnRandomPath(enemyXform, 3, timeToRunPath, pathSpawnInterval));
         }
         if (canSpawnStationary){
             StartCoroutine(SpawnStationaryEnemy());
@@ -103,7 +104,7 @@ public class SpawnManager : MonoBehaviour
             SpawnGroup(enemyXform, numOfEnemiesToSpawnInGroup);
         }
         if (canSpawnIncrementally){
-            StartCoroutine(SpawnEnemiesIncrementally(enemyXform, numOfEnemiesToSpawnInGroup));
+            StartCoroutine(SpawnEnemiesIncrementally(enemyXform, 3, pathSpawnInterval));
         }
         if (canSpawnDrones){
             StartCoroutine(swarmBehavior.InstantiateDrones());
@@ -124,9 +125,9 @@ public class SpawnManager : MonoBehaviour
     /// <param name="enemyTransform">Which type should we spawn?</param>
     /// <param name="numToSpawn">How many?</param>
     /// <param name="speed">How quickly should it run this path?</param>
-    /// <param name="timeBetweenSpawns">How much separation between enemy spawns?</param>
+    /// <param name="interval">How much separation between enemy spawns?</param>
     /// <param name="pathName">which path should we spawn on?</param>
-    public IEnumerator SpawnOnAPath(Transform enemyTransform, int numToSpawn, float speed, float timeBetweenSpawns, string pathName)
+    public IEnumerator SpawnOnAPath(Transform enemyTransform, int numToSpawn, float speed, float interval, string pathName)
     {
         // How many enemies should we spawn?
         var count = numToSpawn;
@@ -141,29 +142,42 @@ public class SpawnManager : MonoBehaviour
             count--;
 
             // call this function, every (x) seconds
-            yield return new WaitForSeconds(timeBetweenSpawns);
+            yield return new WaitForSeconds(interval);
         }
     }
 
 
     /// <summary>
-    /// Spawns enemies on a random path at random intervals
+    /// Spawns enemies on a random path 
     /// </summary>
-    public void SpawnEnemyOnRandomPath()
+    /// <param name="enemyTransform">Which type should we spawn?</param>
+    /// <param name="numToSpawn">How many?</param>
+    /// <param name="speed">How quickly should it run this path?</param>
+    /// <param name="interval">How much separation between enemy spawns?</param>
+    public IEnumerator SpawnEnemyOnRandomPath(Transform enemyTransform, int numToSpawn, float speed, float interval)
     {
-        // Spawn enemy and set type
-        var enemyInstance = _pool.Spawn(pathEnemyXform);
-        enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.Path;
+        // How many enemies should we spawn?
+        var count = numToSpawn;
+        while (count > 0)
+        {
+            // Grab an instance of the enemy transform
+            var pathEnemyInstance = _pool.Spawn(enemyTransform);
+            var iTweenMoveToPath  = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
-        // Move enemy onto the path
-        var iTweenMoveToPath = enemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
-        iTweenMoveToPath.FollowRandomPath();
+            // Enemy follows this path
+            iTweenMoveToPath.FollowRandomPath();
+            count--;
+
+            // call this function, every (x) seconds
+            yield return new WaitForSeconds(interval);
+        }
+
     }
 
 
 
     //----------------------------------------------------------------------------------------------
-    //------------------------------- Stationary or Moving -----------------------------------------
+    //---------------------------------- Spawning Functions ----------------------------------------
 
     /// <summary>
     /// Spawns a stationary enemy
@@ -204,26 +218,27 @@ public class SpawnManager : MonoBehaviour
     /// <summary>
     /// Spawns waves of enemies using enemyTypeXform at a set interval
     /// </summary>
-    /// <param name="EnemyXform">Type of enemy to spawn. Default is Xform used in SpawnMananger</param>
-    /// <param name="NumOfEnemiesToSpawnInGroup"></param>
-    public IEnumerator SpawnEnemiesIncrementally(Transform EnemyXform, int NumOfEnemiesToSpawnInGroup)
+    /// <param name="enemyXform">Type of enemy to spawn. Default is Xform used in SpawnMananger</param>
+    /// <param name="numToSpawn">How many enemies do we create?</param>
+    /// <param name="interval">How often do they spawn?</param>
+    public IEnumerator SpawnEnemiesIncrementally(Transform enemyXform, int numToSpawn, float interval)
     {
         // Resets spawn point to new location
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(EnemyXform.position);
+        _particleManager.CreateSpawnEffects(enemyXform.position);
 
         // How many enemies should we spawn?
-        var count = NumOfEnemiesToSpawnInGroup;
+        var count = numToSpawn;
         while (count > 0)
         {
             // Spawn an enemy & set spawn location within spawn radius
-            SpawnEnemiesWithinSphere(EnemyXform);
+            SpawnEnemiesWithinSphere(enemyXform);
             count--;
 
             // call this function recursively, every (x) seconds
-            yield return new WaitForSeconds(incrementSpawnInterval);
+            yield return new WaitForSeconds(interval);
         }
     }
 
@@ -231,7 +246,9 @@ public class SpawnManager : MonoBehaviour
     /// <summary>
     /// Immediately Spawn _number ofEnemies within the size of _spawnSphereRadius
     /// </summary>
-    public void SpawnGroup(Transform EnemyXform, int NumOfEnemiesToSpawnInGroup)
+    /// <param name="enemyXform">Type of enemy to spawn. Default is Xform used in SpawnMananger</param>
+    /// <param name="numToSpawn">How many enemies do we create?</param>
+    public void SpawnGroup(Transform enemyXform, int numToSpawn)
     {
         // Resets spawn point to new location
         MoveSpawnPoint();
@@ -240,8 +257,8 @@ public class SpawnManager : MonoBehaviour
         _particleManager.CreateSpawnEffects(_xForm.position);
 
         // Spawn some enemies
-        for (var i = 0; i < NumOfEnemiesToSpawnInGroup; i++){
-            SpawnEnemiesWithinSphere(EnemyXform);
+        for (var i = 0; i < numToSpawn; i++){
+            SpawnEnemiesWithinSphere(enemyXform);
         }
     }
 
@@ -253,18 +270,19 @@ public class SpawnManager : MonoBehaviour
     /// <summary>
     /// Spawns enemies within a sphere radius, & locked to player-Z pos  
     /// </summary>
-    private void SpawnEnemiesWithinSphere(Transform EnemyXform)
+    /// <param name="enemyXform">Transform type for the enemy</param>
+    private void SpawnEnemiesWithinSphere(Transform enemyXform)
     {
         // Spawn enemy
-        var enemyInstance = spawnPool.Spawn(EnemyXform);
+        var enemyInstance = spawnPool.Spawn(enemyXform);
 
         // Set spawn location
         var newPos                                    = Random.insideUnitSphere * _spawnSphereRadius;
-        newPos.z = _playerXform.position.z;
+        newPos.z                                      = 0;
         enemyInstance.transform.position              = newPos;
 
-        // Set enemy type //TODO: What type of enemy should this be?
-        enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.WaitForPlayer;
+        // Set enemy type //TODO: Should enemy type be set in prefab?
+    //    enemyInstance.GetComponent<Enemy>().enemyType = Enemy.EnemyType.WaitForPlayer;
     }
 
 

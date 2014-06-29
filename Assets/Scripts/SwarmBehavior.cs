@@ -11,15 +11,15 @@ public class SwarmBehavior : MonoBehaviour
     /// <summary>
     /// the number of drones we want in this swarm
     /// </summary>
-    public int droneCount      = 1;
+    public int droneCount            = 1;
     /// <summary>
     /// Size of area that drones can spawn within. Ideally you want to keep this small (~4f)
     /// </summary>
-    public float spawnRadius   = 3f;
+    public float spawnRadius         = 3f;
     /// <summary>
     /// Drones will try to stay within this boundary when swarming
     /// </summary>
-  	public Vector2 swarmBounds = new Vector2(30f, 30f);
+  	public Vector2 swarmBounds       = new Vector2(30f, 30f);
 
     /// <summary>
     /// Attach the drone prefab
@@ -63,8 +63,8 @@ public class SwarmBehavior : MonoBehaviour
     {
         var position               = _spawnPointXform.position;
         const int randomRangeValue = 10;
-        var randomSpawnPoint = new Vector3(position.x + Random.Range(0, randomRangeValue),
-                                           position.y + Random.Range(-randomRangeValue, randomRangeValue), position.y);
+        var randomSpawnPoint       = new Vector3(position.x + Random.Range(0, randomRangeValue),
+                                                 position.y + Random.Range(-randomRangeValue, randomRangeValue), position.y);
         return randomSpawnPoint;
     }
 

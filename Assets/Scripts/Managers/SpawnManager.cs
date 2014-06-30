@@ -206,7 +206,6 @@ public class SpawnManager : MonoBehaviour
             var enemyScript   = enemyInstance.GetComponent<Enemy>();
 
             // waits a few seconds then shoots
-            var shootDelay    = Random.Range(0.5f, 2.0f);
             StartCoroutine(enemyScript.ShootTowardPlayer(delay, numOfBullets, bulletSpeed));
 
             // call this function recursively, every (x) seconds
@@ -228,7 +227,7 @@ public class SpawnManager : MonoBehaviour
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(enemyXform.position);
+        _particleManager.CreateSpawnEffects(_enemySpawnPointXform.position);
 
         // How many enemies should we spawn?
         var count = numToSpawn;
@@ -255,7 +254,7 @@ public class SpawnManager : MonoBehaviour
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(_xForm.position);
+        _particleManager.CreateSpawnEffects(_enemySpawnPointXform.position);
 
         // Spawn some enemies
         for (var i = 0; i < numToSpawn; i++){

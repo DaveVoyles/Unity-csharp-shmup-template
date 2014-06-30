@@ -8,8 +8,8 @@ public class SpawnTimings : MonoBehaviour
                       public SpawnManager _spawnManager          = null;
 
     [SerializeField] private Transform    _enemyPrefabOne        = null;
-    [SerializeField] private Transform    _enemyPrefabTwo        = null;
-    [SerializeField] private Transform    _enemyPrefabThree      = null;
+    [SerializeField] private Transform    _enemyPathCreatorPF    = null;
+    [SerializeField] private Transform    _enemySeekerPF         = null;
     [SerializeField] private Transform    _pathEnemyOne          = null;
     [SerializeField] private Transform    _pathEnemyTwo          = null;
     [SerializeField] private Transform    _pathEnemyThree        = null;
@@ -24,19 +24,13 @@ public class SpawnTimings : MonoBehaviour
         SpawnWave_1();
 	}
 
-
-	void Update () {
-	
-	}
-
     private void SpawnWave_1()
     {
-//        StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemyPrefabThree, 2));
- //       StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
-        StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f,3,_bulletSpeed));
-        _spawnManager.SpawnGroup(_enemyPrefabTwo, 3);
-  //      StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
-
+        StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemySeekerPF, 3, 2));
+   //     StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
+    //    StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f,3,_bulletSpeed));
+    //    _spawnManager.SpawnGroup(_enemyPathCreatorPF, 3);
+     //   StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
     }
 
 }

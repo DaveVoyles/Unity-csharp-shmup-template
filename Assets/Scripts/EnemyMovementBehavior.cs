@@ -1,17 +1,14 @@
 ﻿/* Handles all of the behavior for enemies. Uses delegates as event listeners, which 
  * tell the enemy how to perform, based on the given situation.
- * 
+ *  
  * DO NOT apply this script to enemies that follow a pre-set path OR swarm enemies
  * 
  * @Author: Dave Voyles - May 2014  
  */
 
-using System.IO;
-using PathologicalGames;
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(Targetable))]
 public class EnemyMovementBehavior : MonoBehaviour
 {
     [SerializeField]

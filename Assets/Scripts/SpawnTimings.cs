@@ -27,16 +27,16 @@ public class SpawnTimings : MonoBehaviour
 
     private IEnumerator SpawnWave_1()
     {
-        //yield return new WaitForSeconds(2f);
-        //StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemySeekerPF, 3, 2));
-        //yield return new WaitForSeconds(3f);
-        //StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
+        yield return new WaitForSeconds(2f);
+        StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemySeekerPF, 3, 2));
+        yield return new WaitForSeconds(3f);
+        StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
         //yield return new WaitForSeconds(4.5f);
-        //StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f,3,_bulletSpeed));
+        //StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f, 3, _bulletSpeed));
         //yield return new WaitForSeconds(4.5f);
         //_spawnManager.SpawnGroup(_enemyPathCreatorPF, 3);
-        yield return new WaitForSeconds(0.5f);
-        StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
+        //yield return new WaitForSeconds(0.5f);
+        //StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
     }
 
 }

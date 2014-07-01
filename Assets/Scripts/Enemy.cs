@@ -18,8 +18,7 @@ public class Enemy : MonoBehaviour
     public Transform               particlePrefab; 
     public Transform               powerupXform;
     /// <summary> How many points is this enemy worth when destroyed? </summary>
-    public int                     scoreValue          = 5;
-    //public int                     numOfBulletsToShoot = 2;
+    public int                     scoreValue         = 5;
 
     private Transform              _xform; // current transform of enemy, cached for perf during init
     private SoundManager           _soundManager;
@@ -28,6 +27,7 @@ public class Enemy : MonoBehaviour
     private SpawnPool              _spawnPool;
     private float                  _bulletSpeed        = -16f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
+    private SpawnManager           _spawnManager       = null;
 
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
     public enum EnemyType
@@ -48,6 +48,10 @@ public class Enemy : MonoBehaviour
         _startingColor   = renderer.material.color; 
         _spawnPool       = GameObject.Find("GameManager").    GetComponent<GameManager>().BulletPool;
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
+        _spawnManager    = GameObject.Find("SpawnMananger").  GetComponent<SpawnManager>();
+
+        // Add enemy to the list, so that we can track how many are on screen at once
+        _spawnManager.enemiesInScene.Add(this);
     }
 
 
@@ -72,11 +76,18 @@ public class Enemy : MonoBehaviour
         var flashScript = gameObject.GetComponent<FlashWhenHit>();
         StartCoroutine(flashScript.FlashWhite());
 
-        // Subtract health, and if the object has 0hp or less, destroy it
+        // Subtract health each time enemy is hit
         hitPoints -= damage;
-        if (hitPoints <= 0){
-            Explode();
+
+        // If we are dead.....
+        if (hitPoints <= 0)
+        {
             CheckIfPowerupCanBeDropped();
+
+            // Remove enemy from list, so that we know when to spawn additional waves
+            _spawnManager.enemiesInScene.Remove(this);
+
+            Explode();
         }
     }
 

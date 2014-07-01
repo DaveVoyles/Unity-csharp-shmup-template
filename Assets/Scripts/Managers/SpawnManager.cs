@@ -5,6 +5,7 @@
  * @Author: Dave Voyles - May 2014
  */
 
+using System.Collections.Generic;
 using PathologicalGames;
 using UnityEngine;
 using System.Collections;
@@ -26,12 +27,15 @@ public class SpawnManager : MonoBehaviour
     public int stationaryEnemyAmount         = 1;
     public int numOfEnemiesToSpawnInGroup    = 4;
     public SwarmBehavior swarmBehavior       = null;
+    [HideInInspector] 
+    public List<Enemy> enemiesInScene        = null;
 
     public bool canSpawnPickup               = false;
     public Transform powerup                 = null;
  
     private SpawnPool _pool                  = null;
     private int _spawnSphereRadius           = 3;
+    [SerializeField]
     private Transform _enemySpawnPointXform  = null;
     private Transform _xForm                 = null;
     private string _pathOne                  = "path1";
@@ -46,14 +50,15 @@ public class SpawnManager : MonoBehaviour
     private Transform              droneXform        = null;
     [SerializeField]
     private ScreenRelativePosition screenRelativePos = null;
-    [SerializeField]
+
+    //TODO: Make these private?
     public ParticleEffectsManager  _particleManager  = null;
     [SerializeField]
     public SpawnPool               spawnPool         = null;
     [SerializeField] 
     public Transform               _playerXform      = null;
- 
 
+    
 
     /// <summary>
     /// Make the pool's group a child of this transform for demo purposes
@@ -75,7 +80,6 @@ public class SpawnManager : MonoBehaviour
         _pool.group.parent        = gameObject.transform;
         _pool.group.localPosition = new Vector3(1.5f, 0, 0);
         _pool.group.localRotation = Quaternion.identity;
-        _enemySpawnPointXform     = GameObject.Find("EnemySpawnPoint").transform;
         swarmBehavior             = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
         // SWARM BEHAVIORS
@@ -189,6 +193,7 @@ public class SpawnManager : MonoBehaviour
     public IEnumerator SpawnStationaryEnemy(float delay, int numOfBullets, float bulletSpeed)
     {
         MoveSpawnPoint();
+
         // How many enemies should we spawn?
         var count = stationaryEnemyAmount;
         while (count > 0)
@@ -227,7 +232,7 @@ public class SpawnManager : MonoBehaviour
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(screenRelativePos.GetCurrentLocation());
+        _particleManager.CreateSpawnEffects(enemyXform.position);
 
         // How many enemies should we spawn?
         var count = numToSpawn;
@@ -254,7 +259,7 @@ public class SpawnManager : MonoBehaviour
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(screenRelativePos.GetCurrentLocation());
+        _particleManager.CreateSpawnEffects(enemyXform.position);
 
         // Spawn some enemies
         for (var i = 0; i < numToSpawn; i++){

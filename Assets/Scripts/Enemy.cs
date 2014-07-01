@@ -15,7 +15,6 @@ public class Enemy : MonoBehaviour
     /// <summary> assigned when the enemy spawns </summary>
     [HideInInspector]
     public Vector3                 motionDir;      
-    public Transform               particlePrefab; 
     public Transform               powerupXform;
     /// <summary> How many points is this enemy worth when destroyed? </summary>
     public int                     scoreValue         = 5;
@@ -49,9 +48,6 @@ public class Enemy : MonoBehaviour
         _spawnPool       = GameObject.Find("GameManager").    GetComponent<GameManager>().BulletPool;
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _spawnManager    = GameObject.Find("SpawnMananger").  GetComponent<SpawnManager>();
-
-        // Add enemy to the list, so that we can track how many are on screen at once
-        _spawnManager.enemiesInScene.Add(this);
     }
 
 
@@ -85,7 +81,7 @@ public class Enemy : MonoBehaviour
             CheckIfPowerupCanBeDropped();
 
             // Remove enemy from list, so that we know when to spawn additional waves
-            _spawnManager.enemiesInScene.Remove(this);
+            _spawnManager.numOfEnemiesInScene --;
 
             Explode();
         }

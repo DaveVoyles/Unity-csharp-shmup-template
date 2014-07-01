@@ -27,11 +27,10 @@ public class SpawnManager : MonoBehaviour
     public int stationaryEnemyAmount         = 1;
     public int numOfEnemiesToSpawnInGroup    = 4;
     public SwarmBehavior swarmBehavior       = null;
-    [HideInInspector] 
-    public List<Enemy> enemiesInScene        = null;
-
     public bool canSpawnPickup               = false;
     public Transform powerup                 = null;
+    [HideInInspector]
+    public int numOfEnemiesInScene           = 0;
  
     private SpawnPool _pool                  = null;
     private int _spawnSphereRadius           = 3;
@@ -146,6 +145,9 @@ public class SpawnManager : MonoBehaviour
             iTweenMoveToPath.FollowPath(pathName, speed, pathEaseType);
             count--;
 
+            // Add enemy to the list, so that we can track how many are on screen at once
+            numOfEnemiesInScene++;
+
             // call this function, every (x) seconds
             yield return new WaitForSeconds(interval);
         }
@@ -173,16 +175,18 @@ public class SpawnManager : MonoBehaviour
             iTweenMoveToPath.FollowRandomPath();
             count--;
 
+            // Add enemy to the list, so that we can track how many are on screen at once
+            numOfEnemiesInScene++;
+
             // call this function, every (x) seconds
             yield return new WaitForSeconds(interval);
         }
 
     }
 
-
-
     //----------------------------------------------------------------------------------------------
     //---------------------------------- Spawning Functions ----------------------------------------
+
 
     /// <summary>
     /// Spawns a stationary enemy
@@ -216,6 +220,9 @@ public class SpawnManager : MonoBehaviour
             // call this function recursively, every (x) seconds
             yield return new WaitForSeconds(stationaryEnemyInterval);
             count--;
+
+            // Add enemy to the list, so that we can track how many are on screen at once
+            numOfEnemiesInScene++;
         }
     }
 
@@ -241,6 +248,9 @@ public class SpawnManager : MonoBehaviour
             // Spawn an enemy & set spawn location within spawn radius
             SpawnEnemiesWithinSphere(enemyXform);
             count--;
+
+            // Add enemy to the list, so that we can track how many are on screen at once
+            numOfEnemiesInScene++;
 
             // call this function recursively, every (x) seconds
             yield return new WaitForSeconds(interval);

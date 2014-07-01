@@ -11,26 +11,27 @@ public class SwarmBehavior : MonoBehaviour
     /// <summary>
     /// the number of drones we want in this swarm
     /// </summary>
-    public int droneCount            = 1;
+    public int              droneCount        = 1;
     /// <summary>
     /// Size of area that drones can spawn within. Ideally you want to keep this small (~4f)
     /// </summary>
-    public float spawnRadius         = 3f;
+    public float            spawnRadius       = 3f;
     /// <summary>
     /// Drones will try to stay within this boundary when swarming
     /// </summary>
-  	public Vector2 swarmBounds       = new Vector2(30f, 30f);
-
+  	public Vector2          swarmBounds       = new Vector2(30f, 30f);
     /// <summary>
     /// Attach the drone prefab
     /// </summary>
-    public Transform droneXform;
+    public Transform        droneXform;
     public List<GameObject> drones;
 
-    private Transform _spawnPointXform;
-    private const string _nameOfPool = "BulletPool";
-    private SpawnPool _pool          = null;
-    private Transform _playerXform   = null;
+    [SerializeField]
+    private SpawnManager    _spawnMananger    = null;
+    private Transform       _spawnPointXform;
+    private const string    _nameOfPool       = "BulletPool";
+    private SpawnPool       _pool             = null;
+    private Transform       _playerXform      = null;
 
 
     protected virtual void Start()
@@ -94,6 +95,9 @@ public class SwarmBehavior : MonoBehaviour
 
         for (var i = 0; i < droneCount; i++)
         {
+            // Add enemy to the list, so that we can track how many are on screen at once
+           _spawnMananger.numOfEnemiesInScene++;
+
             var droneTemp       = _pool.Spawn(droneXform);
             var db              = droneTemp.gameObject.GetComponent<DroneBehavior>();
             db.drones           = drones;

@@ -227,7 +227,7 @@ public class SpawnManager : MonoBehaviour
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(_enemySpawnPointXform.position);
+        _particleManager.CreateSpawnEffects(screenRelativePos.GetCurrentLocation());
 
         // How many enemies should we spawn?
         var count = numToSpawn;
@@ -254,7 +254,7 @@ public class SpawnManager : MonoBehaviour
         MoveSpawnPoint();
 
         // Create particles at spawn location
-        _particleManager.CreateSpawnEffects(_enemySpawnPointXform.position);
+        _particleManager.CreateSpawnEffects(screenRelativePos.GetCurrentLocation());
 
         // Spawn some enemies
         for (var i = 0; i < numToSpawn; i++){
@@ -265,7 +265,6 @@ public class SpawnManager : MonoBehaviour
 
     //----------------------------------------------------------------------------------------------
     //---------------------------- Private Support Functions ---------------------------------------
-
 
     /// <summary>
     /// Spawns enemies within a sphere radius, & locked to player-Z pos  

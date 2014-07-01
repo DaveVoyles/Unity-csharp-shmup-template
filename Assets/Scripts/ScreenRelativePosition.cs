@@ -12,8 +12,15 @@ public class ScreenRelativePosition : MonoBehaviour {
     public float      yOffset;
     public float      xOffset;
 
+    /// <summary>
+    /// Returns current location for spawning particles 
+    /// </summary>
+    public Vector3 GetCurrentLocation()
+    {
+      return transform.position;
+    }
 
-	void Start ()
+    void Start ()
     {
         CalculatePosition();
 	}

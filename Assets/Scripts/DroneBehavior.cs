@@ -58,7 +58,7 @@ public class DroneBehavior : MonoBehaviour
         newVelocity   += _bounds            * boundsWeight;
         newVelocity   =  newVelocity        * speed;
         newVelocity   =  rigidbody.velocity + newVelocity;
-        newVelocity.z = 0f;
+    //    newVelocity.z = 0f;
 
         rigidbody.velocity = Limit(newVelocity, maxSpeed);
     }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class SpawnTimings : MonoBehaviour
 {
@@ -21,16 +22,21 @@ public class SpawnTimings : MonoBehaviour
 	
 	void Start () {
 
-        SpawnWave_1();
-	}
+        StartCoroutine(SpawnWave_1());
+	}   
 
-    private void SpawnWave_1()
+    private IEnumerator SpawnWave_1()
     {
-        StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemySeekerPF, 3, 2));
-   //     StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
-    //    StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f,3,_bulletSpeed));
-    //    _spawnManager.SpawnGroup(_enemyPathCreatorPF, 3);
-     //   StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
+        //yield return new WaitForSeconds(2f);
+        //StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemySeekerPF, 3, 2));
+        //yield return new WaitForSeconds(3f);
+        //StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
+        //yield return new WaitForSeconds(4.5f);
+        //StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f,3,_bulletSpeed));
+        //yield return new WaitForSeconds(4.5f);
+        //_spawnManager.SpawnGroup(_enemyPathCreatorPF, 3);
+        yield return new WaitForSeconds(0.5f);
+        StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
     }
 
 }

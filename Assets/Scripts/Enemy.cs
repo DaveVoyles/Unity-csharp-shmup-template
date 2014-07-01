@@ -5,6 +5,9 @@ using System.Collections;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof (Transform))]
+[RequireComponent(typeof(EnemyMovementBehavior))]
+[RequireComponent(typeof(DespawnOnNotVisible))]
+[RequireComponent(typeof(FlashWhenHit))]
 public class Enemy : MonoBehaviour
 {
     [HideInInspector]
@@ -15,8 +18,8 @@ public class Enemy : MonoBehaviour
     public Transform               particlePrefab; 
     public Transform               powerupXform;
     /// <summary> How many points is this enemy worth when destroyed? </summary>
-    public int                     scoreValue          = 1;
-    public int                     numOfBulletsToShoot = 2;
+    public int                     scoreValue          = 5;
+    //public int                     numOfBulletsToShoot = 2;
 
     private Transform              _xform; // current transform of enemy, cached for perf during init
     private SoundManager           _soundManager;
@@ -35,7 +38,6 @@ public class Enemy : MonoBehaviour
         Seeker,
         WaitForPlayer,
         StationaryShooter,
- 
     }
     public EnemyType enemyType = EnemyType.WaitForPlayer;
 

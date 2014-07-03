@@ -16,12 +16,15 @@ public class GameManager : MonoBehaviour
     /// <summary> Globally accessible Particle for all game objects to reference   </summary>
     [HideInInspector] public SpawnPool   ParticlePool;
 
-
     private string            _bulletPoolString           = "BulletPool";
     private string            _ParticlePoolString         = "ParticlePool";
     private int               _respawnTime                = 3;
     private SoundManager      _soundManager;
     private static GameObject _GMGameObj;
+    
+    //----------------------
+    // States and difficulty
+    //-----------------------
 
     /// <summary> Sets the game difficulty </summary>
     public enum Difficulty
@@ -32,13 +35,20 @@ public class GameManager : MonoBehaviour
     }
     public Difficulty difficulty                          = Difficulty.Medium;
 
-    public enum CurrentGameState
+    /// <summary> Manages the current state of the game </summary>
+    public enum CurrentState
     {
-        PauseScreen
-
+          GameStart
+        , Playing
+        , GameOver  
+        , PauseScreen
+        , StartScreen
+        , OptionsScreen
+        , CreditsScreen
+        , UpdateScore
+        , UpdateLives
     };
-
-
+    public CurrentState currentState = CurrentState.StartScreen;
 
 
 
@@ -51,7 +61,7 @@ public class GameManager : MonoBehaviour
         // If a Game Manager exists, then return that
         if (_GMGameObj != null) return (GameManager) _GMGameObj.GetComponent(typeof (GameManager));
 
-        // If one doesn't exist, then create a new GameManager
+        // If one doesn't exist, create a new GameManager
         _GMGameObj = new GameObject();
         return (GameManager)_GMGameObj.AddComponent(typeof(GameManager));
     }   
@@ -62,17 +72,34 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        // Grab a sound manager and play a track
-        _soundManager = SoundManager.GetSingleton();    
-        _soundManager.PlayClip(backgroundMusic, false); 
+        GameEventManager.GameStart += SetSoundMananger;
+        GameEventManager.GameStart += SetObjectPools;
 
-        BulletPool   = PoolManager.Pools[_bulletPoolString];
-        ParticlePool = PoolManager.Pools[_ParticlePoolString]; 
-
+        //TODO Tie this into the menus 
         SetDifficulty();
-       
     }
 
+    /// <summary>
+    /// Grab a sound manager and play a track
+    /// </summary>
+    private void SetSoundMananger()
+    {
+        _soundManager = SoundManager.GetSingleton();
+        _soundManager.PlayClip(backgroundMusic, false);
+    }
+
+    /// <summary>
+    /// Creates a reference to object pools in the game
+    /// //TODO: Do I never need this here?
+    /// </summary>
+    private void SetObjectPools()
+    {
+        BulletPool   = PoolManager.Pools[_bulletPoolString];
+        ParticlePool = PoolManager.Pools[_ParticlePoolString];
+    }
+
+    //-----------------------------------------------------------------------------------------------
+    //------------------------------------- Difficulty Settings -------------------------------------
 
     /// <summary>
     /// Sets the game difficulty accordingly 

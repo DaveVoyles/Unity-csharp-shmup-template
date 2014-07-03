@@ -37,7 +37,7 @@ public static class GameEventManager
     public delegate void GameEvent();
     public static  event GameEvent 
           GameStart
-        , GameOver
+        , GameOver  
         , PauseScreen
         , StartScreen
         , OptionsScreen

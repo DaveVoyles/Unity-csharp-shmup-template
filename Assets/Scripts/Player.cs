@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private SpawnPool    _pool                      = null;
     private ParticleEffectsManager _particleManager = null;
     private const float DEFAULT_PLAYER_SPEED        = 18f;
+    [SerializeField] private GameManager _gm        = null;
 
     [HideInInspector] public Weapons weapons        = null;
     [HideInInspector] public Transform xform        = null;
@@ -44,8 +45,12 @@ public class Player : MonoBehaviour
     }
 
 
+
     void Update()
     {
+        // If we aren't playing, then just get out of here
+        if (_gm.currentState != GameManager.CurrentState.Playing) return;
+
         // Is the player isn't alive, return
         if (_state == State.Explosion) return;
 

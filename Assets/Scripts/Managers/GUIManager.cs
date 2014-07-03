@@ -32,6 +32,8 @@ public class GUIManager : MonoBehaviour
     private UILabel _audioUiLabel     = null;
     private float   _volume           = 1.0f;
 
+    [SerializeField] 
+    private GameManager _gm   = null;
 
 
     /// <summary>
@@ -39,11 +41,12 @@ public class GUIManager : MonoBehaviour
     /// </summary>
 	private void Start ()
     {
-        GameEventManager.StartScreen += SetStartScreenDuringInit;
         GameEventManager.GameStart   += SetScoreStringDuringInit;
         GameEventManager.GameStart   += SetLivesStringDuringInit;
         GameEventManager.UpdateScore += UpdateScoreString;
         GameEventManager.UpdateLives += UpdateLivesString;
+        GameEventManager.StartScreen += SetStartScreenDuringInit;
+
 
         // TODO: Move this so that it only displays during gameplay
      //   StartCoroutine(BlinkCaratChar());
@@ -64,7 +67,7 @@ public class GUIManager : MonoBehaviour
 
 
 
-    //----------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------
     //------------------------------------- Start Screen --------------------------------------------
 
 

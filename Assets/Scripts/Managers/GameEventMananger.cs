@@ -35,7 +35,17 @@
 public static class GameEventManager
 {
     public delegate void GameEvent();
-    public static event  GameEvent GameStart, GameOver, PauseScreen, StartScreen, UpdateScore, UpdateLives;
+    public static  event GameEvent 
+          GameStart
+        , GameOver
+        , PauseScreen
+        , StartScreen
+        , OptionsScreen
+        , CreditsScreen
+        , UpdateScore
+        , UpdateLives
+        ;
+
 
     public static void TriggerGameStart()
     {
@@ -70,7 +80,19 @@ public static class GameEventManager
     public static void TriggerStartScreen()
     {
         if (StartScreen == null) return;
-        PauseScreen();
+        StartScreen();
+    }
+
+    public static void TriggerOptionsScreen()
+    {
+        if (OptionsScreen == null) return;
+            OptionsScreen();
+    }
+
+    public static void TriggerCreditsScreen()
+    {
+        if (CreditsScreen == null) return;;
+            CreditsScreen();
     }
 
 

@@ -32,6 +32,14 @@ public class GameManager : MonoBehaviour
     }
     public Difficulty difficulty                          = Difficulty.Medium;
 
+    public enum CurrentGameState
+    {
+        PauseScreen
+
+    };
+
+
+
 
 
     /// <summary>

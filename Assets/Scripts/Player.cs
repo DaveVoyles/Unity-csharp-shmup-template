@@ -1,8 +1,6 @@
-﻿using System;
+﻿
 using System.Collections;
-using System.Collections.Generic;
 using PathologicalGames;
-using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -22,15 +20,14 @@ public class Player : MonoBehaviour
     [HideInInspector] public Weapons weapons        = null;
     [HideInInspector] public Transform xform        = null;
 
-    //-------------------------------------------------------------
+    //--------------------
     // Used for power ups
-    public float GetPlayerSpeed()
-    {
+    //--------------------
+    public float GetPlayerSpeed(){
         return _playerSpeed;
     }
 
-    public void SetPlayerSpeed(float playerSpeed)
-    {
+    public void SetPlayerSpeed(float playerSpeed){
         _playerSpeed = playerSpeed;
     }
 

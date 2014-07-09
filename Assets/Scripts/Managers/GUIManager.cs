@@ -33,38 +33,55 @@ public class GUIManager : MonoBehaviour
     private float   _volume           = 1.0f;
 
     [SerializeField] 
-    private GameManager _gm   = null;
+    private GameManager _gm           = null;
+    private static GameObject _GMGameObj = null;
+
+
+    /// <summary>
+    /// Sets up a static singleton instance of HUIManager, which is accessible to everything
+    /// </summary>
+    /// <returns>GUI Manager object</returns>
+    public static GameManager GetSingleton()
+    {
+        // If a Game Manager exists, then return that
+        if (_GMGameObj != null) return (GameManager)_GMGameObj.GetComponent(typeof(GameManager));
+
+        // If one doesn't exist, create a new GameManager
+        _GMGameObj = new GameObject();
+        return (GameManager)_GMGameObj.AddComponent(typeof(GameManager));
+    }   
 
 
     /// <summary>
     /// Listen for the following events, and call these functions when the event is triggered
     /// </summary>
-	private void Start ()
+	private void Awake ()
     {
-        GameEventManager.GameStart   += SetScoreStringDuringInit;
-        GameEventManager.GameStart   += SetLivesStringDuringInit;
-        GameEventManager.UpdateScore += UpdateScoreString;
-        GameEventManager.UpdateLives += UpdateLivesString;
         GameEventManager.StartScreen += SetStartScreenDuringInit;
 
+        //GameEventManager.GameStart += SetScoreStringDuringInit;
+        //GameEventManager.GameStart += SetLivesStringDuringInit;
+        //GameEventManager.GameStart   += SetGameUI;
+        //GameEventManager.UpdateScore += UpdateScoreString;
+        //GameEventManager.UpdateLives += UpdateLivesString;
 
-        // TODO: Move this so that it only displays during gameplay
-     //   StartCoroutine(BlinkCaratChar());
-    }
-
-    /// <summary>
-    /// Locate the GUI elements, which we will set text to
-    /// </summary>
-    private void Awake()
-    {
         // // TODO: Move this so that it only displays during gameplay
         //_scoreUILabel    = GameObject.Find("Label_Score").     GetComponent<UILabel>();
         //_livesUILabel    = GameObject.Find("Label_LivesText"). GetComponent<UILabel>();
         //_insertCoinLabel = GameObject.Find("Label_InsertCoin").GetComponent<UILabel>();
+
+        // TODO: Move this so that it only displays during gameplay
+      // StartCoroutine(BlinkCaratChar());
     }
 
 
 
+    private void SetGameUI()
+    {
+        _scoreUILabel    = GameObject.Find("Label_Score").     GetComponent<UILabel>();
+        _livesUILabel    = GameObject.Find("Label_LivesText"). GetComponent<UILabel>();
+        _insertCoinLabel = GameObject.Find("Label_InsertCoin").GetComponent<UILabel>();
+    }
 
 
     //-----------------------------------------------------------------------------------------------
@@ -76,13 +93,10 @@ public class GUIManager : MonoBehaviour
     /// </summary>
     private void SetStartScreenDuringInit()
     {
-        _easyUILabel.text      = _easyString;
-        _normalUiLabel.text    = _normalString;
+        _easyUILabel.     text = _easyString;
+        _normalUiLabel.   text = _normalString;
         _difficultUiLabel.text = _difficultString;
     }
-
-
-
 
 
     //----------------------------------------------------------------------------------------------
@@ -128,7 +142,7 @@ public class GUIManager : MonoBehaviour
     /// <summary>
     /// Flashes the "Insert Coin" text 
     /// </summary>
-    private IEnumerator BlinkCaratChar ()
+    private IEnumerator BlinkCaratChar()
     {
         // The number keeps incrementing and decrementing, so it never ends
         for(var n = 0; n < 1; n++)

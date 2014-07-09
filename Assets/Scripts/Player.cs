@@ -16,7 +16,10 @@ public class Player : MonoBehaviour
     private SpawnPool    _pool                      = null;
     private ParticleEffectsManager _particleManager = null;
     private const float DEFAULT_PLAYER_SPEED        = 18f;
-    [SerializeField] private GameManager _gm        = null;
+    [SerializeField]
+    private GameManager                _gm          = null;
+    [SerializeField]
+    private ParticleEffectsManager     _pm          = null;
 
     [HideInInspector] public Weapons weapons        = null;
     [HideInInspector] public Transform xform        = null;
@@ -33,24 +36,28 @@ public class Player : MonoBehaviour
     }
 
 
-    void Start()
+    void Awake()
     {
-        xform                     = transform;                                     
+        xform                     = transform;    
+        //TODO: Move this to a private serialized object                         
         _playerSpawnPoint         = GameObject.Find("PlayerSpawnPoint").transform; // set reference to Spawn Point Object
         xform.position            = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
-        _pool                     = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
+        _pool                     = _gm.BulletPool;
         _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _soundManager             = SoundManager.GetSingleton();
         weapons                   = GetComponent<Weapons>();
+
+        GameEventManager.GameStart += GameStart;
     }
 
+    private void GameStart()
+    {
+         //sTUFF
+    }
 
 
     void Update()
     {
-        // If we aren't playing, then just get out of here
-        if (_gm.currentState != GameManager.CurrentState.Playing) return;
-
         // Is the player isn't alive, return
         if (_state == State.Explosion) return;
 

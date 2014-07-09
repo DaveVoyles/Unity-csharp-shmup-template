@@ -16,8 +16,9 @@ public class SelectDifficulty : MonoBehaviour {
 
     void OnPress(bool isPressed)
     {
-          print("button is pressed");
-         //   Application.LoadLevel("Level1"); 
-            Application.LoadLevel("Level1");
+        GameEventManager.TriggerGameStart();
+        Application.LoadLevel("Level1");
+
+
     }
 }

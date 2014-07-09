@@ -8,10 +8,7 @@ using PathologicalGames;
 using UnityEngine;
 
 public class Weapons : MonoBehaviour {
-    public enum WeaponType {
-        SingleShot,
-        SpreadWeapon
-    }
+
     private bool[]     _weaponInventory;
     private Player     _player;
     private SpawnPool  _pool                  = null;
@@ -23,17 +20,21 @@ public class Weapons : MonoBehaviour {
     private const float DEFAULT_FIRE_RATE     = 0.035f;
     private float       _fireRate             = 0.035f;     // time between shots
 
+    public enum WeaponType{
+        SingleShot,
+        SpreadWeapon
+    }
     public Transform playerBulletPrefab;
     public Transform playerMissilePrefab;
     public AudioClip sfxShoot;
     public WeaponType currentWeapon = WeaponType.SingleShot;
 
 
-    private void  Start ()
+    private void  Start()
     {
         // Create an inventory, and store the first weapon in there
         _weaponInventory = new bool[ System.Enum.GetValues(typeof (WeaponType)).Length];
-        _player          = gameObject.GetComponent<Player>();
+        _player          = gameObject.                    GetComponent<Player>();
         _pool            = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
     }
  
@@ -63,12 +64,16 @@ public class Weapons : MonoBehaviour {
         SwitchToWeapon(weapon); 
     }
  
-
+    /// <summary>
+    /// Remove currently selected weapon from inventory
+    /// </summary>
+    /// <param name="weapon">weapon type we want to drop</param>
     public void DropWeapon ( WeaponType weapon  )
     {
         if (currentWeapon == weapon) {
            var nextWeaponIndex = (int) (weapon + 1);
-            //Going past the length of the array, so return to 0
+
+           //Going past the length of the array, so return to 0
            if (nextWeaponIndex >= System.Enum.GetValues(typeof (WeaponType)).Length) {
              nextWeaponIndex = 0;
            }

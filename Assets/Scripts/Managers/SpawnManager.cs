@@ -5,7 +5,6 @@
  * @Author: Dave Voyles - May 2014
  */
 
-using System.Collections.Generic;
 using PathologicalGames;
 using UnityEngine;
 using System.Collections;
@@ -49,6 +48,8 @@ public class SpawnManager : MonoBehaviour
     private Transform              droneXform        = null;
     [SerializeField]
     private ScreenRelativePosition screenRelativePos = null;
+    [SerializeField]
+    private GameManager            _gm               = null;
 
     //TODO: Make these private?
     public ParticleEffectsManager  _particleManager  = null;
@@ -75,10 +76,7 @@ public class SpawnManager : MonoBehaviour
     private void SetProperties()
     {
         _xForm                    = transform;
-        _pool                     = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
-        _pool.group.parent        = gameObject.transform;
-        _pool.group.localPosition = new Vector3(1.5f, 0, 0);
-        _pool.group.localRotation = Quaternion.identity;
+        _pool                     = GameObject.Find("GameManager").        GetComponent<GameManager>().BulletPool;
         swarmBehavior             = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
         // SWARM BEHAVIORS

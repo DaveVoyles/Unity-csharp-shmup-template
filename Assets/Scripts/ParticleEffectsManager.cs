@@ -9,7 +9,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     public Transform playerExplosionXform;
     public AudioClip sfxSpawning;
 
-    private const String PARTICLE_POOL_STRING = "ParticlePool";
+    private const String _PARTICLE_POOL_STRING = "ParticlePool";
 
     ///<summary>
     /// Creates particles, de-spawns particles, and plays SFX for spawning
@@ -17,7 +17,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreateSpawnEffects(Vector3 spawnLocation)
     {
-        var pool         = PoolManager.Pools[PARTICLE_POOL_STRING];
+        var pool         = PoolManager.Pools[_PARTICLE_POOL_STRING];
         var particleInst = pool.Spawn(particleXform, spawnLocation, Quaternion.identity);
         pool.Despawn(particleInst, 2);    
 
@@ -31,7 +31,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreatePlayerExplosionEffects(Vector3 spawnLocation)
     {
-        var pool         = PoolManager.Pools[PARTICLE_POOL_STRING];
+        var pool         = PoolManager.Pools[_PARTICLE_POOL_STRING];
         var particleInst = pool.Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
         pool.Despawn(particleInst, 3);
         Camera.main.GetComponent<CameraShake>().Shake();
@@ -46,7 +46,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreateExplodingEnemyEffects(Vector3 spawnLocation)
     {
-        var pool         = PoolManager.Pools[PARTICLE_POOL_STRING];
+        var pool         = PoolManager.Pools[_PARTICLE_POOL_STRING];
         var particleInst = pool.Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
         pool.Despawn(particleInst, 2);
 
@@ -60,7 +60,7 @@ public class ParticleEffectsManager : MonoBehaviour {
     /// <param name="spawnLocation">Pass in the Vec3 loc where particles should begin</param>
     public void CreatePowerupParticleEffects(Vector3 spawnLocation)
     {
-        var pool = PoolManager.Pools[PARTICLE_POOL_STRING];
+        var pool = PoolManager.Pools[_PARTICLE_POOL_STRING];
         var particleInst = pool.Spawn(playerExplosionXform, spawnLocation, Quaternion.identity);
         pool.Despawn(particleInst, 2);
 

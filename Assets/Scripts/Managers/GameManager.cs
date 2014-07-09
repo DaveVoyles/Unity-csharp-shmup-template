@@ -16,9 +16,9 @@ public class GameManager : MonoBehaviour
     /// <summary> Globally accessible Particle for all game objects to reference   </summary>
     [HideInInspector] public SpawnPool   ParticlePool;
 
-    private string            _bulletPoolString           = "BulletPool";
-    private string            _ParticlePoolString         = "ParticlePool";
-    private int               _respawnTime                = 3;
+    private const string      _BULLET_POOL_STRING        = "BulletPool";
+    private const string      _PARTICLE_POOL_STRING      = "ParticlePool";
+    private int               _respawnTime               = 3;
     private SoundManager      _soundManager;
     private static GameObject _GMGameObj;
     
@@ -72,9 +72,13 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        GameEventManager.GameStart += SetSoundMananger;
-        GameEventManager.GameStart += SetObjectPools;
+  //      GameEventManager.GameStart += GameStart;
+        GameStart();
+    }
 
+    private void GameStart()
+    {
+        SetObjectPools();
         //TODO Tie this into the menus 
         SetDifficulty();
     }
@@ -94,8 +98,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void SetObjectPools()
     {
-        BulletPool   = PoolManager.Pools[_bulletPoolString];
-        ParticlePool = PoolManager.Pools[_ParticlePoolString];
+        BulletPool   = PoolManager.Pools[_BULLET_POOL_STRING];
+        ParticlePool = PoolManager.Pools[_PARTICLE_POOL_STRING];
     }
 
     //-----------------------------------------------------------------------------------------------
@@ -137,10 +141,6 @@ public class GameManager : MonoBehaviour
     {
         // Insert logic
     }
-
-
-
-
 
 
 }

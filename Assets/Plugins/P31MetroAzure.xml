@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>P31MetroAzure</name>
+    </assembly>
+    <members>
+        <!-- Badly formed XML comment ignored for member "T:Prime31.MetroAzure.Azure" -->
+        <member name="M:Prime31.MetroAzure.Azure.authenticateWithServiceProvider(Prime31.MetroAzure.MobileServiceAuthenticationProvider,System.Action{Prime31.MetroAzure.MobileServiceUser})">
+            <summary>
+            Authenticates a user with the service provider. Note that the service provider must first be setup in the Azure web dashboard! The completionHandler
+            will return null in the event of a login failure.
+            </summary>
+        </member>
+        <member name="M:Prime31.MetroAzure.Azure.connect(System.String,System.String)">
+            <summary>
+            Prepares the connection to the Azure servers. This must be called before any other methods.
+            </summary>
+            <param name="applicationUrl"></param>
+            <param name="applicationKey"></param>
+        </member>
+        <member name="M:Prime31.MetroAzure.Azure.insert``1(``0,System.Action)">
+            <summary>
+            Inserts a new item into the database
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="completionHandler"></param>
+        </member>
+        <member name="M:Prime31.MetroAzure.Azure.update``1(``0,System.Action)">
+            <summary>
+            Updates an item in the database
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="completionHandler"></param>
+        </member>
+        <member name="M:Prime31.MetroAzure.Azure.delete``1(``0,System.Action)">
+            <summary>
+            Deletes an item from the database
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="completionHandler"></param>
+        </member>
+        <member name="M:Prime31.MetroAzure.Azure.where``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Action{System.Collections.Generic.List{``0}})">
+            <summary>
+            Queries the database
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="predicate"></param>
+            <param name="completionHandler"></param>
+        </member>
+        <member name="M:Prime31.MetroAzure.Azure.lookup``1(``0,System.Action{``0})">
+            <summary>
+            Looks an item up to see if it is in the database
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="item"></param>
+            <param name="completionHandler"></param>
+        </member>
+        <member name="T:Prime31.MetroAzure.MobileServiceAuthenticationProvider">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Prime31.MetroAzure.MobileServiceAuthenticationProvider.MicrosoftAccount">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Prime31.MetroAzure.MobileServiceAuthenticationProvider.Google">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Prime31.MetroAzure.MobileServiceAuthenticationProvider.Twitter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Prime31.MetroAzure.MobileServiceAuthenticationProvider.Facebook">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Prime31.MetroAzure.MobileServiceUser">
+            <summary>
+            Encapsulates a Microsoft MobileServiceUser
+            </summary>
+        </member>
+        <member name="F:Prime31.MetroAzure.MobileServiceUser.userId">
+            <summary>
+            The userId for the user
+            </summary>
+        </member>
+        <member name="F:Prime31.MetroAzure.MobileServiceUser.token">
+            <summary>
+            The access token for the user
+            </summary>
+        </member>
+        <member name="M:Prime31.MetroAzure.MobileServiceUser.#ctor(System.String,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="userId"></param>
+            <param name="token"></param>
+        </member>
+    </members>
+</doc>

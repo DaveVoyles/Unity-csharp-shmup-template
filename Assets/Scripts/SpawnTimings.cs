@@ -28,7 +28,6 @@ public class SpawnTimings : MonoBehaviour
 
     private IEnumerator SpawnWave_1()
     {
-        print(_spawnManager.numOfEnemiesInScene);
         yield return new WaitForSeconds(2f);
         StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemySeekerPF, 3, 2));
         print(_spawnManager.numOfEnemiesInScene);

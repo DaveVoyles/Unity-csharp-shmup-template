@@ -23,10 +23,10 @@ public class Enemy : MonoBehaviour
     private SoundManager           _soundManager;
     public Transform               _bulletXform;
     private ParticleEffectsManager _particleManager;
-    private SpawnPool              _spawnPool;
-    private float                  _bulletSpeed        = -16f;  // neg, so that it goes from right to left
+    private SpawnPool              _pool;
+    private float                  _bulletSpeed       = -16f;  // neg, so that it goes from right to left
     private Color                  _startingColor;
-    private SpawnManager           _spawnManager       = null;
+    private SpawnManager           _spawnManager      = null;
 
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
     public enum EnemyType
@@ -45,7 +45,7 @@ public class Enemy : MonoBehaviour
     {
         _xform           = transform; 
         _startingColor   = renderer.material.color; 
-        _spawnPool       = GameObject.Find("GameManager").    GetComponent<GameManager>().BulletPool;
+        _pool            = GameObject.Find("GameManager").    GetComponent<GameManager>().BulletPool;
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
         _spawnManager    = GameObject.Find("SpawnMananger").  GetComponent<SpawnManager>();
     }
@@ -95,7 +95,7 @@ public class Enemy : MonoBehaviour
         _particleManager.CreateExplodingEnemyEffects(_xform.position);
 
         // put this back on the stack for later re-use
-        _spawnPool.Despawn(_xform);
+        _pool.Despawn(_xform);
 
         // Update the score in the GameManager, then set it in the UI
         GameManager.score += scoreValue;
@@ -130,7 +130,7 @@ public class Enemy : MonoBehaviour
             yield return new WaitForSeconds(delay);
 
             // Grabs current instance of bullet
-            var bullletPrefab                = _spawnPool.Spawn(_bulletXform, _xform.position, Quaternion.identity);
+            var bullletPrefab                = _pool.Spawn(_bulletXform, _xform.position, Quaternion.identity);
             bullletPrefab.rigidbody.velocity = new Vector3(_bulletSpeed, 0, 0);
             count--;
         }

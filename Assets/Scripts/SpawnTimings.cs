@@ -21,11 +21,17 @@ public class SpawnTimings : MonoBehaviour
                      private int          _numOfEnemiesInScene   = 0;
 
 	
-	void Start () {
-
+    /// <summary>
+    /// Init functions
+    /// </summary>
+	void Start ()
+    {
         StartCoroutine(SpawnWave_1());
 	}   
 
+    /// <summary>
+    /// Control the order of enemy spawns
+    /// </summary>
     private IEnumerator SpawnWave_1()
     {
         yield return new WaitForSeconds(2f);
@@ -41,6 +47,8 @@ public class SpawnTimings : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         StartCoroutine(_spawnManager.swarmBehavior.InstantiateDrones(8));
         yield return new WaitForSeconds(3f);
+
+        // Control the flow of enemy spawns
         if (_spawnManager.numOfEnemiesInScene < 3)
         {
             print("let's spawn some fools!");

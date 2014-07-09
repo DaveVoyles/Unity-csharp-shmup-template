@@ -45,19 +45,21 @@ public class EnemyMovementBehavior : MonoBehaviour
     /// <summary>
     /// Initializes variables and set references to objects used by the script 
     /// </summary>
-    private void Awake()
+    private void Start()
     {
         // MUST keep this reference here. W/ out it, enemies only chance player's starting pos 
-        _playerXform     = GameObject.Find("Player").transform;
-        _xform           = transform;
-        controller       = GetComponent<CharacterController>();
+        _playerXform = GameObject.Find("Player").transform;
+        _xform = transform;
+        controller = GetComponent<CharacterController>();
 
         // Figure out which enemy type we are during initialization
         _enemy = GetComponent<Enemy>();
 
         // Enemies will move according to the type they were initialized as 
         SetMovementsBasedOnEnemyType();
+
     }
+
 
 
     //------------------------------------------------------------------------------------------------------
@@ -67,7 +69,6 @@ public class EnemyMovementBehavior : MonoBehaviour
     /// <summary>
     /// Movement behaviors are determined by the type of enemy it is.
     /// Enemy type is set by spawner during initialization
-    /// TODO: Set this in Awake()?
     /// </summary>
     private void SetMovementsBasedOnEnemyType()
     {
@@ -149,7 +150,7 @@ public class EnemyMovementBehavior : MonoBehaviour
     /// </summary>
     private void LookAtTarget()
     {
-        if (target == null) { return; }
+        if (target == null) { target = GameObject.Find("Player").transform; }
 
         Vector3 direction     = target.position - transform.position;
         transform.rotation    = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
@@ -162,9 +163,17 @@ public class EnemyMovementBehavior : MonoBehaviour
     /// </summary>
     private void MoveToTarget()
     {
-        if (target == null) { return; }
+        if (target == null)
+        {
+            target = GameObject.Find("Player").transform;
+        }
 
         var dir = (target.position - transform.position).normalized;
+
+        if (controller == null)
+        {
+            controller = GetComponent<CharacterController>();
+        } 
         controller.Move(dir * movementSpeed * Time.deltaTime);
     }
 
@@ -175,6 +184,10 @@ public class EnemyMovementBehavior : MonoBehaviour
     private void HeadTowardsPlayerFunc()
     {
         target = _playerXform;
+        if (target == null)
+        {
+            _playerXform = GameObject.Find("Player").transform;
+        }
         LookAtTarget();
         MoveToTarget();
     }

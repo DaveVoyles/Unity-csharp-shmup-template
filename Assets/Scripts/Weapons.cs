@@ -18,6 +18,7 @@ public class Weapons : MonoBehaviour {
     private const float DEFAULT_BULLET_VEL_X  = 40f;
     private const int   DEFAULT_BULLET_DMG    = 1;
     private const float DEFAULT_FIRE_RATE     = 0.035f;
+    private const string _BULLET_POOL_STRING  = "BulletPool";
     private float       _fireRate             = 0.035f;     // time between shots
 
     public enum WeaponType{
@@ -34,8 +35,8 @@ public class Weapons : MonoBehaviour {
     {
         // Create an inventory, and store the first weapon in there
         _weaponInventory = new bool[ System.Enum.GetValues(typeof (WeaponType)).Length];
-        _player          = gameObject.                    GetComponent<Player>();
-        _pool            = GameObject.Find("GameManager").GetComponent<GameManager>().BulletPool;
+        _player          = gameObject.GetComponent<Player>();
+        _pool            = PoolManager.Pools[_BULLET_POOL_STRING];
     }
  
     public void  SwitchToWeapon ( int weapon  ){

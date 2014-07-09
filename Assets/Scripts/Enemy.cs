@@ -18,16 +18,6 @@ public class Enemy : MonoBehaviour
     public Transform               powerupXform;
     /// <summary> How many points is this enemy worth when destroyed? </summary>
     public int                     scoreValue         = 5;
-
-    private Transform              _xform; // current transform of enemy, cached for perf during init
-    private SoundManager           _soundManager;
-    public Transform               _bulletXform;
-    private ParticleEffectsManager _particleManager;
-    private SpawnPool              _pool;
-    private float                  _bulletSpeed       = -16f;  // neg, so that it goes from right to left
-    private Color                  _startingColor;
-    private SpawnManager           _spawnManager      = null;
-
     /// <summary> SpawnManager sets enemy type when spawning enemies </summary>
     public enum EnemyType
     {
@@ -41,13 +31,27 @@ public class Enemy : MonoBehaviour
     public EnemyType enemyType = EnemyType.WaitForPlayer;
 
 
+    private Transform              _xform; 
+    private SoundManager           _soundManager;
+    public Transform               _bulletXform;
+    private ParticleEffectsManager _particleManager;
+    private SpawnPool              _pool;
+    // neg, so that it goes from right to left
+    private float                  _bulletSpeed       = -16f;  
+    private Color                  _startingColor;
+    private SpawnManager           _spawnManager      = null;
+    private const string _BULLET_POOL_STRING          = "BulletPool";
+
+
+
+    
     private void Start()
     {
         _xform           = transform; 
         _startingColor   = renderer.material.color; 
-        _pool            = GameObject.Find("GameManager").    GetComponent<GameManager>().BulletPool;
+        _pool            = PoolManager.Pools[_BULLET_POOL_STRING];
         _particleManager = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
-        _spawnManager    = GameObject.Find("SpawnMananger").  GetComponent<SpawnManager>();
+        _spawnManager    = GameObject.Find("SpawnMananger").GetComponent<SpawnManager>();
     }
 
 
@@ -86,6 +90,7 @@ public class Enemy : MonoBehaviour
             Explode();
         }
     }
+
 
     /// <summary>
     /// Particles and sound effects when object is destroyed

@@ -32,11 +32,27 @@ public class SwarmBehavior : MonoBehaviour
     private const string    _nameOfPool       = "BulletPool";
     private SpawnPool       _pool             = null;
     private Transform       _playerXform      = null;
+    private bool            _isActive         = false;
 
 
     protected virtual void Start()
     {
-        if (droneXform == null){
+        //if (droneXform == null){
+        //    Debug.Log("Please assign a drone prefab.");
+        //    return;
+        //}
+
+        //_spawnPointXform = GameObject.Find("EnemySpawnPoint").transform;
+        //_playerXform     = GameObject.Find("Player").transform;
+        //_pool            = PoolManager.Pools[_nameOfPool];
+        GameEventManager.GameStart += GameStart;
+
+    }
+
+    private void GameStart()
+    {
+        if (droneXform == null)
+        {
             Debug.Log("Please assign a drone prefab.");
             return;
         }
@@ -44,7 +60,7 @@ public class SwarmBehavior : MonoBehaviour
         _spawnPointXform = GameObject.Find("EnemySpawnPoint").transform;
         _playerXform     = GameObject.Find("Player").transform;
         _pool            = PoolManager.Pools[_nameOfPool];
-
+        _isActive        = true;
     }
 
     /// <summary>
@@ -52,6 +68,10 @@ public class SwarmBehavior : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        if (_playerXform == null)
+        {
+            _playerXform = GameObject.Find("Player").transform;
+        }
         transform.position = _playerXform.position;
     }
 

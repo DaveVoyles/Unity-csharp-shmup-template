@@ -32,6 +32,8 @@
  *  Dave Voyles - June 2014
  */
 
+using System.Diagnostics;
+
 public static class GameEventManager
 {
     public delegate void GameEvent();

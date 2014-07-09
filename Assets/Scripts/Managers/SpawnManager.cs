@@ -37,6 +37,7 @@ public class SpawnManager : MonoBehaviour
     private Transform _enemySpawnPointXform  = null;
     private Transform _xForm                 = null;
     private string _pathOne                  = "path1";
+    private const string _BULLET_POOL_STRING = "BulletPool";
     private float _bulletSpeed               = -16f;  // neg, so that it goes from right to left
 
     // Expose these to the editor
@@ -68,7 +69,8 @@ public class SpawnManager : MonoBehaviour
 	{
         SetProperties();
         ToggleWhichEnemiesCanSpawn();
-    }
+	}
+
 
     /// <summary>
     /// Instantiates the values for all private properties
@@ -76,7 +78,7 @@ public class SpawnManager : MonoBehaviour
     private void SetProperties()
     {
         _xForm                    = transform;
-        _pool                     = GameObject.Find("GameManager").        GetComponent<GameManager>().BulletPool;
+        _pool                     = PoolManager.Pools[_BULLET_POOL_STRING];
         swarmBehavior             = GameObject.Find("SwarmBehaviorPrefab").GetComponent<SwarmBehavior>();
 
         // SWARM BEHAVIORS

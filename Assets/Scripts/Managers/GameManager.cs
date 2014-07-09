@@ -68,20 +68,25 @@ public class GameManager : MonoBehaviour
 
 
     /// <summary>
-    /// Set up all of the global properties: Player, bullet & particle pools & set game difficulty
+    /// Listen for GameStart event, which is triggered by the Start Screen
     /// </summary>
     private void Start()
     {
-  //      GameEventManager.GameStart += GameStart;
-        GameStart();
+        GameEventManager.GameStart += GameStart;
     }
 
+
+    /// <summary>
+    /// Set up all of the global properties: Player, bullet & particle pools & set game difficulty
+    /// </summary>
     private void GameStart()
     {
         SetObjectPools();
         //TODO Tie this into the menus 
         SetDifficulty();
+        print("GameStart is called");
     }
+
 
     /// <summary>
     /// Grab a sound manager and play a track
@@ -92,15 +97,16 @@ public class GameManager : MonoBehaviour
         _soundManager.PlayClip(backgroundMusic, false);
     }
 
+
     /// <summary>
     /// Creates a reference to object pools in the game
-    /// //TODO: Do I never need this here?
     /// </summary>
     private void SetObjectPools()
     {
         BulletPool   = PoolManager.Pools[_BULLET_POOL_STRING];
         ParticlePool = PoolManager.Pools[_PARTICLE_POOL_STRING];
     }
+
 
     //-----------------------------------------------------------------------------------------------
     //------------------------------------- Difficulty Settings -------------------------------------

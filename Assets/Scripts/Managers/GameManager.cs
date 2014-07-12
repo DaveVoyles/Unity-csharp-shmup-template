@@ -19,7 +19,6 @@ public class GameManager : MonoBehaviour
     private const string      _BULLET_POOL_STRING        = "BulletPool";
     private const string      _PARTICLE_POOL_STRING      = "ParticlePool";
     private int               _respawnTime               = 3;
-    private SoundManager      _soundManager;
     private static GameObject _GMGameObj;
     
     //----------------------
@@ -85,16 +84,6 @@ public class GameManager : MonoBehaviour
         //TODO Tie this into the menus 
         SetDifficulty();
         print("GameStart is called");
-    }
-
-
-    /// <summary>
-    /// Grab a sound manager and play a track
-    /// </summary>
-    private void SetSoundMananger()
-    {
-        _soundManager = SoundManager.GetSingleton();
-        _soundManager.PlayClip(backgroundMusic, false);
     }
 
 

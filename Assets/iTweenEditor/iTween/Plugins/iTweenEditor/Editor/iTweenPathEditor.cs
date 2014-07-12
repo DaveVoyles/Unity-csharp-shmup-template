@@ -1,5 +1,5 @@
 //by Bob Berkebile : Pixelplacement : http://www.pixelplacement.com
-
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -95,3 +95,4 @@ public class iTweenPathEditor : Editor
 		} // dkoontz
 	}
 }
+#endif

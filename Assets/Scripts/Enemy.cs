@@ -32,7 +32,6 @@ public class Enemy : MonoBehaviour
 
 
     private Transform              _xform; 
-    private SoundManager           _soundManager;
     public Transform               _bulletXform;
     private ParticleEffectsManager _particleManager;
     private SpawnPool              _pool;

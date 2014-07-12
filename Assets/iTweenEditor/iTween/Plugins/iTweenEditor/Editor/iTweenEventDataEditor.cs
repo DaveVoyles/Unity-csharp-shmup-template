@@ -22,6 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
@@ -350,3 +351,5 @@ public class iTweenEventDataEditor : Editor {
 		previousType = evt.type;
 	}
 }
+
+#endif

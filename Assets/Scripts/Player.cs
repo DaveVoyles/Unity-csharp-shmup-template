@@ -5,8 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Player : MonoBehaviour
-{
-    private SoundManager _soundManager              = null;        
+{  
     private float        _nextFire                  = 0;          
     private float        _playerSpeed               = 18f;
     private enum State                                { Playing, Explosion, Invincible }
@@ -44,7 +43,6 @@ public class Player : MonoBehaviour
         xform.position            = _playerSpawnPoint.position;                    // Set player pos to spawnPoint pos
         _pool                     = _gm.BulletPool;
         _particleManager          = GameObject.Find("ParticleManager").GetComponent<ParticleEffectsManager>();
-        _soundManager             = SoundManager.GetSingleton();
         weapons                   = GetComponent<Weapons>();
 
         GameEventManager.GameStart += GameStart;

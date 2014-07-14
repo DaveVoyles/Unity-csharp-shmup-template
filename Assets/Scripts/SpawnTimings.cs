@@ -38,8 +38,8 @@ public class SpawnTimings : MonoBehaviour
         StartCoroutine(_spawnManager.SpawnEnemiesIncrementally(_enemySeekerPF, 3, 2));
         print(_spawnManager.numOfEnemiesInScene);
         yield return new WaitForSeconds(3f);
-        StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
-        print(_spawnManager.numOfEnemiesInScene);
+        //StartCoroutine(_spawnManager.SpawnOnAPath(_pathEnemyThree, 3, 4, 1, _pathOne));
+        //print(_spawnManager.numOfEnemiesInScene);
         yield return new WaitForSeconds(4.5f);
         StartCoroutine(_spawnManager.SpawnStationaryEnemy(1f, 3, _bulletSpeed));
         yield return new WaitForSeconds(4.5f);

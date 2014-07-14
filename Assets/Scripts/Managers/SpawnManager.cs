@@ -95,12 +95,12 @@ public class SpawnManager : MonoBehaviour
     /// </summary>
     private void ToggleWhichEnemiesCanSpawn()
     {
-        if (canSpawnPath){
-            StartCoroutine(SpawnOnAPath(pathEnemyXform, 1, timeToRunPath, pathSpawnInterval, _pathOne));
-        }
-        if (canSpawnRandomPath){
-            StartCoroutine(SpawnEnemyOnRandomPath(enemyXform, 3, timeToRunPath, pathSpawnInterval));
-        }
+        //if (canSpawnPath){
+        //    StartCoroutine(SpawnOnAPath(pathEnemyXform, 1, timeToRunPath, pathSpawnInterval, _pathOne));
+        //}
+        //if (canSpawnRandomPath){
+        //    StartCoroutine(SpawnEnemyOnRandomPath(enemyXform, 3, timeToRunPath, pathSpawnInterval));
+        //}
         if (canSpawnStationary){
             StartCoroutine(SpawnStationaryEnemy(3,3,_bulletSpeed));
         }
@@ -131,27 +131,27 @@ public class SpawnManager : MonoBehaviour
     /// <param name="speed">How quickly should it run this path?</param>
     /// <param name="interval">How much separation between enemy spawns?</param>
     /// <param name="pathName">which path should we spawn on?</param>
-    public IEnumerator SpawnOnAPath(Transform enemyTransform, int numToSpawn, float speed, float interval, string pathName)
-    {
-        // How many enemies should we spawn?
-        var count = numToSpawn;
-        while (count > 0)
-        {
-            // Grab an instance of the enemy transform
-            var pathEnemyInstance = _pool.Spawn(enemyTransform);
-            var iTweenMoveToPath  = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+    //public IEnumerator SpawnOnAPath(Transform enemyTransform, int numToSpawn, float speed, float interval, string pathName)
+    //{
+    //    // How many enemies should we spawn?
+    //    var count = numToSpawn;
+    //    while (count > 0)
+    //    {
+    //        // Grab an instance of the enemy transform
+    //        var pathEnemyInstance = _pool.Spawn(enemyTransform);
+    //        var iTweenMoveToPath  = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
-            // Enemy follows this path
-            iTweenMoveToPath.FollowPath(pathName, speed, pathEaseType);
-            count--;
+    //        // Enemy follows this path
+    //        iTweenMoveToPath.FollowPath(pathName, speed, pathEaseType);
+    //        count--;
 
-            // Add enemy to the list, so that we can track how many are on screen at once
-            numOfEnemiesInScene++;
+    //        // Add enemy to the list, so that we can track how many are on screen at once
+    //        numOfEnemiesInScene++;
 
-            // call this function, every (x) seconds
-            yield return new WaitForSeconds(interval);
-        }
-    }
+    //        // call this function, every (x) seconds
+    //        yield return new WaitForSeconds(interval);
+    //    }
+    //}
 
 
     /// <summary>
@@ -161,28 +161,28 @@ public class SpawnManager : MonoBehaviour
     /// <param name="numToSpawn">How many?</param>
     /// <param name="speed">How quickly should it run this path?</param>
     /// <param name="interval">How much separation between enemy spawns?</param>
-    public IEnumerator SpawnEnemyOnRandomPath(Transform enemyTransform, int numToSpawn, float speed, float interval)
-    {
-        // How many enemies should we spawn?
-        var count = numToSpawn;
-        while (count > 0)
-        {
-            // Grab an instance of the enemy transform
-            var pathEnemyInstance = _pool.Spawn(enemyTransform);
-            var iTweenMoveToPath  = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
+    //public IEnumerator SpawnEnemyOnRandomPath(Transform enemyTransform, int numToSpawn, float speed, float interval)
+    //{
+    //    // How many enemies should we spawn?
+    //    var count = numToSpawn;
+    //    while (count > 0)
+    //    {
+    //        // Grab an instance of the enemy transform
+    //        var pathEnemyInstance = _pool.Spawn(enemyTransform);
+    //        var iTweenMoveToPath  = pathEnemyInstance.gameObject.GetComponent<iTweenMoveToPath>();
 
-            // Enemy follows this path
-            iTweenMoveToPath.FollowRandomPath();
-            count--;
+    //        // Enemy follows this path
+    //        iTweenMoveToPath.FollowRandomPath();
+    //        count--;
 
-            // Add enemy to the list, so that we can track how many are on screen at once
-            numOfEnemiesInScene++;
+    //        // Add enemy to the list, so that we can track how many are on screen at once
+    //        numOfEnemiesInScene++;
 
-            // call this function, every (x) seconds
-            yield return new WaitForSeconds(interval);
-        }
+    //        // call this function, every (x) seconds
+    //        yield return new WaitForSeconds(interval);
+    //    }
 
-    }
+    //}
 
     //----------------------------------------------------------------------------------------------
     //---------------------------------- Spawning Functions ----------------------------------------

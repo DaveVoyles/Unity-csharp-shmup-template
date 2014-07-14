@@ -74,6 +74,7 @@ namespace Shooter
 
 		private void Unity_Loaded()
 		{
+			P31WinPhoneHelpers.UIHelper.initialize( Dispatcher );
 			SetupGeolocator();
 		}
 

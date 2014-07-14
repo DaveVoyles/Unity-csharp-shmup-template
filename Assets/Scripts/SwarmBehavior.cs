@@ -81,8 +81,8 @@ public class SwarmBehavior : MonoBehaviour
     /// </summary>
     /// <returns> Vector 3 of a random spawn point, within 20 pixels x & y of the original</returns>
     private Vector3 GeneratedSpawnPoint()
-    {
-        var position               = _spawnPointXform.position;
+    {   
+        var position               = GameObject.Find("EnemySpawnPoint").transform.position;
         const int randomRangeValue = 10;
         var randomSpawnPoint       = new Vector3(position.x + Random.Range(0, randomRangeValue),
                                                  position.y + Random.Range(-randomRangeValue, randomRangeValue), position.y);
